@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+  <title>Wormhole - Spacetime Observatory</title>
+  <script type="module" crossorigin src="./assets/wormhole-DglNpWj0.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-YP0FEG5d.js">
+  <link rel="modulepreload" crossorigin href="./assets/auth-CR3qn4r5.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-Dr5TeDim.js">
+  <link rel="modulepreload" crossorigin href="./assets/controls-DXhDXXzc.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-pA4yY1qD.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div id="hud">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">Spacetime Observatory / Wormhole</div>
+      <div class="user-info">
+        <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
+        <button class="glass-btn" onclick="window.location.href='./equations.html'">Equations</button>
+      </div>
+    </div>
+    
+    <!-- Info Panel -->
+    <div class="info-panel glass-panel">
+      <h3 style="margin-bottom: 16px; font-size: 18px;">Physics Data</h3>
+      
+      <div class="info-row">
+        <span class="glass-label">Distance</span>
+        <span class="info-value" id="value-distance">2.00 r_0</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Warp Strength</span>
+        <span class="info-value" id="value-warp">25%</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Exotic Matter</span>
+        <span class="info-value" id="value-exotic">Yes</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">At Throat</span>
+        <span class="info-value" id="value-throat">No</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Performance</span>
+        <span class="info-value" id="value-fps">60 FPS</span>
+      </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls glass-panel">
+      <div class="control-group">
+        <label class="glass-label">Observer Distance (r/r_0)</label>
+        <div class="slider-container">
+          <input 
+            type="range" 
+            id="slider-distance" 
+            class="glass-slider" 
+            min="0.5" 
+            max="5" 
+            step="0.1" 
+            value="2"
+          >
+          <span class="slider-value" id="slider-value-distance">2.00 r_0</span>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button class="glass-btn" id="btn-reset">Reset View</button>
+        <button class="glass-btn" onclick="window.location.href='./equations.html'">
+          How It Works
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>© 2026 Turki Abdullah. All Rights Reserved.</p>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+  <title>Home - Spacetime Observatory</title>
+  <script type="module" crossorigin src="./assets/home-_mTgl-um.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-YP0FEG5d.js">
+  <link rel="modulepreload" crossorigin href="./assets/auth-CR3qn4r5.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-Dr5TeDim.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-pA4yY1qD.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div class="home-container">
+    <h1 class="glass-title">Spacetime Observatory</h1>
+    <p class="glass-subtitle">Explore the fabric of spacetime</p>
+    
+    <div class="mode-selection">
+      <div class="mode-card glass-panel glow-border" onclick="window.location.href='./blackhole.html'">
+        <h2>Black Hole</h2>
+        <p>Explore Schwarzschild spacetime, gravitational time dilation, and the event horizon</p>
+      </div>
+      
+      <div class="mode-card glass-panel glow-border" onclick="window.location.href='./wormhole.html'">
+        <h2>Wormhole</h2>
+        <p>Traverse a Morris-Thorne wormhole and witness exotic matter violation</p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <button class="glass-btn" onclick="window.location.href='./equations.html'">
+        View Equations
+      </button>
+      <button class="glass-btn" onclick="window.location.href='./about.html'">
+        About & Rights
+      </button>
+      <button class="glass-btn" id="btn-logout">
+        Logout
+      </button>
+    </div>
+    
+    <div style="margin-top: 32px;">
+      <p class="glass-text" style="text-align: center;">
+        Welcome, <span id="user-name"></span>
+      </p>
+    </div>
+  </div>
+  
+</body>
+</html>
