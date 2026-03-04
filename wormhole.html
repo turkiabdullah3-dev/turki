@@ -21,38 +21,51 @@
     
     <!-- Info Panel -->
     <div class="info-panel glass-panel">
-      <h3 style="margin-bottom: 16px; font-size: 18px;">Physics Data</h3>
+      <h3 style="margin-bottom: 16px; font-size: 18px;">🌀 Morris-Thorne Wormhole</h3>
+      
+      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+        A theoretical passage through spacetime connecting two regions. This visualization shows the classic Morris-Thorne geometry with exotic matter at the throat.
+      </p>
       
       <div class="info-row">
-        <span class="glass-label">Distance</span>
-        <span class="info-value" id="value-distance">2.00 r_0</span>
+        <span class="glass-label">Distance from Throat</span>
+        <span class="info-value" id="value-distance">2.00 r₀</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">Warp Strength</span>
+        <span class="glass-label">Throat Radius</span>
+        <span class="info-value" id="value-throat-radius">1.00 r₀</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Spacetime Curvature</span>
         <span class="info-value" id="value-warp">25%</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">Exotic Matter</span>
-        <span class="info-value" id="value-exotic">Yes</span>
+        <span class="glass-label">Exotic Matter Status</span>
+        <span class="info-value" id="value-exotic">Required ⚠️</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">At Throat</span>
-        <span class="info-value" id="value-throat">No</span>
-      </div>
-      
-      <div class="info-row">
-        <span class="glass-label">Performance</span>
+        <span class="glass-label">Frame Rate</span>
         <span class="info-value" id="value-fps">60 FPS</span>
       </div>
+      
+      <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+        📌 Tip: Move the slider to explore different distances from the wormhole throat. Note the exotic matter (negative energy) required to keep it open.
+      </p>
     </div>
     
     <!-- Controls -->
     <div class="controls glass-panel">
+      <h4 style="margin-bottom: 12px; font-size: 14px;">⚙️ Interactive Controls</h4>
+      
       <div class="control-group">
-        <label class="glass-label">Observer Distance (r/r_0)</label>
+        <label class="glass-label">Distance from Throat (r/r₀)</label>
+        <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+          Adjust your position relative to the wormhole throat. The throat is at r₀.
+        </p>
         <div class="slider-container">
           <input 
             type="range" 
@@ -63,14 +76,14 @@
             step="0.1" 
             value="2"
           >
-          <span class="slider-value" id="slider-value-distance">2.00 r_0</span>
+          <span class="slider-value" id="slider-value-distance">2.00 r₀</span>
         </div>
       </div>
       
       <div style="display: flex; gap: 12px; margin-top: 16px;">
-        <button class="glass-btn" id="btn-reset">Reset View</button>
-        <button class="glass-btn" onclick="window.location.href='./equations.html'">
-          How It Works
+        <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
+        <button class="glass-btn" onclick="window.location.href='./equations.html'" style="flex: 1;">
+          📊 View Equations
         </button>
       </div>
     </div>
