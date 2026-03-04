@@ -521,6 +521,10 @@ export class WormholeScene {
     const tidalForcesEl = document.getElementById('tidal-forces');
     const fpsEl = document.getElementById('render-fps');
     
+    // Get HUD panel for visual effects
+    const hudPanels = document.querySelectorAll('[style*="position: absolute"][style*="top: 20px"][style*="right: 20px"]');
+    const hudPanel = hudPanels[0];
+    
     if (throatRadiusEl) {
       const radius = this.physics.throatRadius || 1.5;
       throatRadiusEl.textContent = `${radius.toFixed(2)} M`;
@@ -541,6 +545,7 @@ export class WormholeScene {
       timeDilationEl.textContent = alpha.toFixed(3);
     }
     
+    let dangerLevel = 0;
     if (tidalForcesEl) {
       // Tidal force approximation
       const cameraZ = Math.abs(this.camera.position.z);
@@ -554,10 +559,32 @@ export class WormholeScene {
       const tidalAccel = Math.pow(throatRadius, 2) / Math.pow(Math.max(distance, throatRadius), 3);
       
       let level = 'Safe';
-      if (tidalAccel > 0.5) level = 'High';
-      else if (tidalAccel > 0.2) level = 'Moderate';
+      dangerLevel = tidalAccel / 0.5; // Normalize to 0-1 range
+      
+      if (tidalAccel > 0.5) {
+        level = 'High';
+        dangerLevel = Math.min(1, tidalAccel / 0.5);
+      } else if (tidalAccel > 0.2) {
+        level = 'Moderate';
+        dangerLevel = (tidalAccel / 0.2) * 0.5;
+      }
       
       tidalForcesEl.textContent = `${level} (${tidalAccel.toFixed(3)})`;
+    }
+    
+    // Apply visual danger feedback to HUD
+    if (hudPanel) {
+      if (dangerLevel > 0.5) {
+        // High danger - pulsing red glow
+        const pulse = Math.sin(performance.now() * 0.005) * 0.5 + 0.5;
+        const glowIntensity = 20 * pulse + 10;
+        hudPanel.style.borderColor = `rgb(${255 * dangerLevel}, ${150 * (1 - dangerLevel)}, ${100})`;
+        hudPanel.style.boxShadow = `0 0 ${glowIntensity}px rgba(255, 107, 157, ${0.5 + pulse * 0.3})`;
+      } else {
+        // Safe - cyan glow
+        hudPanel.style.borderColor = '#00d9ff';
+        hudPanel.style.boxShadow = '0 0 20px rgba(0, 217, 255, 0.3)';
+      }
     }
     
     if (fpsEl) {
