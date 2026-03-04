@@ -4,7 +4,7 @@
 import WormholePhysics from '../physics/wormhole.js';
 import { safeNumber } from '../physics/safety.js';
 
-export class WormholeScene {
+class WormholeScene {
   constructor(canvasRoot) {
     this.canvasRoot = canvasRoot;
     this.physics = new WormholePhysics();

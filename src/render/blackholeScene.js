@@ -4,7 +4,7 @@
 import BlackHolePhysics from '../physics/blackhole.js';
 import { safeNumber } from '../physics/safety.js';
 
-export class BlackHoleScene {
+class BlackHoleScene {
   constructor(canvasRoot) {
     this.canvasRoot = canvasRoot;
     this.physics = new BlackHolePhysics();
