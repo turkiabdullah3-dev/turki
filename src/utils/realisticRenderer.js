@@ -40,7 +40,7 @@ export class RealisticBlackHoleRenderer {
     const rs = this.visualRs;
     
     // Create visible dark sphere (stable on all devices)
-    const geometry = new THREE.SphereGeometry(rs, 128, 128);
+    const geometry = new THREE.SphereGeometry(rs, 64, 64); // تقليل segments
     const material = new THREE.MeshStandardMaterial({
       color: 0x10131a,
       emissive: 0x1a0f2e,
@@ -62,8 +62,8 @@ export class RealisticBlackHoleRenderer {
   createAccretionDisk() {
     const innerRadius = this.visualRs * 1.8;
     const outerRadius = this.visualRs * 4.5;
-    const segments = 64;
-    const rings = 48;
+    const segments = 48; // تقليل segments
+    const rings = 32; // تقليل rings
     
     const geometry = new THREE.BufferGeometry();
     const vertices = [];
@@ -148,7 +148,7 @@ export class RealisticBlackHoleRenderer {
     const r_ph = this.visualRph;
     
     // Create bright glowing ring
-    const torusGeometry = new THREE.TorusGeometry(r_ph, r_ph * 0.08, 32, 128);
+    const torusGeometry = new THREE.TorusGeometry(r_ph, r_ph * 0.08, 24, 64); // تقليل segments
     
     const material = new THREE.MeshStandardMaterial({
       color: 0xffff00,
@@ -174,7 +174,7 @@ export class RealisticBlackHoleRenderer {
   createPhotonRingHalo() {
     const r_ph = this.visualRph;
     
-    const particleCount = 200;
+    const particleCount = 120; // تقليل particles لتحسين الأداء
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);

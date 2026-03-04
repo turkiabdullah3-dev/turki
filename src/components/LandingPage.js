@@ -48,24 +48,36 @@ export class LandingPage {
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'landing-buttons';
     
-    const blackHoleBtn = document.createElement('button');
-    blackHoleBtn.className = 'glow-button';
-    blackHoleBtn.textContent = 'Enter Black Hole';
-    blackHoleBtn.addEventListener('click', () => this.callbacks.onBlackHoleClick());
+    // Dual portal button - merged Black Hole and Wormhole
+    const dualPortalBtn = document.createElement('div');
+    dualPortalBtn.className = 'dual-portal-btn';
     
-    const wormholeBtn = document.createElement('button');
-    wormholeBtn.className = 'glow-button';
-    wormholeBtn.textContent = 'Enter Wormhole';
-    wormholeBtn.addEventListener('click', () => this.callbacks.onWormholeClick());
+    const blackHolePortal = document.createElement('button');
+    blackHolePortal.className = 'portal-button portal-left';
+    blackHolePortal.innerHTML = '<span class="portal-icon">●</span><span class="portal-label">Black Hole</span>';
+    blackHolePortal.addEventListener('click', () => this.callbacks.onBlackHoleClick());
+    blackHolePortal.addEventListener('mouseenter', () => this.activatePortal('left'));
+    blackHolePortal.addEventListener('mouseleave', () => this.deactivatePortal('left'));
+    
+    const wormholePortal = document.createElement('button');
+    wormholePortal.className = 'portal-button portal-right';
+    wormholePortal.innerHTML = '<span class="portal-icon">◇</span><span class="portal-label">Wormhole</span>';
+    wormholePortal.addEventListener('click', () => this.callbacks.onWormholeClick());
+    wormholePortal.addEventListener('mouseenter', () => this.activatePortal('right'));
+    wormholePortal.addEventListener('mouseleave', () => this.deactivatePortal('right'));
 
     const equationsBtn = document.createElement('button');
-    equationsBtn.className = 'glow-button';
-    equationsBtn.textContent = 'Equations & How It Works';
+    equationsBtn.className = 'glow-button equations-btn';
+    equationsBtn.textContent = '∑ Equations & How It Works';
     equationsBtn.addEventListener('click', () => this.callbacks.onEquationsClick());
     
-    buttonContainer.appendChild(blackHoleBtn);
-    buttonContainer.appendChild(wormholeBtn);
+    dualPortalBtn.appendChild(blackHolePortal);
+    dualPortalBtn.appendChild(wormholePortal);
+    
+    buttonContainer.appendChild(dualPortalBtn);
     buttonContainer.appendChild(equationsBtn);
+    
+    this.portals = { left: blackHolePortal, right: wormholePortal };
     
     content.appendChild(title);
     content.appendChild(subtitle);
@@ -290,6 +302,16 @@ export class LandingPage {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     }
+  }
+
+  activatePortal(side) {
+    const portal = this.portals[side];
+    portal.classList.add('portal-active');
+  }
+
+  deactivatePortal(side) {
+    const portal = this.portals[side];
+    portal.classList.remove('portal-active');
   }
 
   dispose() {

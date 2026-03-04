@@ -35,7 +35,7 @@ export class WormholeScene {
     this.frameCounter = 0;
     this.lastFrameTime = performance.now();
     this.lastHudUpdateTime = 0;
-    this.hudUpdateIntervalMs = this.isMobile ? 150 : 100;
+    this.hudUpdateIntervalMs = this.isMobile ? 200 : 120; // تقليل تحديث HUD لتحسين الأداء
     this.handleResize = null;
     this.handleMouseMove = null;
     this.handleKeyDown = null;
@@ -201,12 +201,15 @@ export class WormholeScene {
     
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: window.devicePixelRatio <= 1.25,
-      alpha: true
+      antialias: false,
+      alpha: true,
+      powerPreference: 'high-performance',
+      precision: 'mediump'
     });
     this.syncRendererSize(true);
     this.renderer.setClearColor(0x000000, 1);
-    this.usePostProcessing = window.innerWidth >= 1100;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
+    this.usePostProcessing = false;
     
     // Enhanced rendering with bloom-like effect
     this.renderer.toneMappingExposure = 1.15;

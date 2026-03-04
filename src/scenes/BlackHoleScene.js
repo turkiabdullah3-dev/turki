@@ -35,7 +35,7 @@ export class BlackHoleScene {
     this.frameCounter = 0;
     this.lastFrameTime = performance.now();
     this.lastHudUpdateTime = 0;
-    this.hudUpdateIntervalMs = this.isMobile ? 140 : 90;
+    this.hudUpdateIntervalMs = this.isMobile ? 200 : 120; // تقليل تحديث HUD لتحسين الأداء
     this.handleResize = null;
     this.handleKeyDown = null;
     this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -214,11 +214,14 @@ export class BlackHoleScene {
     
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: window.devicePixelRatio <= 1.25,
-      alpha: true
+      antialias: false,
+      alpha: true,
+      powerPreference: 'high-performance',
+      precision: 'mediump'
     });
     this.syncRendererSize(true);
     this.renderer.setClearColor(0x000000, 1);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     this.usePostProcessing = false;
     
     // Enhanced rendering

@@ -32,8 +32,8 @@ export class RealisticWormholeRenderer {
    */
   createTunnel() {
     const length = this.physics.tunnelLength * 200;
-    const segments = 128;
-    const radialSegments = 32;
+    const segments = 64; // تقليل segments
+    const radialSegments = 24; // تقليل radial segments
     
     // Create tapered tunnel (wider at ends, narrower at throat)
     const geometry = new THREE.BufferGeometry();
@@ -112,8 +112,8 @@ export class RealisticWormholeRenderer {
     const torusGeometry = new THREE.TorusGeometry(
       throatRadius,
       throatRadius * 0.12,
-      32,
-      128
+      24,
+      64 // تقليل segments
     );
     
     const material = new THREE.MeshStandardMaterial({
