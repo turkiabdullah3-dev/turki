@@ -51,7 +51,8 @@ export class WormholeScene {
     page.className = 'experience-page';
     
     const sceneContainer = document.createElement('div');
-    sceneContainer.className = 'scene-container';
+    sceneContainer.className = 'scene-container scene-cosmic-bg';
+    this.sceneContainer = sceneContainer;
     
     const canvas = document.createElement('canvas');
     sceneContainer.appendChild(canvas);
@@ -206,7 +207,7 @@ export class WormholeScene {
       precision: 'mediump'
     });
     this.syncRendererSize(true);
-    this.renderer.setClearColor(0x000000, 1);
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     this.usePostProcessing = false;
     
@@ -215,9 +216,6 @@ export class WormholeScene {
     this.renderer.toneMapping = THREE.ReinhardToneMapping;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    // Lightweight live background texture (replaces heavy particle starfield)
-    this.createLiveBackdrop();
-    
     // Create realistic wormhole visualization
     this.realisticRenderer = new RealisticWormholeRenderer(this.physics, this.scene);
     
@@ -246,57 +244,6 @@ export class WormholeScene {
 
     this.handleResize = () => this.onWindowResize();
     window.addEventListener('resize', this.handleResize);
-  }
-
-  createLiveBackdrop() {
-    const textureSize = this.isMobile ? 512 : 768;
-    const bgCanvas = document.createElement('canvas');
-    bgCanvas.width = textureSize;
-    bgCanvas.height = textureSize;
-    const bgCtx = bgCanvas.getContext('2d');
-
-    const gradient = bgCtx.createRadialGradient(
-      textureSize * 0.5,
-      textureSize * 0.5,
-      textureSize * 0.05,
-      textureSize * 0.5,
-      textureSize * 0.5,
-      textureSize * 0.6
-    );
-    gradient.addColorStop(0, '#291246');
-    gradient.addColorStop(0.45, '#120a28');
-    gradient.addColorStop(1, '#03050d');
-    bgCtx.fillStyle = gradient;
-    bgCtx.fillRect(0, 0, textureSize, textureSize);
-
-    const starCount = this.isMobile ? 110 : 180;
-    for (let i = 0; i < starCount; i++) {
-      const x = Math.random() * textureSize;
-      const y = Math.random() * textureSize;
-      const r = Math.random() * 1.2 + 0.2;
-      const alpha = Math.random() * 0.7 + 0.2;
-      bgCtx.fillStyle = `rgba(${180 + Math.floor(Math.random() * 70)}, ${200 + Math.floor(Math.random() * 55)}, 255, ${alpha})`;
-      bgCtx.beginPath();
-      bgCtx.arc(x, y, r, 0, Math.PI * 2);
-      bgCtx.fill();
-    }
-
-    this.liveBackdropTexture = new THREE.CanvasTexture(bgCanvas);
-    this.liveBackdropTexture.wrapS = THREE.RepeatWrapping;
-    this.liveBackdropTexture.wrapT = THREE.RepeatWrapping;
-    this.liveBackdropTexture.repeat.set(1.2, 1.2);
-    this.liveBackdropTexture.colorSpace = THREE.SRGBColorSpace;
-
-    const backdropGeometry = new THREE.SphereGeometry(4200, this.isMobile ? 16 : 22, this.isMobile ? 12 : 16);
-    const backdropMaterial = new THREE.MeshBasicMaterial({
-      map: this.liveBackdropTexture,
-      side: THREE.BackSide,
-      transparent: true,
-      opacity: 0.95
-    });
-
-    this.liveBackdropMesh = new THREE.Mesh(backdropGeometry, backdropMaterial);
-    this.scene.add(this.liveBackdropMesh);
   }
 
   createWormhole() {
@@ -592,10 +539,11 @@ export class WormholeScene {
       this.realisticRenderer.update(this.frameCounter * 0.01);
     }
 
-    // Lightweight animated movement for live background texture
-    if (this.liveBackdropTexture && heavyUpdateFrame) {
-      this.liveBackdropTexture.offset.x += 0.00012;
-      this.liveBackdropTexture.offset.y += 0.00005;
+    // Lightweight CSS background parallax
+    if (this.sceneContainer && heavyUpdateFrame) {
+      const bgShiftX = Math.sin(this.frameCounter * 0.004) * 4;
+      const bgShiftY = Math.cos(this.frameCounter * 0.003) * 3;
+      this.sceneContainer.style.backgroundPosition = `${50 + bgShiftX}% ${50 + bgShiftY}%`;
     }
     
     this.frameCounter++;
@@ -701,10 +649,6 @@ export class WormholeScene {
           });
         }
       });
-    }
-    if (this.liveBackdropTexture) {
-      this.liveBackdropTexture.dispose();
-      this.liveBackdropTexture = null;
     }
     if (this.equationDisplay) {
       this.equationDisplay.dispose();
