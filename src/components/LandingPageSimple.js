@@ -37,9 +37,19 @@ export class LandingPageSimple {
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'landing-buttons';
     
+    // Dual portal wrapper
+    const dualPortalWrapper = document.createElement('div');
+    dualPortalWrapper.className = 'dual-portal-btn';
+    
+    // Black Hole portal button
+    const blackHolePortal = document.createElement('button');
+    blackHolePortal.className = 'portal-button portal-left';
+    blackHolePortal.innerHTML = '<span class="portal-icon">●</span><span class="portal-label">Black Hole</span>';
+    blackHolePortal.addEventListener('click', () => this.callbacks.onBlackHoleClick());
+    
     // Wormhole portal button
     const wormholePortal = document.createElement('button');
-    wormholePortal.className = 'portal-button';
+    wormholePortal.className = 'portal-button portal-right';
     wormholePortal.innerHTML = '<span class="portal-icon">◇</span><span class="portal-label">Wormhole</span>';
     wormholePortal.addEventListener('click', () => this.callbacks.onWormholeClick());
 
@@ -48,7 +58,9 @@ export class LandingPageSimple {
     equationsBtn.textContent = '∑ Equations & How It Works';
     equationsBtn.addEventListener('click', () => this.callbacks.onEquationsClick());
     
-    buttonContainer.appendChild(wormholePortal);
+    dualPortalWrapper.appendChild(blackHolePortal);
+    dualPortalWrapper.appendChild(wormholePortal);
+    buttonContainer.appendChild(dualPortalWrapper);
     buttonContainer.appendChild(equationsBtn);
     
     content.appendChild(title);

@@ -8,13 +8,21 @@
 /* === Hero Section === */
 .hero {
     position: relative;
-    height: 100vh;
+    height: auto;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     color: white;
     text-align: center;
+    padding: 2rem 0;
+}
+
+.hero.hero-premium {
+    height: auto;
+    min-height: auto;
+    padding: 3rem 2rem;
 }
 
 .hero-bg {
@@ -34,8 +42,11 @@
 .hero-content {
     position: relative;
     z-index: 50;
-    max-width: 600px;
+    max-width: 1200px;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .hero h1 {
@@ -50,16 +61,112 @@
 
 .hero p {
     font-size: 1.3rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
     color: rgba(255, 255, 255, 0.9);
     animation: slideIn 0.8s ease-out 0.1s both;
+}
+
+/* === MAIN EXPERIENCES - DUAL PORTALS === */
+.main-experiences {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+    animation: slideIn 0.8s ease-out 0.2s both;
+}
+
+.experience-portal {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 220, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.experience-portal:hover {
+    border-color: rgba(0, 255, 220, 0.8);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 220, 0.3);
+    transform: scale(1.02);
+}
+
+.portal-visual {
+    font-size: 3rem;
+    text-align: center;
+    animation: float 3s ease-in-out infinite;
+    min-width: 80px;
+}
+
+.black-hole-portal .portal-visual {
+    color: #ff6b9d;
+    text-shadow: 0 0 10px #ff6b9d;
+}
+
+.wormhole-portal .portal-visual {
+    color: #00ffdc;
+    text-shadow: 0 0 10px #00ffdc;
+    animation: float 3s ease-in-out infinite 0.5s;
+}
+
+.portal-content {
+    text-align: right;
+}
+
+.portal-content h3 {
+    font-size: 1.5rem;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, #00ffdc, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.portal-content p {
+    margin: 0.3rem 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.portal-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-portal {
+    background: linear-gradient(135deg, #00ffdc, #00d4ff);
+    border: none;
+    color: #001a2e;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-portal:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 255, 220, 0.5);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 .hero-buttons {
     display: flex;
     gap: 1rem;
     justify-content: center;
-    animation: slideIn 0.8s ease-out 0.2s both;
+    flex-wrap: wrap;
+    animation: slideIn 0.8s ease-out 0.3s both;
 }
 
 /* === Features Section === */
@@ -78,6 +185,18 @@
     background-clip: text;
 }
 
+/* Feature Categories */
+.feature-category {
+    margin-bottom: 3rem;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #00ffdc;
+    text-align: right;
+}
+
 .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -91,7 +210,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    text-align: center;
+    text-align: right;
     transition: var(--transition);
     cursor: pointer;
 }
@@ -102,8 +221,15 @@
 }
 
 .feature-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.feature-card h4 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin: 0;
 }
 
 .feature-card h3 {
@@ -115,6 +241,7 @@
     color: var(--text-secondary);
     line-height: 1.6;
     flex-grow: 1;
+    margin: 0;
 }
 
 .feature-link {
@@ -123,11 +250,12 @@
     font-weight: 600;
     transition: var(--transition);
     display: inline-block;
+    text-align: right;
 }
 
 .feature-link:hover {
     color: var(--primary-color);
-    transform: translateX(4px);
+    transform: translateX(-4px);
 }
 
 /* === Experiences Section === */
@@ -320,6 +448,16 @@
     margin-bottom: 2rem;
 }
 
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn-primary {
+    margin: 0.5rem;
+}
 /* === Footer === */
 .home-footer {
     background: var(--bg-darker);
