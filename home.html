@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+  <title>Home - Spacetime Observatory</title>
+  <link rel="stylesheet" href="./styles/app.css">
+  <link rel="stylesheet" href="./styles/glass.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div class="home-container">
+    <h1 class="glass-title">Spacetime Observatory</h1>
+    <p class="glass-subtitle">Explore the fabric of spacetime</p>
+    
+    <div class="mode-selection">
+      <div class="mode-card glass-panel glow-border" onclick="window.location.href='./blackhole.html'">
+        <h2>Black Hole</h2>
+        <p>Explore Schwarzschild spacetime, gravitational time dilation, and the event horizon</p>
+      </div>
+      
+      <div class="mode-card glass-panel glow-border" onclick="window.location.href='./wormhole.html'">
+        <h2>Wormhole</h2>
+        <p>Traverse a Morris-Thorne wormhole and witness exotic matter violation</p>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <button class="glass-btn" onclick="window.location.href='./equations.html'">
+        View Equations
+      </button>
+      <button class="glass-btn" onclick="window.location.href='./about.html'">
+        About & Rights
+      </button>
+      <button class="glass-btn" id="btn-logout">
+        Logout
+      </button>
+    </div>
+    
+    <div style="margin-top: 32px;">
+      <p class="glass-text" style="text-align: center;">
+        Welcome, <span id="user-name"></span>
+      </p>
+    </div>
+  </div>
+  
+  <script type="module">
+    import CanvasRoot from './src/render/canvasRoot.js';
+    import SpaceBackground from './src/render/spaceBackground.js';
+    import auth from './src/core/auth.js';
+    import { sanitize } from './src/core/sanitize.js';
+    
+    // Require login
+    auth.requireLogin();
+    
+    // Display user name
+    const session = auth.getSession();
+    if (session) {
+      sanitize.setText(document.getElementById('user-name'), session.displayName);
+    }
+    
+    // Logout button
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      auth.logout();
+    });
+    
+    // Setup space background
+    const container = document.getElementById('canvas-container');
+    const canvasRoot = new CanvasRoot(container);
+    canvasRoot.init();
+    
+    const spaceBackground = new SpaceBackground(canvasRoot);
+    spaceBackground.init();
+    
+    // Animation loop
+    function animate(time) {
+      canvasRoot.clear('#000000');
+      spaceBackground.update(time);
+      spaceBackground.render(time);
+      spaceBackground.renderNebula();
+      requestAnimationFrame(animate);
+    }
+    animate(0);
+  </script>
+</body>
+</html>

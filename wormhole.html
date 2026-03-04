@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+  <title>Wormhole - Spacetime Observatory</title>
+  <link rel="stylesheet" href="./styles/app.css">
+  <link rel="stylesheet" href="./styles/glass.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div id="hud">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">Spacetime Observatory / Wormhole</div>
+      <div class="user-info">
+        <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
+        <button class="glass-btn" onclick="window.location.href='./equations.html'">Equations</button>
+      </div>
+    </div>
+    
+    <!-- Info Panel -->
+    <div class="info-panel glass-panel">
+      <h3 style="margin-bottom: 16px; font-size: 18px;">Physics Data</h3>
+      
+      <div class="info-row">
+        <span class="glass-label">Distance</span>
+        <span class="info-value" id="value-distance">2.00 r_0</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Warp Strength</span>
+        <span class="info-value" id="value-warp">25%</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Exotic Matter</span>
+        <span class="info-value" id="value-exotic">Yes</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">At Throat</span>
+        <span class="info-value" id="value-throat">No</span>
+      </div>
+      
+      <div class="info-row">
+        <span class="glass-label">Performance</span>
+        <span class="info-value" id="value-fps">60 FPS</span>
+      </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls glass-panel">
+      <div class="control-group">
+        <label class="glass-label">Observer Distance (r/r_0)</label>
+        <div class="slider-container">
+          <input 
+            type="range" 
+            id="slider-distance" 
+            class="glass-slider" 
+            min="0.5" 
+            max="5" 
+            step="0.1" 
+            value="2"
+          >
+          <span class="slider-value" id="slider-value-distance">2.00 r_0</span>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button class="glass-btn" id="btn-reset">Reset View</button>
+        <button class="glass-btn" onclick="window.location.href='./equations.html'">
+          How It Works
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>© 2026 Turki Abdullah. All Rights Reserved.</p>
+  </div>
+  
+  <script type="module">
+    import auth from './src/core/auth.js';
+    import CanvasRoot from './src/render/canvasRoot.js';
+    import SpaceBackground from './src/render/spaceBackground.js';
+    import WormholeScene from './src/render/wormholeScene.js';
+    import PostFX from './src/render/postFX.js';
+    import HUD from './src/ui/hud.js';
+    import Controls from './src/ui/controls.js';
+    import perf from './src/core/perf.js';
+    import { sanitize } from './src/core/sanitize.js';
+    
+    // Require login
+    auth.requireLogin();
+    
+    // Setup canvas
+    const container = document.getElementById('canvas-container');
+    const canvasRoot = new CanvasRoot(container);
+    if (!canvasRoot.init()) {
+      alert('Failed to initialize canvas');
+    }
+    
+    // Create scene components
+    const spaceBackground = new SpaceBackground(canvasRoot);
+    const wormholeScene = new WormholeScene(canvasRoot);
+    const postFX = new PostFX(canvasRoot);
+    
+    spaceBackground.init();
+    wormholeScene.init();
+    
+    // Setup HUD (custom for wormhole)
+    const hud = new HUD();
+    hud.init();
+    
+    // Setup controls
+    const controls = new Controls(
+      (distance) => {
+        wormholeScene.setDistance(distance);
+        const state = wormholeScene.getState();
+        updateWormholeHUD(state);
+      },
+      () => {
+        wormholeScene.setDistance(2);
+        const state = wormholeScene.getState();
+        updateWormholeHUD(state);
+      }
+    );
+    controls.init('wormhole');
+    
+    // Custom HUD update for wormhole
+    function updateWormholeHUD(state) {
+      const distanceEl = document.getElementById('value-distance');
+      const warpEl = document.getElementById('value-warp');
+      const exoticEl = document.getElementById('value-exotic');
+      const throatEl = document.getElementById('value-throat');
+      
+      if (distanceEl) sanitize.setText(distanceEl, `${state.r_normalized.toFixed(2)} r_0`);
+      if (warpEl) sanitize.setText(warpEl, `${(state.warpStrength * 100).toFixed(0)}%`);
+      if (exoticEl) sanitize.setText(exoticEl, state.exoticMatter < 0 ? 'Yes' : 'No');
+      if (throatEl) sanitize.setText(throatEl, state.atThroat ? 'Yes' : 'No');
+    }
+    
+    // Initial state
+    const initialDistance = controls.getValue();
+    wormholeScene.setDistance(initialDistance);
+    updateWormholeHUD(wormholeScene.getState());
+    
+    // Animation loop
+    function animate(time) {
+      // Clear
+      canvasRoot.clear('#000000');
+      
+      // Update
+      spaceBackground.update(time);
+      wormholeScene.update(time);
+      
+      // Render
+      spaceBackground.render(time);
+      wormholeScene.render(time);
+      spaceBackground.renderNebula();
+      postFX.apply(0.3, 0.2);
+      
+      // Update FPS
+      perf.fpsCounter.update();
+      hud.updateFPS();
+      
+      requestAnimationFrame(animate);
+    }
+    
+    animate(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+/* Main Application Styles */
+/* Owner: Turki Abdullah © 2026 */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Canvas container */
+#canvas-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* HUD overlay */
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+#hud > * {
+  pointer-events: auto;
+}
+
+/* Header */
+.header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.user-info {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Controls panel */
+.controls {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 400px;
+  max-width: 600px;
+  pointer-events: auto;
+}
+
+.control-group {
+  margin-bottom: 20px;
+}
+
+.control-group:last-child {
+  margin-bottom: 0;
+}
+
+.slider-container {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.slider-value {
+  min-width: 80px;
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+/* Info panel */
+.info-panel {
+  position: absolute;
+  top: 100px;
+  right: 40px;
+  width: 300px;
+  pointer-events: auto;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.info-value {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+/* Footer */
+.footer {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+/* Login page */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-box h1 {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.error-message {
+  background: rgba(255, 50, 50, 0.2);
+  border: 1px solid rgba(255, 50, 50, 0.5);
+  color: #ff6666;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Home page */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px;
+  text-align: center;
+}
+
+.mode-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin: 48px 0;
+  max-width: 800px;
+  width: 100%;
+}
+
+.mode-card {
+  cursor: pointer;
+  text-align: center;
+  padding: 32px;
+}
+
+.mode-card h2 {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.mode-card p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Equations page */
+.equations-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.equation-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.equation-card {
+  margin-bottom: 24px;
+  padding: 24px;
+}
+
+.equation-card h3 {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.equation-formula {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.equation-explain {
+  margin: 16px 0;
+  padding-left: 16px;
+  border-left: 3px solid var(--glow-primary);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 8px;
+  background: var(--glow-primary);
+  color: white;
+}
+
+.badge.exact {
+  background: rgba(100, 200, 100, 0.6);
+}
+
+.badge.approx {
+  background: rgba(255, 180, 100, 0.6);
+}
+
+/* About page */
+.about-container {
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.about-section {
+  margin-bottom: 40px;
+}
+
+.about-section h2 {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .controls {
+    min-width: auto;
+    left: 20px;
+    right: 20px;
+    transform: none;
+  }
+  
+  .info-panel {
+    right: 20px;
+    width: 250px;
+  }
+  
+  .mode-selection {
+    grid-template-columns: 1fr;
+  }
+}

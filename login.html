@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+  <title>Login - Spacetime Observatory</title>
+  <link rel="stylesheet" href="./styles/app.css">
+  <link rel="stylesheet" href="./styles/glass.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div class="login-container">
+    <div class="login-box glass-panel glow-border">
+      <h1 class="glass-title" style="font-size: 36px;">Spacetime Observatory</h1>
+      <p class="glass-subtitle" style="font-size: 16px; margin-bottom: 32px;">Interactive Physics Experience</p>
+      
+      <div id="error-message" class="error-message" style="display: none;"></div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label class="glass-label">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            class="glass-input" 
+            placeholder="Enter username"
+            autocomplete="username"
+            required
+          >
+        </div>
+        
+        <button type="submit" class="glass-btn primary btn-block">
+          Enter Observatory
+        </button>
+      </form>
+      
+      <div style="margin-top: 24px; text-align: center;">
+        <p class="glass-text" style="font-size: 12px; color: rgba(255,255,255,0.5);">
+          Valid users: turki (owner), mashael (guest)
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import CanvasRoot from './src/render/canvasRoot.js';
+    import SpaceBackground from './src/render/spaceBackground.js';
+    import auth from './src/core/auth.js';
+    import { sanitize } from './src/core/sanitize.js';
+    
+    // Setup space background
+    const container = document.getElementById('canvas-container');
+    const canvasRoot = new CanvasRoot(container);
+    canvasRoot.init();
+    
+    const spaceBackground = new SpaceBackground(canvasRoot);
+    spaceBackground.init();
+    
+    // Animation loop
+    function animate(time) {
+      canvasRoot.clear('#000000');
+      spaceBackground.update(time);
+      spaceBackground.render(time);
+      spaceBackground.renderNebula();
+      requestAnimationFrame(animate);
+    }
+    animate(0);
+    
+    // Handle login
+    const form = document.getElementById('login-form');
+    const usernameInput = document.getElementById('username');
+    const errorMessage = document.getElementById('error-message');
+    
+    // Check if already logged in
+    if (auth.isLoggedIn()) {
+      window.location.href = './home.html';
+    }
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const username = usernameInput.value.trim().toLowerCase();
+      
+      if (auth.login(username)) {
+        window.location.href = './home.html';
+      } else {
+        errorMessage.style.display = 'block';
+        sanitize.setText(errorMessage, 'Invalid username. Try "turki" or "mashael".');
+      }
+    });
+  </script>
+</body>
+</html>

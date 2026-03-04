@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+  <title>Equations - Spacetime Observatory</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="./styles/app.css">
+  <link rel="stylesheet" href="./styles/glass.css">
+</head>
+<body style="background: #000;">
+  <div class="equations-container">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+      <h1 class="glass-title" style="font-size: 36px;">Equations Reference</h1>
+      <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="equation-tabs">
+      <button class="glass-btn" data-tab="blackhole">Black Hole</button>
+      <button class="glass-btn" data-tab="wormhole">Wormhole</button>
+      <button class="glass-btn" data-tab="glossary">Glossary</button>
+      <button class="glass-btn" data-tab="assumptions">Assumptions</button>
+    </div>
+    
+    <!-- Black Hole Tab -->
+    <div data-tab-content="blackhole">
+      <div class="equation-card glass-panel">
+        <h3>Schwarzschild Radius</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-schwarzschild"></div>
+        <p class="glass-text">Where: r_s = Schwarzschild radius, G = gravitational constant, M = black hole mass, c = speed of light</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">This is the radius of the event horizon - the point of no return. If you get closer than this, even light can't escape!</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The black circle at the center of the visualization. For a 10 solar mass black hole, this is about 30 km.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Time Dilation Factor</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-time-dilation"></div>
+        <p class="glass-text">Where: α(r) = time dilation factor, r = distance from center, r_s = Schwarzschild radius</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">Time runs slower near the black hole! If α = 0.5, your clock ticks at half speed compared to someone far away.</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The "Time Dilation α" value in the info panel. As you get closer (smaller distance), α gets smaller and time slows down.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Gravitational Redshift</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-redshift"></div>
+        <p class="glass-text">Where: z = redshift factor, r = distance from center, r_s = Schwarzschild radius</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">Light loses energy climbing out of gravity. Red light is lower energy than blue, so we call it "redshift".</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The "Redshift z" value. Larger values mean light is more stretched and redder.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Photon Sphere</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-photon"></div>
+        <p class="glass-text">Where: r_ph = photon sphere radius, r_s = Schwarzschild radius</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">At this special distance, light can orbit the black hole in a circle! It's like a racetrack for photons.</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The faint blue ring around the black hole, at 1.5 times the event horizon radius.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Tidal Acceleration</h3>
+        <span class="badge approx">Approximate</span>
+        <div class="equation-formula" id="eq-tidal"></div>
+        <p class="glass-text">Where: a_tidal = tidal force, G = gravitational constant, M = mass, L = object length, r = distance</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">Gravity is stronger on your feet than your head (if falling feet-first). This stretching force is "spaghettification"!</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The "Tidal Force" value, assuming a 2-meter tall object. Gets huge near the horizon!</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Wormhole Tab -->
+    <div data-tab-content="wormhole" style="display: none;">
+      <div class="equation-card glass-panel">
+        <h3>Morris-Thorne Metric</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-mt-metric"></div>
+        <p class="glass-text">Where: ds² = spacetime interval, Φ(r) = redshift function, b(r) = shape function, r = radial coordinate, dΩ² = angular part</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">This describes the shape of spacetime around a wormhole - like a tunnel connecting two places in the universe.</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The curved embedding diagram showing how space bends to form a tunnel.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Throat Condition</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-throat"></div>
+        <p class="glass-text">Where: b(r₀) = shape function at throat, r₀ = throat radius</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">The throat is the narrowest part of the wormhole tunnel. This equation says the tunnel has a minimum size.</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The glowing ring at the center - the wormhole's throat.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Flare-Out Condition</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-flare"></div>
+        <p class="glass-text">Where: b'(r₀) = derivative of shape function at throat</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">The tunnel must get wider as you move away from the throat - it can't close up on you!</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">How the embedding curves widen away from the center.</p>
+        </div>
+      </div>
+      
+      <div class="equation-card glass-panel">
+        <h3>Null Energy Condition Violation</h3>
+        <span class="badge exact">Exact</span>
+        <div class="equation-formula" id="eq-nec"></div>
+        <p class="glass-text">Where: ρ = energy density, p_r = radial pressure</p>
+        <div class="equation-explain">
+          <div class="glass-label">Explain like I'm 10:</div>
+          <p class="glass-text">Wormholes need "exotic matter" - weird stuff with negative energy that doesn't exist in nature (as far as we know!).</p>
+        </div>
+        <div class="equation-explain">
+          <div class="glass-label">What you see:</div>
+          <p class="glass-text">The "Exotic Matter: Yes" indicator - this is what keeps the wormhole open.</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Glossary Tab -->
+    <div data-tab-content="glossary" style="display: none;">
+      <div class="glass-panel" style="padding: 24px;">
+        <h3 style="margin-bottom: 16px;">Key Terms</h3>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Event Horizon</h4>
+          <p class="glass-text">The boundary around a black hole beyond which nothing can escape, not even light.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Time Dilation</h4>
+          <p class="glass-text">The slowing down of time in strong gravitational fields relative to a distant observer.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Redshift</h4>
+          <p class="glass-text">The stretching of light waves to longer (redder) wavelengths due to gravity or motion.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Spacetime</h4>
+          <p class="glass-text">The four-dimensional fabric combining space and time, which can be curved by mass and energy.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Exotic Matter</h4>
+          <p class="glass-text">Hypothetical matter with negative energy density, required to keep wormholes open.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Schwarzschild Solution</h4>
+          <p class="glass-text">The exact solution to Einstein's field equations for a non-rotating, spherically symmetric black hole.</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Assumptions Tab -->
+    <div data-tab-content="assumptions" style="display: none;">
+      <div class="glass-panel" style="padding: 24px;">
+        <h3 style="margin-bottom: 16px;">Scientific Honesty</h3>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">What This Is</h4>
+          <p class="glass-text">An interactive educational visualization using scientifically accurate equations from General Relativity.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">What This Is NOT</h4>
+          <p class="glass-text">This is not a full general relativistic ray-tracing simulation. True photon paths around black holes require solving geodesic equations numerically.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Assumptions Made</h4>
+          <ul style="margin-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+            <li>Non-rotating (Schwarzschild) black hole</li>
+            <li>No accretion disk physics (visual approximation only)</li>
+            <li>Observer at rest relative to black hole</li>
+            <li>Static spacetime (no time evolution)</li>
+            <li>Vacuum solution (no surrounding matter except visualization)</li>
+          </ul>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Wormhole Note</h4>
+          <p class="glass-text">Traversable wormholes remain purely theoretical. No exotic matter has been discovered, and it may be impossible to create or stabilize such structures.</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h4 class="glass-label" style="font-size: 16px; margin-bottom: 8px;">Numerical Accuracy</h4>
+          <p class="glass-text">All physics calculations use safety clamps to prevent NaN and Infinity values, ensuring stable visualization even at extreme conditions.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 40px; text-align: center;">
+      <p class="glass-text" style="font-size: 12px; color: rgba(255,255,255,0.5);">
+        © 2026 Turki Abdullah. All Rights Reserved.
+      </p>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script type="module">
+    import auth from './src/core/auth.js';
+    
+    // Require login
+    auth.requireLogin();
+    
+    // Wait for KaTeX to load
+    window.addEventListener('load', () => {
+      if (typeof katex !== 'undefined') {
+        renderEquations();
+      }
+    });
+    
+    function renderEquations() {
+      // Black hole equations
+      katex.render('r_s = \\frac{2GM}{c^2}', document.getElementById('eq-schwarzschild'), { displayMode: true });
+      katex.render('\\alpha(r) = \\sqrt{1 - \\frac{r_s}{r}}', document.getElementById('eq-time-dilation'), { displayMode: true });
+      katex.render('1 + z = \\frac{1}{\\sqrt{1 - \\frac{r_s}{r}}}', document.getElementById('eq-redshift'), { displayMode: true });
+      katex.render('r_{ph} = \\frac{3GM}{c^2} = \\frac{3}{2}r_s', document.getElementById('eq-photon'), { displayMode: true });
+      katex.render('a_{tidal} \\approx \\frac{2GML}{r^3}', document.getElementById('eq-tidal'), { displayMode: true });
+      
+      // Wormhole equations
+      katex.render('ds^2 = -e^{2\\Phi(r)}c^2dt^2 + \\frac{dr^2}{1 - \\frac{b(r)}{r}} + r^2d\\Omega^2', document.getElementById('eq-mt-metric'), { displayMode: true });
+      katex.render('b(r_0) = r_0', document.getElementById('eq-throat'), { displayMode: true });
+      katex.render('b\'(r_0) < 1', document.getElementById('eq-flare'), { displayMode: true });
+      katex.render('\\rho + p_r < 0', document.getElementById('eq-nec'), { displayMode: true });
+    }
+    
+    // Tab switching
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const tabName = e.target.dataset.tab;
+        
+        // Update buttons
+        document.querySelectorAll('[data-tab]').forEach(t => {
+          t.classList.remove('primary');
+        });
+        e.target.classList.add('primary');
+        
+        // Show content
+        document.querySelectorAll('[data-tab-content]').forEach(content => {
+          content.style.display = content.dataset.tabContent === tabName ? 'block' : 'none';
+        });
+      });
+    });
+    
+    // Set initial tab
+    document.querySelector('[data-tab="blackhole"]').classList.add('primary');
+  </script>
+</body>
+</html>
