@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
   <title>Black Hole - Spacetime Observatory</title>
-  <link rel="stylesheet" href="./styles/app.css">
-  <link rel="stylesheet" href="./styles/glass.css">
 </head>
 <body>
   <div id="canvas-container"></div>
@@ -83,6 +81,10 @@
   </div>
   
   <script type="module">
+    // Import styles
+    import './styles/app.css';
+    import './styles/glass.css';
+    
     import auth from './src/core/auth.js';
     import CanvasRoot from './src/render/canvasRoot.js';
     import SpaceBackground from './src/render/spaceBackground.js';

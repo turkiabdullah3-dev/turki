@@ -1,7 +1,7 @@
 // Interactive controls (sliders, buttons)
 // Owner: Turki Abdullah © 2026
 
-import { storage } from '../core/storage.js';
+import storage from '../core/storage.js';
 
 export class Controls {
   constructor(onDistanceChange, onReset) {
