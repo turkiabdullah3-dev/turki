@@ -32,7 +32,11 @@ export class LandingPageSimple {
     
     const subtitle = document.createElement('p');
     subtitle.className = 'landing-subtitle';
-    subtitle.textContent = 'Journey Through Black Holes & Wormholes';
+    subtitle.textContent = 'Interactive Physics Visualization';
+    
+    const creator = document.createElement('p');
+    creator.className = 'landing-creator';
+    creator.textContent = 'Created by Turki Al-Marrakhi';
     
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'landing-buttons';
@@ -65,6 +69,7 @@ export class LandingPageSimple {
     
     content.appendChild(title);
     content.appendChild(subtitle);
+    content.appendChild(creator);
     content.appendChild(buttonContainer);
     
     page.appendChild(bg);

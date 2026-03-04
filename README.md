@@ -1,53 +1,40 @@
-# 🌌 Spacetime Explorer: Cinematic Black Hole & Wormhole Experience
+# 🌌 Spacetime Explorer
 
-> A production-ready, visually stunning interactive physics visualization combining scientific accuracy with professional cinematic aesthetics.
+> Interactive physics visualization exploring black holes and wormholes through general relativity
 
-## ✨ Key Features
+**Created by:** Turki Al-Marrakhi  
+**Live Demo:** [https://turkiabdullah3-dev.github.io/Black-hole/](https://turkiabdullah3-dev.github.io/Black-hole/)
 
-### 🎬 Cinematic Atmosphere
-- **4-Layer Cosmic System**: Deep nebula gradient + starfield + dust particles + glowing foreground
-- **Parallax Depth**: Each layer moves at different speeds for immersive 3D effect
-- **Cursor Trail**: Glowing particles following mouse movement
-- **Vignette Effect**: Radial edge darkening for cinematic frame
-- **Scanline Animation**: Subtle overlay for premium display feel
+## 🎯 Overview
 
-### 🌑 Black Hole Experience
-- **4-Phase Journey**: Distant → Approach → Event Horizon → First-Person
-- **Accurate Physics**:
-  - Schwarzschild radius calculations
-  - Gravitational time dilation
-  - Gravitational redshift from gravity wells
-  - Spacetime curvature visualization
-- **5,000-Particle Accretion Disk**: Temperature-based coloring (red → orange → yellow)
-- **Photon Ring**: Light orbiting at ISCO (3× Schwarzschild radius)
-- **Event Horizon**: Gradient texture with shimmer patterns
-- **Lensing Grid**: Spacetime distortion visualization
+An educational physics visualization project that brings Einstein's general relativity to life through interactive 3D graphics. Experience black holes and wormholes with scientifically accurate physics calculations rendered in real-time.
 
-### 🌀 Wormhole Experience
-- **Dual Galaxy View**: Two 2,000-particle galaxy clouds
-- **Curved Tunnel**: Morris-Thorne geometry with violet-cyan gradient
-- **External Mode**: Full view of both galaxies and connecting tunnel
-- **Internal Mode**: Immersive tunnel traversal with flowing particles
-- **Spacetime Grid**: Visible distortion near wormhole throat
-- **Procedural Effects**: Luminous particles and motion textures
+## ✨ Features
 
-### 🎮 Interactive Interface
-- **Glass Morphism HUD**: Modern frosted glass panels with glow effects
-- **Draggable Panels**: Click and drag to reposition information windows
-- **Live Data Display**: Real-time physics values updating at 100ms
-- **Progress Visualization**: Animated progress bars and graphs
-- **Toast Notifications**: Auto-dismissing status messages
-- **Control Buttons**: Smooth transitions, glow on hover, scale animations
+### 🌑 Black Hole Visualization
+- **Schwarzschild Metric**: Accurate spacetime curvature around a black hole
+- **Event Horizon**: Visual representation of the point of no return
+- **Gravitational Lensing**: Light bending around massive objects
+- **Time Dilation**: Real-time calculation of time flow near the singularity
+- **Accretion Disk**: Particle system showing matter spiraling into the black hole
+- **Photon Sphere**: Unstable orbit where light circles the black hole
 
-### ⚡ Performance & Optimization
-- **60 FPS Target**: Maintains smooth frame rate across devices
-- **Adaptive Quality**: Automatically adjusts high/medium/low based on FPS
-- **Device Detection**: Recommends settings for mobile vs desktop
-- **Memory Tracking**: Monitors heap usage and warns of critical levels
-- **Frustum Culling**: Skips rendering off-screen objects
-- **Particle Optimization**: Scales from 10,000+ (high) to 4,000 (low)
+### 🌀 Wormhole Visualization
+- **Morris-Thorne Geometry**: Traversable wormhole model
+- **Dual Spacetimes**: Two connected regions visualized with particle galaxies
+- **Throat Visualization**: The narrow passage connecting both ends
+- **External & Internal Views**: Switch between orbiting and traveling through
+- **Spacetime Curvature**: Real-time Ricci scalar calculations
+- **Tidal Forces**: Safety indicators showing gravitational stress
 
-## 📦 Technology Stack
+### 📊 Physics Engine
+- **General Relativity Equations**: Schwarzschild and Morris-Thorne metrics
+- **Real-time Calculations**: Time dilation, redshift, tidal forces
+- **Safety Constraints**: Prevents unphysical states (NaN/Infinity)
+- **HUD Display**: Live physics metrics with color-coded warnings
+- **Performance Monitoring**: 60 FPS target with adaptive quality
+
+## 🛠️ Technology Stack
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
@@ -58,79 +45,71 @@
 | CSS 3 | Latest | Visual design |
 
 ## 📂 Project Structure
-
-```
-src/
-├── index.js                          (47 lines) - App controller
-├── components/
-│   └── LandingPage.js               (275 lines) - Landing with atmosphere
-├── scenes/
-│   ├── BlackHoleScene.js            (431 lines) - Black hole experience
-│   └── WormholeScene.js             (456 lines) - Wormhole experience
-├── utils/
-│   ├── atmosphere.js                (350 lines) - 4-layer cosmos
-│   ├── blackHoleVisualizer.js       (305 lines) - Black hole phases
-│   ├── wormholeVisualizer.js        (280 lines) - Wormhole 3D
-│   ├── visualEffects.js             (385 lines) - Effects library
-│   ├── hud.js                       (330 lines) - Interactive UI
-│   ├── performance.js               (415 lines) - Optimization system
-│   ├── physics.js                   (100 lines) - Physics engine
-│   ├── helpers.js                   (130 lines) - Utilities
-│   └── postProcessing.js            (82 lines) - Post-FX setup
-├── styles/
-│   └── main.css                     (712 lines) - Complete styling
-└── shaders/ (7 files)               (200 lines) - GLSL shaders
-
-Total: 4,849 lines of production code
-```
+- **Three.js** v0.160.0 - 3D graphics engine
+- **Vite** v5.4.21 - Build tool and dev server
+- **WebGL** - GPU-accelerated rendering
+- **GLSL Shaders** - Custom visual effects
 
 ## 🚀 Quick Start
 
-### Installation
 ```bash
-cd /Users/turki/Desktop/٥٨٧
-npm install  # Install dependencies
-npm run dev  # Start development server (localhost:3001)
+# Install dependencies
+npm install
+
+# Development server
+npm run dev
+
+# Production build
+npm run build
 ```
 
-### Production Build
-```bash
-npm run build      # Creates optimized dist/
-npm run preview    # Preview production build locally
+## 📁 Project Structure
+
+```
+src/
+├── index.js                    - Main application
+├── components/
+│   └── LandingPageSimple.js   - Homepage
+├── scenes/
+│   ├── BlackHoleScene.js      - Black hole visualization
+│   └── WormholeScene.js       - Wormhole visualization  
+├── utils/
+│   ├── physics.js             - Physics calculations
+│   ├── safePhysics.js         - Safety constraints
+│   └── performance.js         - Optimization
+└── styles/
+    └── main.css               - Styling
 ```
 
-## 📊 Performance Metrics
+## 🎓 Physics Background
 
-| Metric | High Quality | Medium | Low |
-|--------|------------|--------|-----|
-| **FPS** | 58-60 | 55-60 | 55-60 |
-| **Particles** | 10,000+ | 7,000 | 4,000 |
-| **Memory** | 145MB | 110MB | 80MB |
-| **Load Time** | 2.1s | 2.1s | 2.1s |
+### Black Holes (Schwarzschild Metric)
+The project uses the Schwarzschild solution to Einstein's field equations:
 
-## 🎨 Features Highlight
+**Time Dilation:** `α = √(1 - 2M/r)`  
+**Gravitational Redshift:** `z = 1/α - 1`  
+**Event Horizon:** `r_s = 2GM/c²`
 
-### Visual Effects
-- ✅ Vignette darkening
-- ✅ Scanline animation
-- ✅ Glass morphism
-- ✅ Chromatic aberration (framework)
-- ✅ Bloom effect (framework)
-- ✅ Redshift calculations
-- ✅ Volumetric lighting (framework)
-- ✅ Particle trails
-- ✅ Glow outlines
+### Wormholes (Morris-Thorne Geometry)
+Based on the traversable wormhole model:
 
-### Physics
-- ✅ Schwarzschild geometry
-- ✅ Gravitational redshift
-- ✅ Time dilation
-- ✅ Morris-Thorne wormhole
-- ✅ ISCO photon ring
-- ✅ Spacetime curvature
-- ✅ Event horizon geometry
+**Throat Radius:** Minimum wormhole diameter  
+**Ricci Curvature:** `R = 4/a²`  
+**Tidal Forces:** `F ∝ M/r³`
 
-### Interactivity
+## 📊 Performance
+
+- **Target:** 60 FPS
+- **Particles:** 500-1000 depending on scene
+- **Adaptive Quality:** Auto-adjusts based on performance
+- **Build Time:** ~1.6 seconds
+
+## 🎯 Use Cases
+
+- **Physics Education:** Visual demonstration of general relativity
+- **Scientific Visualization:** Real-time metric calculations
+- **Interactive Learning:** Explore spacetime curvature
+- **Research Tool:** Test wormhole stability models
 - ✅ Mouse parallax
 - ✅ Phase transitions
 - ✅ Mode switching
@@ -168,56 +147,27 @@ This project serves as both a visualization tool and learning resource:
 - Educational UI overlays (future)
 
 ## 🔮 Future Enhancements
+## 📝 License
 
-- [ ] Shader-based post-processing effects
-- [ ] Audio design and soundscape
-- [ ] Mobile touch gestures
-- [ ] VR mode (WebXR)
-- [ ] Save/load functionality
-- [ ] Multiplayer viewing
-- [ ] Advanced particle systems
-- [ ] Procedural nebula generation
+MIT License - Created by Turki Al-Marrakhi
 
-## 💡 Code Statistics
+## 🔗 Links
 
-| Metric | Count |
-|--------|-------|
-| JavaScript Files | 13 |
-| Total JS Lines | 3,731 |
-| CSS Lines | 712 |
-| Documentation | 1,100+ |
-| Total Project | 4,849 lines |
+- **Live Demo:** [https://turkiabdullah3-dev.github.io/Black-hole/](https://turkiabdullah3-dev.github.io/Black-hole/)
+- **Repository:** [https://github.com/turkiabdullah3-dev/Black-hole](https://github.com/turkiabdullah3-dev/Black-hole)
 
-## 🏆 Highlights
+## 📚 References
 
-✨ **Professional Grade**: Production-ready code with optimization and error handling  
-✨ **Scientifically Accurate**: Based on general relativity and astrophysics  
-✨ **Visually Stunning**: Cinematic effects and smooth animations  
-✨ **Well Documented**: Complete guides, API reference, and examples  
-✨ **High Performance**: Adaptive quality maintaining 60 FPS  
-✨ **Mobile Friendly**: Responsive design with device optimization  
+- Einstein's General Relativity (1915)
+- Schwarzschild Solution (1916)
+- Morris-Thorne Wormhole Model (1988)
+- Three.js Documentation
+- WebGL Specifications
 
-## 🎬 Experience Flow
+---
 
-```
-Landing Page (Cinematic Intro)
-  ↓
-  ├─→ Black Hole (4-Phase Journey)
-  │    ├─ Distant View
-  │    ├─ Approach Phase
-  │    ├─ Event Horizon
-  │    └─ First-Person Fall
-  │
-  └─→ Wormhole (2 Modes)
-       ├─ External View
-       └─ Internal Traversal
-```
-
-## 📞 Support & Resources
-
-- **Three.js**: https://threejs.org/
-- **Physics Background**: https://en.wikipedia.org/wiki/Black_hole
-- **Visualization**: https://jila.colorado.edu/~ajsh/bh.html
+**Created with passion for physics and visualization**  
+*Turki Al-Marrakhi - 2024*
 
 ## 📄 License
 
