@@ -240,6 +240,9 @@ export class WormholeScene {
     // Create realistic wormhole visualization
     this.realisticRenderer = new RealisticWormholeRenderer(this.physics, this.scene);
     
+    // Create the wormhole geometry and objects
+    this.createWormhole();
+    
     // Lighting
     const ambientLight = new THREE.AmbientLight(0x00d9ff, 0.35);
     this.scene.add(ambientLight);
