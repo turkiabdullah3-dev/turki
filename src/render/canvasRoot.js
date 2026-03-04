@@ -25,8 +25,9 @@ export class CanvasRoot {
     this.canvas.style.position = 'fixed';
     this.canvas.style.inset = '0';
     this.canvas.style.zIndex = '0';
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
+    this.canvas.style.width = '100vw';
+    this.canvas.style.height = '100vh';
+    this.canvas.style.display = 'block';
     
     // Get 2D context
     this.ctx = this.canvas.getContext('2d', {
@@ -61,10 +62,9 @@ export class CanvasRoot {
   resize() {
     if (!this.canvas) return;
     
-    // Get display size from bounding rect
-    const rect = this.canvas.getBoundingClientRect();
-    const displayWidth = rect.width;
-    const displayHeight = rect.height;
+    // Get display size from window (fixed positioned canvas covers viewport)
+    const displayWidth = window.innerWidth;
+    const displayHeight = window.innerHeight;
     
     // Get safe DPR
     this.dpr = perf.getSafeDPR();
@@ -80,8 +80,6 @@ export class CanvasRoot {
       
       this.width = bufferWidth;
       this.height = bufferHeight;
-      
-      console.log(`Canvas resized: ${bufferWidth}x${bufferHeight} (DPR: ${this.dpr})`);
     }
   }
   
