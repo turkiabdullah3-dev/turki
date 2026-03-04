@@ -60,6 +60,54 @@ export class WormholeScene {
     this.canvas = canvas;
     sceneContainer.appendChild(canvas);
     
+    // HUD Panel
+    const hudPanel = document.createElement('div');
+    hudPanel.style.cssText = `
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 350px;
+      background: rgba(0, 20, 40, 0.85);
+      border: 2px solid #00d9ff;
+      border-radius: 10px;
+      padding: 20px;
+      color: #00d9ff;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      z-index: 100;
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+      backdrop-filter: blur(10px);
+    `;
+    
+    hudPanel.innerHTML = `
+      <div style="margin-bottom: 15px; border-bottom: 1px solid #00d9ff; padding-bottom: 10px;">
+        <h3 style="margin: 0; color: #ff6b9d; font-size: 14px;">⚙️ WORMHOLE METRICS</h3>
+      </div>
+      <div style="display: grid; gap: 10px;">
+        <div>
+          <span style="color: #00d9ff;">Throat Radius (a):</span>
+          <span style="color: #ff6b9d;" id="throat-radius">1.5 M</span>
+        </div>
+        <div>
+          <span style="color: #00d9ff;">Spacetime Curvature:</span>
+          <span style="color: #ff6b9d;" id="curvature">High</span>
+        </div>
+        <div>
+          <span style="color: #00d9ff;">Time Dilation (α):</span>
+          <span style="color: #ff6b9d;" id="time-dilation">0.8-1.0</span>
+        </div>
+        <div>
+          <span style="color: #00d9ff;">Tidal Forces:</span>
+          <span style="color: #ff6b9d;" id="tidal-forces">Moderate</span>
+        </div>
+      </div>
+      <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #00d9ff; font-size: 11px; color: #00a8cc;">
+        <p style="margin: 0 0 5px 0;">📐 Morris-Thorne Geometry</p>
+        <p style="margin: 0;">Exotic matter required</p>
+      </div>
+    `;
+    sceneContainer.appendChild(hudPanel);
+    
     // Back button
     const backBtn = document.createElement('button');
     backBtn.className = 'back-button';
@@ -68,37 +116,60 @@ export class WormholeScene {
       position: absolute;
       top: 20px;
       left: 20px;
-      padding: 10px 20px;
-      background: rgba(0, 217, 255, 0.3);
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(0, 150, 200, 0.2));
       color: #00d9ff;
-      border: 1px solid #00d9ff;
-      border-radius: 5px;
+      border: 2px solid #00d9ff;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       z-index: 100;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 217, 255, 0.2);
     `;
+    backBtn.addEventListener('mouseover', () => {
+      backBtn.style.background = 'linear-gradient(135deg, rgba(0, 217, 255, 0.4), rgba(0, 150, 200, 0.4))';
+      backBtn.style.boxShadow = '0 0 20px rgba(0, 217, 255, 0.5)';
+    });
+    backBtn.addEventListener('mouseout', () => {
+      backBtn.style.background = 'linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(0, 150, 200, 0.2))';
+      backBtn.style.boxShadow = '0 0 10px rgba(0, 217, 255, 0.2)';
+    });
     backBtn.addEventListener('click', () => this.callbacks.onBack());
     sceneContainer.appendChild(backBtn);
     
     // Mode toggle button
     const modeBtn = document.createElement('button');
     modeBtn.className = 'mode-button';
-    modeBtn.textContent = '🔄 Internal View';
+    modeBtn.textContent = '🔄 نمط داخلي';
     modeBtn.style.cssText = `
       position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background: rgba(255, 107, 157, 0.3);
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(255, 50, 100, 0.2));
       color: #ff6b9d;
-      border: 1px solid #ff6b9d;
-      border-radius: 5px;
+      border: 2px solid #ff6b9d;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       z-index: 100;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 107, 157, 0.2);
     `;
-    modeBtn.addEventListener('click', () => this.toggleMode());
+    modeBtn.addEventListener('mouseover', () => {
+      modeBtn.style.background = 'linear-gradient(135deg, rgba(255, 107, 157, 0.4), rgba(255, 50, 100, 0.4))';
+      modeBtn.style.boxShadow = '0 0 20px rgba(255, 107, 157, 0.5)';
+    });
+    modeBtn.addEventListener('mouseout', () => {
+      modeBtn.style.background = 'linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(255, 50, 100, 0.2))';
+      modeBtn.style.boxShadow = '0 0 10px rgba(255, 107, 157, 0.2)';
+    });
+    modeBtn.addEventListener('click', () => this.toggleMode(modeBtn));
     sceneContainer.appendChild(modeBtn);
+    this.modeBtn = modeBtn;
     
     page.appendChild(sceneContainer);
     return page;
@@ -157,26 +228,30 @@ export class WormholeScene {
   }
 
   createWormholeGeometry() {
-    // Galaxy 1 (left)
-    this.createGalaxy(new THREE.Vector3(-400, 0, 0), 0);
+    // Galaxy 1 (left) - Blue side
+    this.createGalaxy(new THREE.Vector3(-400, 0, 0), 0, 0x1a4d7a, 0x00d9ff);
     
-    // Galaxy 2 (right)
-    this.createGalaxy(new THREE.Vector3(400, 0, 0), Math.PI);
+    // Galaxy 2 (right) - Pink side
+    this.createGalaxy(new THREE.Vector3(400, 0, 0), Math.PI, 0x7a1a4d, 0xff6b9d);
     
     // Wormhole tunnel
     this.createTunnel();
     
     // Particle field
     this.createParticles();
+    
+    // Add accretion disk effect
+    this.createAccretionDisk();
   }
 
-  createGalaxy(position, rotationZ) {
+  createGalaxy(position, rotationZ, baseColor, glowColor) {
     const diskGeometry = new THREE.CircleGeometry(80, 64);
     const diskMaterial = new THREE.MeshPhongMaterial({
-      color: 0x1a4d7a,
-      emissive: 0x00d9ff,
-      emissiveIntensity: 0.3,
-      side: THREE.DoubleSide
+      color: baseColor,
+      emissive: glowColor,
+      emissiveIntensity: 0.5,
+      side: THREE.DoubleSide,
+      wireframe: false
     });
     
     const disk = new THREE.Mesh(diskGeometry, diskMaterial);
@@ -186,17 +261,83 @@ export class WormholeScene {
     disk.castShadow = true;
     this.scene.add(disk);
     
-    // Galaxy core
-    const coreGeometry = new THREE.SphereGeometry(15, 32, 32);
+    // Galaxy core - much brighter
+    const coreGeometry = new THREE.SphereGeometry(20, 32, 32);
     const coreMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff6b9d,
-      emissive: 0xff6b9d,
-      emissiveIntensity: 0.8
+      color: glowColor,
+      emissive: glowColor,
+      emissiveIntensity: 1.5
     });
     
     const core = new THREE.Mesh(coreGeometry, coreMaterial);
     core.position.copy(position);
     this.scene.add(core);
+    
+    // Core glow halo
+    const haloGeometry = new THREE.SphereGeometry(35, 32, 32);
+    const haloMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        color: { value: new THREE.Color(glowColor) }
+      },
+      vertexShader: `
+        varying float vNormal;
+        void main() {
+          vNormal = dot(normalize(normalMatrix * normal), normalize(modelViewMatrix * vec4(position, 1.0)).xyz);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 color;
+        varying float vNormal;
+        void main() {
+          float alpha = (1.0 - abs(vNormal)) * 0.4;
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      transparent: true
+    });
+    
+    const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+    halo.position.copy(position);
+    this.scene.add(halo);
+  }
+
+  createAccretionDisk() {
+    const diskGeometry = new THREE.TorusGeometry(150, 50, 32, 100);
+    const diskMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 }
+      },
+      vertexShader: `
+        varying float vY;
+        void main() {
+          vY = position.y;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        varying float vY;
+        void main() {
+          float hue = fract(vY * 0.01 + time * 0.1);
+          vec3 color = mix(
+            vec3(0.0, 0.8, 1.0),
+            mix(vec3(1.0, 0.4, 0.8), vec3(1.0, 0.2, 0.4), hue),
+            hue
+          );
+          gl_FragColor = vec4(color, 0.5);
+        }
+      `,
+      side: THREE.DoubleSide,
+      transparent: true,
+      blending: THREE.AdditiveBlending
+    });
+    
+    this.accretionDisk = new THREE.Mesh(diskGeometry, diskMaterial);
+    this.accretionDisk.rotation.x = Math.PI * 0.3;
+    this.scene.add(this.accretionDisk);
   }
 
   createTunnel() {
@@ -298,9 +439,8 @@ export class WormholeScene {
 
   toggleMode() {
     this.mode = this.mode === 'external' ? 'internal' : 'external';
-    const modeBtn = this.sceneContainer.querySelector('.mode-button');
-    if (modeBtn) {
-      modeBtn.textContent = this.mode === 'external' ? '🔄 Internal View' : '🔄 External View';
+    if (this.modeBtn) {
+      this.modeBtn.textContent = this.mode === 'external' ? '🔄 نمط داخلي' : '🔄 نمط خارجي';
     }
   }
 
@@ -336,6 +476,12 @@ export class WormholeScene {
       this.tunnelMesh.material.uniforms.time.value += 0.02;
     }
     
+    // Update accretion disk
+    if (this.accretionDisk && this.accretionDisk.material.uniforms) {
+      this.accretionDisk.material.uniforms.time.value += 0.01;
+      this.accretionDisk.rotation.z += 0.001;
+    }
+    
     // Update particles
     if (this.particles) {
       const positions = this.particles.geometry.attributes.position.array;
@@ -354,8 +500,92 @@ export class WormholeScene {
       this.particles.geometry.attributes.position.needsUpdate = true;
     }
     
+    // Update HUD with physics data
+    this.updateHUD();
+    
     // Render
     this.composer.render();
+  }
+
+  updateHUD() {
+    const throatRadiusEl = document.getElementById('throat-radius');
+    const curvatureEl = document.getElementById('curvature');
+    const timeDilationEl = document.getElementById('time-dilation');
+    const tidalForcesEl = document.getElementById('tidal-forces');
+    
+    if (throatRadiusEl) {
+      const radius = this.physics.throatRadius || 1.5;
+      throatRadiusEl.textContent = `${radius.toFixed(2)} M`;
+    }
+    
+    if (curvatureEl) {
+      // Calculate Ricci curvature scalar
+      const R = 4 / (this.physics.throatRadius ** 2);
+      const level = R > 2 ? 'Very High' : R > 1 ? 'High' : 'Moderate';
+      curvatureEl.textContent = level;
+    }
+    
+    if (timeDilationEl) {
+      // Time dilation factor α = √(1 - r_s/r)
+      const r = Math.max(this.physics.throatRadius, 1.05 * (this.physics.throatRadius || 0.5));
+      const r_s = 1.0; // Schwarzschild radius
+      const alpha = Math.sqrt(Math.max(0, 1 - r_s / r));
+      timeDilationEl.textContent = alpha.toFixed(3);
+    }
+    
+    if (tidalForcesEl) {
+      // Tidal force approximation
+      const cameraZ = Math.abs(this.camera.position.z);
+      const distance = Math.sqrt(
+        this.camera.position.x ** 2 + 
+        this.camera.position.y ** 2 + 
+        cameraZ ** 2
+      );
+      
+      const throatRadius = this.physics.throatRadius || 1.5;
+      const tidalAccel = Math.pow(throatRadius, 2) / Math.pow(Math.max(distance, throatRadius), 3);
+      
+      let level = 'Safe';
+      if (tidalAccel > 0.5) level = 'High';
+      else if (tidalAccel > 0.2) level = 'Moderate';
+      
+      tidalForcesEl.textContent = `${level} (${tidalAccel.toFixed(3)})`;
+    }
+  }
+
+  getPhysicsMetrics() {
+    const cameraZ = Math.abs(this.camera.position.z);
+    const distance = Math.sqrt(
+      this.camera.position.x ** 2 + 
+      this.camera.position.y ** 2 + 
+      cameraZ ** 2
+    );
+    
+    const M = 1.0; // Schwarzschild mass parameter
+    const a = this.physics.throatRadius; // Throat radius
+    
+    // Time dilation: α = √(1 - 2M/r)
+    const r_s = 2 * M; // Schwarzschild radius
+    const r = Math.max(distance, a);
+    const timeDilation = Math.sqrt(Math.max(0.1, 1 - r_s / r));
+    
+    // Redshift: z = 1/√(g_tt) - 1
+    const redshift = (1 / timeDilation) - 1;
+    
+    // Tidal force: F_tidal ∝ M/r³
+    const tidalForce = M / Math.pow(r, 3);
+    
+    // Spacetime curvature: Ricci scalar R = 4/a²
+    const curvature = 4 / (a * a);
+    
+    return {
+      timeDilation,
+      redshift,
+      tidalForce,
+      curvature,
+      distance,
+      throatRadius: a
+    };
   }
 
   onWindowResize() {
