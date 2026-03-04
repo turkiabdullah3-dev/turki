@@ -5,6 +5,14 @@ import { BlackHoleEquationDisplay } from '../utils/equationCards.js';
 import { BlackHoleHUDPanel } from '../utils/hudPhysics.js';
 import { DualClockDisplay } from '../utils/dualClock.js';
 import { createStarfield, lerp, easeInOutCubic, formatDistance, formatValue } from '../utils/helpers.js';
+import { 
+  PhysicsValidator, 
+  ObserverConstraint, 
+  ShaderValueSanitizer,
+  PhysicsWatchdog,
+  safeNumber,
+  clamp
+} from '../utils/safePhysics.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -317,33 +325,46 @@ export class BlackHoleScene {
   }
 
   updatePhysicsDisplay(cameraDistance, deltaSeconds = 0.016) {
-    const safeDistance = Number.isFinite(cameraDistance) && cameraDistance > 0 ? cameraDistance : 1;
-    const timeDilation = this.physics.getTimeDilationFactor(cameraDistance);
-    const redshift = this.physics.getRedshift(cameraDistance);
-    const metrics = this.physics.getMetricsAtRadius(safeDistance);
+    // LAYER 1: Enforce observer constraints
+    const constrainedDistance = ObserverConstraint.enforceSafeRadius(
+      cameraDistance, 
+      this.physics.schwarzschildRadius,
+      1.05  // Stay 5% outside event horizon
+    );
+
+    // LAYER 2: Get physics metrics with constrained distance
+    const metrics = this.physics.getMetricsAtRadius(constrainedDistance);
     
-    this.dilationValue.textContent = formatValue(timeDilation);
-    this.redshiftValue.textContent = formatValue(redshift);
+    // LAYER 3: Validate and sanitize all physics values
+    const safeMetrics = PhysicsValidator.validateMetrics(metrics);
     
-    if (safeDistance > this.physics.schwarzschildRadius * 100) {
-      this.distanceValue.textContent = formatDistance(safeDistance);
+    // LAYER 4: Monitor physics health (optional debug logging)
+    PhysicsWatchdog.checkPhysicsHealth(safeMetrics, constrainedDistance, this.physics.schwarzschildRadius);
+
+    // Display safe values
+    this.dilationValue.textContent = formatValue(safeMetrics.timeDilationFactor);
+    this.redshiftValue.textContent = formatValue(safeMetrics.redshift);
+    
+    // Display distance (use constrained if needed)
+    if (constrainedDistance > this.physics.schwarzschildRadius * 100) {
+      this.distanceValue.textContent = formatDistance(constrainedDistance);
     } else {
       this.distanceValue.textContent = formatDistance(this.physics.schwarzschildRadius * 100);
     }
 
-    // Update equation card display with live physics values
+    // Update equation display with safe metrics
     if (this.equationDisplay) {
-      this.equationDisplay.updateByDistance(safeDistance);
+      this.equationDisplay.updateByDistance(constrainedDistance);
     }
 
-    // Update physics data panel
+    // Update HUD physics panel with validated metrics
     if (this.hudPhysicsPanel) {
-      this.hudPhysicsPanel.update(metrics, safeDistance);
+      this.hudPhysicsPanel.update(safeMetrics, constrainedDistance);
     }
 
-    // Update dual clock system
+    // Update dual clock system with safe values
     if (this.dualClock) {
-      this.dualClock.update(safeDistance, deltaSeconds);
+      this.dualClock.update(constrainedDistance, deltaSeconds);
     }
   }
 
@@ -406,12 +427,23 @@ export class BlackHoleScene {
     if (!this.currentDistance) this.currentDistance = this.camera.position.z;
     this.currentDistance += (targetDistance - this.currentDistance) * 0.1;
     
-    // Update camera
+    // ENFORCE OBSERVER CONSTRAINT: Never let distance drop below safe radius
+    const minimumSafeDistance = this.physics.schwarzschildRadius * 1.05;
+    this.currentDistance = Math.max(this.currentDistance, minimumSafeDistance);
+    
+    // Update camera position
     const dist = this.currentDistance;
     this.camera.position.x = Math.sin(targetYaw) * Math.cos(targetPitch) * dist;
     this.camera.position.y = Math.sin(targetPitch) * dist;
     this.camera.position.z = Math.cos(targetYaw) * Math.cos(targetPitch) * dist;
     this.camera.lookAt(0, 0, 0);
+    
+    // SAFETY CHECK: Verify camera position is outside event horizon
+    ObserverConstraint.constrainCameraPosition(
+      this.camera.position, 
+      this.physics.schwarzschildRadius,
+      1.05
+    );
     
     if (now - this.lastHudUpdateTime >= this.hudUpdateIntervalMs) {
       this.updatePhysicsDisplay(dist, deltaSeconds);

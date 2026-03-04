@@ -4,6 +4,13 @@ import { RealisticWormholeRenderer } from '../utils/realisticWormholeRenderer.js
 import { WormholeEquationDisplay } from '../utils/equationCards.js';
 import { WormholeHUDPanel } from '../utils/hudPhysics.js';
 import { WormholeEmbeddingDiagram } from '../utils/embeddingDiagram.js';
+import { 
+  PhysicsValidator, 
+  ShaderValueSanitizer,
+  PhysicsWatchdog,
+  safeNumber,
+  clamp
+} from '../utils/safePhysics.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -453,8 +460,12 @@ export class WormholeScene {
     this.throatRadius = radius;
     this.physics.setThroatRadius(radius);
     
-    this.throatValueDisplay.textContent = radius.toFixed(2);
-    this.stabilityValue.textContent = (this.physics.stability).toFixed(2);
+    // Sanitize displayed values
+    const safeRadius = safeNumber(radius, 1.5);
+    const safeStability = safeNumber(this.physics.stability, 0.5);
+    
+    this.throatValueDisplay.textContent = safeRadius.toFixed(2);
+    this.stabilityValue.textContent = clamp(safeStability, 0, 1).toFixed(2);
     
     // Rebuild tunnel with new radius
     if (this.tunnelLine) this.scene.remove(this.tunnelLine);
@@ -463,7 +474,7 @@ export class WormholeScene {
     
     // Update embedding diagram
     if (this.embeddingDiagram) {
-      this.embeddingDiagram.updateThroatRadius(radius);
+      this.embeddingDiagram.updateThroatRadius(safeRadius);
     }
   }
 
