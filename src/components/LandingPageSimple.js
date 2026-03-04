@@ -72,10 +72,12 @@ export class LandingPageSimple {
     page.appendChild(content);
     
     this.canvas = canvas;
+    this.element = page;
     return page;
   }
 
   initThree() {
+    console.log('LandingPageSimple: Initializing Three.js...');
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.Fog(0x000000, 5000, 10000);
     
@@ -96,10 +98,11 @@ export class LandingPageSimple {
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
-    this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    console.log('LandingPageSimple: Three.js initialized, creating starfield...');
     
     // Minimal starfield
+    this.createMinimalStarfield();
     this.createMinimalStarfield();
   }
 
@@ -151,8 +154,10 @@ export class LandingPageSimple {
     this.animationFrameId = requestAnimationFrame(() => this.animate());
     
     // Gentle camera movement
-    this.camera.position.x = Math.sin(Date.now() * 0.0001) * 30;
-    this.camera.position.y = Math.cos(Date.now() * 0.00008) * 20;
+    const time = Date.now() * 0.0001;
+    this.camera.position.x = Math.sin(time) * 30;
+    this.camera.position.y = Math.cos(time * 0.8) * 20;
+    this.camera.lookAt(0, 0, 0);
     
     this.renderer.render(this.scene, this.camera);
   }
