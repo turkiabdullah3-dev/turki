@@ -14,18 +14,30 @@
     const params = new URLSearchParams(window.location.search);
     const scene = params.get('scene');
     
-    if (scene === 'blackhole' || scene === 'wormhole') {
-      // Initialize app and load the scene
-      const app = new App();
-      if (scene === 'blackhole') {
-        app.renderBlackHole();
-      } else if (scene === 'wormhole') {
-        app.renderWormhole();
-      }
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        handleScene(scene);
+      });
     } else {
-      // Redirect to home with preserved query params
-      const queryString = window.location.search;
-      window.location.href = 'home.html' + queryString;
+      handleScene(scene);
+    }
+    
+    function handleScene(scene) {
+      if (scene === 'blackhole' || scene === 'wormhole') {
+        // Initialize app and load the scene
+        const app = new App();
+        window.app = app;
+        
+        if (scene === 'blackhole') {
+          app.renderBlackHole();
+        } else if (scene === 'wormhole') {
+          app.renderWormhole();
+        }
+      } else {
+        // Redirect to home
+        window.location.href = 'home.html';
+      }
     }
   </script>
 </body>
