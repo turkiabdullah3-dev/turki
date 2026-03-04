@@ -79,6 +79,11 @@ canvas {
   opacity: 0;
 }
 
+.landing-content-visible {
+  pointer-events: auto;
+  opacity: 1;
+}
+
 .landing-title {
   font-size: 3.5rem;
   font-weight: 300;

@@ -26,7 +26,7 @@ export class LandingPageSimple {
     canvas.className = 'landing-canvas';
     
     const content = document.createElement('div');
-    content.className = 'landing-content';
+    content.className = 'landing-content landing-content-visible';
     
     const title = document.createElement('h1');
     title.className = 'landing-title';
@@ -102,7 +102,6 @@ export class LandingPageSimple {
     console.log('LandingPageSimple: Three.js initialized, creating starfield...');
     
     // Minimal starfield
-    this.createMinimalStarfield();
     this.createMinimalStarfield();
   }
 
