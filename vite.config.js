@@ -7,6 +7,11 @@ export default defineConfig({
   root: './',
   base: '/Black-hole/',
   publicDir: 'public',
+  resolve: {
+    alias: {
+      '@': resolve(projectRoot, 'src')
+    }
+  },
   server: {
     host: true,
     port: 3000,
