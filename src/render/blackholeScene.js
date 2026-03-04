@@ -3,6 +3,7 @@
 
 import BlackHolePhysics from '../physics/blackhole.js';
 import { safeNumber } from '../physics/safety.js';
+import { sanitizeBlackHoleState, getVisualRadius } from '../physics/renderSafety.js';
 
 class BlackHoleScene {
   constructor(canvasRoot) {
@@ -55,23 +56,23 @@ class BlackHoleScene {
    * Render black hole
    */
   render(time) {
+    // CRITICAL: Sanitize state before rendering to prevent Infinity/NaN
+    const safeState = sanitizeBlackHoleState(this.state);
+    this.state = safeState; // Update with safe values
+    
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
     
     const centerX = width / 2;
     const centerY = height / 2;
     
-    // Calculate visual sizes
-    const horizonRadius = this.calculateVisualRadius(this.physics.r_s);
-    const photonRadius = this.calculateVisualRadius(this.physics.r_photon);
-    const observerRadius = this.calculateVisualRadius(this.distance);
+    // Calculate visual sizes using safe getVisualRadius
+    const horizonRadius = getVisualRadius(this.physics.r_s, this.physics.r_s, Math.min(width, height) * 0.2);
+    const photonRadius = getVisualRadius(this.physics.r_photon, this.physics.r_s, Math.min(width, height) * 0.2);
+    const observerRadius = getVisualRadius(this.distance, this.physics.r_s, Math.min(width, height) * 0.2);
     
-    // Draw photon sphere (faint ring)
-    ctx.strokeStyle = 'rgba(100, 150, 255, 0.3)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, photonRadius, 0, Math.PI * 2);
-    ctx.stroke();
+    // Draw photon sphere with enhanced visuals
+    this.drawPhotonSphere(centerX, centerY, photonRadius);
     
     // Draw accretion disk (simplified)
     this.drawAccretionDisk(centerX, centerY, horizonRadius, photonRadius, time);
@@ -113,15 +114,26 @@ class BlackHoleScene {
   }
   
   /**
-   * Draw event horizon
+   * Draw event horizon with photon sphere and accretion glow
    */
   drawEventHorizon(x, y, radius) {
     const ctx = this.canvasRoot.getContext();
     
-    // Glow gradient
+    // LAYER 1: Deep shadow core
+    const shadowGradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 1.5);
+    shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+    shadowGradient.addColorStop(0.6, 'rgba(20, 0, 40, 0.95)');
+    shadowGradient.addColorStop(1, 'rgba(40, 20, 80, 0.5)');
+    
+    ctx.fillStyle = shadowGradient;
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // LAYER 2: Main glow gradient
     const gradient = ctx.createRadialGradient(x, y, radius * 0.8, x, y, radius * 1.3);
     gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-    gradient.addColorStop(0.7, 'rgba(50, 30, 80, 0.8)');
+    gradient.addColorStop(0.5, `rgba(80, 40, 120, ${Math.min(1, 0.6 + this.state.alpha * 0.4)})`);
     gradient.addColorStop(1, 'rgba(100, 50, 150, 0)');
     
     ctx.fillStyle = gradient;
@@ -129,15 +141,22 @@ class BlackHoleScene {
     ctx.arc(x, y, radius * 1.3, 0, Math.PI * 2);
     ctx.fill();
     
-    // Black hole itself
+    // LAYER 3: Black hole itself
     ctx.fillStyle = '#000000';
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
+    
+    // LAYER 4: Event horizon ring (always visible, subtle)
+    ctx.strokeStyle = `rgba(200, 100, 200, ${0.3 + 0.2 * Math.sin(performance.now() * 0.002)})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.stroke();
   }
   
   /**
-   * Draw accretion disk
+   * Draw accretion disk with enhanced visuals
    */
   drawAccretionDisk(x, y, innerRadius, outerRadius, time) {
     const ctx = this.canvasRoot.getContext();
@@ -145,21 +164,74 @@ class BlackHoleScene {
     // Disk rotation
     const rotation = time * 0.0002;
     
-    // Draw disk as multiple ellipses
-    for (let i = 0; i < 20; i++) {
-      const t = i / 20;
+    // ENHANCEMENT: Add glow effect proportional to time dilation distortion
+    const glowStrength = Math.max(0.1, Math.min(1, this.state.alpha)); // More glow when alpha is lower (closer to horizon)
+    
+    // Draw disk as multiple ellipses with enhanced color/glow
+    for (let i = 0; i < 25; i++) {
+      const t = i / 25;
       const radius = innerRadius + (outerRadius - innerRadius) * t;
-      const alpha = 0.1 * (1 - t);
+      const alpha = 0.15 * (1 - t) * glowStrength;
       
-      // Color shifts from hot (inner) to cool (outer)
-      const hue = 30 - t * 20; // Orange to red
+      // Color shifts from hot orange (inner) to cool red (outer), with time dilation brightness
+      const hue = 30 - t * 25; // Orange to red to dark
+      const saturation = 100 - t * 30; // More saturated inner disk
+      const lightness = 55 + t * 5; // Slightly brighter outer disk
       
-      ctx.strokeStyle = `hsla(${hue}, 100%, 60%, ${alpha})`;
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
+      ctx.lineWidth = 2.5 + t * 1.5; // Thicker outer rings
       ctx.beginPath();
-      ctx.ellipse(x, y, radius, radius * 0.3, rotation, 0, Math.PI * 2);
+      ctx.ellipse(x, y, radius, radius * 0.25, rotation, 0, Math.PI * 2);
       ctx.stroke();
     }
+    
+    // ENHANCEMENT: Adds a subtle photon sphere glow inside the accretion disk
+    // This represents the region where light orbits
+    const photonGlowGradient = ctx.createRadialGradient(
+      x, y, outerRadius * 0.6,
+      x, y, outerRadius * 1.0
+    );
+    photonGlowGradient.addColorStop(0, `rgba(150, 200, 255, ${0.1 * glowStrength})`);
+    photonGlowGradient.addColorStop(1, 'rgba(100, 150, 255, 0)');
+    
+    ctx.fillStyle = photonGlowGradient;
+    ctx.beginPath();
+    ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  /**
+   * Draw photon sphere ring with enhanced visibility
+   */
+  drawPhotonSphere(x, y, radius) {
+    const ctx = this.canvasRoot.getContext();
+    
+    // LAYER 1: Glow halo
+    const haloGradient = ctx.createRadialGradient(x, y, radius * 0.7, x, y, radius * 1.3);
+    haloGradient.addColorStop(0, 'rgba(100, 180, 255, 0.2)');
+    haloGradient.addColorStop(0.5, 'rgba(100, 150, 255, 0.08)');
+    haloGradient.addColorStop(1, 'rgba(80, 120, 255, 0)');
+    
+    ctx.fillStyle = haloGradient;
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 1.3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // LAYER 2: Main photon sphere ring (bright, always visible)
+    ctx.strokeStyle = `rgba(120, 180, 255, ${0.5 + 0.15 * Math.sin(performance.now() * 0.003)})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // LAYER 3: Inner structure hint
+    ctx.strokeStyle = 'rgba(100, 160, 255, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]); // Dashed line
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 0.9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]); // Reset line dash
   }
   
   /**

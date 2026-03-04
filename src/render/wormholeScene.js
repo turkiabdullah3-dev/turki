@@ -3,6 +3,7 @@
 
 import WormholePhysics from '../physics/wormhole.js';
 import { safeNumber } from '../physics/safety.js';
+import { sanitizeWormholeState, getVisualWarpAmount, getVisualRadius } from '../physics/renderSafety.js';
 
 class WormholeScene {
   constructor(canvasRoot) {
@@ -61,13 +62,17 @@ class WormholeScene {
    * Render wormhole
    */
   render(time) {
+    // CRITICAL: Sanitize state before rendering to prevent Infinity/NaN
+    const safeState = sanitizeWormholeState(this.state);
+    this.state = safeState; // Update with safe values
+    
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
     
     const centerX = width / 2;
     const centerY = height / 2;
     
-    // Draw embedding diagram (side view)
+    // Draw starfield background
     this.drawEmbeddingDiagram(centerX, centerY, time);
     
     // Draw throat indicator
@@ -76,7 +81,7 @@ class WormholeScene {
     // Draw observer position
     this.drawObserver(centerX, centerY);
     
-    // Draw warp effect
+    // Draw warp effect with safe values
     this.drawWarpEffect(time);
   }
   
@@ -142,7 +147,7 @@ class WormholeScene {
   }
   
   /**
-   * Draw throat region
+   * Draw throat region with enhanced visuals
    */
   drawThroat(x, y) {
     const ctx = this.canvasRoot.getContext();
@@ -150,11 +155,24 @@ class WormholeScene {
     const scale = Math.min(width, height) * 0.0015;
     
     const throatRadius = this.physics.r0 * scale;
+    const warpStrength = getVisualWarpAmount(this.state.warpStrength);
     
-    // Throat glow
+    // LAYER 1: Deep tunnel gradient (dark blue-purple core)
+    const tunnelGradient = ctx.createRadialGradient(x, y, 0, x, y, throatRadius * 3);
+    tunnelGradient.addColorStop(0, `rgba(50, 20, 120, ${0.4 * warpStrength})`);
+    tunnelGradient.addColorStop(0.3, `rgba(80, 40, 150, ${0.25 * warpStrength})`);
+    tunnelGradient.addColorStop(1, 'rgba(30, 10, 60, 0)');
+    
+    ctx.fillStyle = tunnelGradient;
+    ctx.beginPath();
+    ctx.arc(x, y, throatRadius * 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // LAYER 2: Throat glow (main visual)
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, throatRadius * 2);
-    gradient.addColorStop(0, 'rgba(150, 100, 255, 0.6)');
-    gradient.addColorStop(0.5, 'rgba(100, 50, 200, 0.3)');
+    gradient.addColorStop(0, `rgba(200, 150, 255, ${0.7 * warpStrength})`);
+    gradient.addColorStop(0.3, `rgba(150, 100, 255, ${0.5 * warpStrength})`);
+    gradient.addColorStop(0.7, `rgba(100, 50, 200, ${0.25 * warpStrength})`);
     gradient.addColorStop(1, 'rgba(50, 0, 150, 0)');
     
     ctx.fillStyle = gradient;
@@ -162,11 +180,22 @@ class WormholeScene {
     ctx.arc(x, y, throatRadius * 2, 0, Math.PI * 2);
     ctx.fill();
     
-    // Throat ring
-    ctx.strokeStyle = 'rgba(200, 150, 255, 0.8)';
+    // LAYER 3: Sharp throat ring (critical visual - always visible)
+    ctx.strokeStyle = `rgba(220, 180, 255, ${0.8 + 0.2 * Math.sin(performance.now() * 0.003)})`;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(x, y, throatRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // LAYER 4: Inner ring structure (high frequency detail)
+    ctx.strokeStyle = 'rgba(180, 130, 220, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, throatRadius * 0.7, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(x, y, throatRadius * 0.3, 0, Math.PI * 2);
     ctx.stroke();
   }
   
@@ -234,29 +263,89 @@ class WormholeScene {
   }
   
   /**
-   * Draw warp effect (tunnel distortion)
+   * Draw warp effect (tunnel distortion with localized effect)
    */
   drawWarpEffect(time) {
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
     
-    const strength = this.state.warpStrength;
+    // Use safe warp strength that's guaranteed to be 0-1
+    const strength = getVisualWarpAmount(this.state.warpStrength);
     
-    // Radial distortion
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // EFFECT 1: Localized warp distortion around throat (screen-space)
+    // Only affects a radius around the center
+    const warpRadius = Math.min(width, height) * 0.4 * strength;
+    
+    // Create pixel-level distortion effect
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    
+    // Simple distortion: shift pixels radially based on distance from center
+    const distorted = ctx.createImageData(imageData);
+    const distortedData = distorted.data;
+    
+    // Pre-distort: sample from offset positions
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        // Warp amount (decreases with distance, max at center)
+        const warpAmount = Math.max(0, 1 - dist / warpRadius) * strength * 15;
+        
+        // Sample offset
+        const angle = Math.atan2(dy, dx);
+        const sampX = Math.round(x + Math.cos(angle) * warpAmount);
+        const sampY = Math.round(y + Math.sin(angle) * warpAmount);
+        
+        // Bounds check
+        if (sampX >= 0 && sampX < width && sampY >= 0 && sampY < height) {
+          const srcIdx = (sampY * width + sampX) * 4;
+          const dstIdx = (y * width + x) * 4;
+          
+          distortedData[dstIdx] = data[srcIdx];
+          distortedData[dstIdx + 1] = data[srcIdx + 1];
+          distortedData[dstIdx + 2] = data[srcIdx + 2];
+          distortedData[dstIdx + 3] = data[srcIdx + 3];
+        }
+      }
+    }
+    
+    // Only apply distortion if performance allows (skip on low-end devices)
+    // For now, use a simpler approach: just add glow instead of pixel shifting
+    
+    // EFFECT 2: Radial tunnel depth illusion with pulsating glow
     const gradient = ctx.createRadialGradient(
-      width / 2, height / 2, 0,
-      width / 2, height / 2, Math.max(width, height) / 2
+      centerX, centerY, warpRadius * 0.2,
+      centerX, centerY, warpRadius * 2
     );
     
-    // Pulsating effect
+    // Pulsating effect with safe values
     const pulse = Math.sin(time * 0.002) * 0.1 + 0.9;
+    const centerAlpha = Math.max(0, Math.min(1, strength * 0.25 * pulse));
+    const midAlpha = Math.max(0, Math.min(1, strength * 0.12 * pulse));
     
-    gradient.addColorStop(0, `rgba(100, 50, 200, ${strength * 0.2 * pulse})`);
-    gradient.addColorStop(0.5, `rgba(50, 25, 100, ${strength * 0.1 * pulse})`);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(0, `rgba(150, 80, 220, ${centerAlpha})`);
+    gradient.addColorStop(0.4, `rgba(100, 50, 180, ${midAlpha * 0.7})`);
+    gradient.addColorStop(1, 'rgba(30, 10, 80, 0)');
     
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
+    
+    // EFFECT 3: Add subtle animated rings for depth cues
+    ctx.strokeStyle = `rgba(120, 80, 200, ${strength * 0.15})`;
+    ctx.lineWidth = 2;
+    
+    for (let i = 1; i <= 3; i++) {
+      const ringRadius = warpRadius * (0.3 * i) * (0.9 + 0.1 * Math.sin(time * 0.001 + i));
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
 }
 
