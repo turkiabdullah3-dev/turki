@@ -27,38 +27,51 @@
     
     <!-- Info Panel -->
     <div class="info-panel glass-panel">
-      <h3 style="margin-bottom: 16px; font-size: 18px;">Physics Data</h3>
+      <h3 style="margin-bottom: 16px; font-size: 18px;">🕳️ Schwarzschild Black Hole</h3>
+      
+      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+        A non-rotating black hole described by the Schwarzschild metric. Observe gravitational time dilation, redshift, and tidal forces as you approach the event horizon.
+      </p>
       
       <div class="info-row">
-        <span class="glass-label">Distance</span>
+        <span class="glass-label">Distance from Center</span>
         <span class="info-value" id="value-distance">5.00 r_s</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">Time Dilation α</span>
+        <span class="glass-label">Time Dilation Factor (α)</span>
         <span class="info-value" id="value-alpha">0.8944</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">Redshift z</span>
+        <span class="glass-label">Gravitational Redshift</span>
         <span class="info-value" id="value-redshift">0.12</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">Tidal Force</span>
+        <span class="glass-label">Tidal Acceleration</span>
         <span class="info-value" id="value-tidal">0.00e+0 m/s²</span>
       </div>
       
       <div class="info-row">
-        <span class="glass-label">Performance</span>
+        <span class="glass-label">Frame Rate</span>
         <span class="info-value" id="value-fps">60 FPS</span>
       </div>
+      
+      <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+        📌 Tip: r_s is the Schwarzschild radius (event horizon). Move closer to see increasing time dilation and redshift effects.
+      </p>
     </div>
     
     <!-- Controls -->
     <div class="controls glass-panel">
+      <h4 style="margin-bottom: 12px; font-size: 14px;">⚙️ Interactive Controls</h4>
+      
       <div class="control-group">
-        <label class="glass-label">Observer Distance (r/r_s)</label>
+        <label class="glass-label">Distance from Center (r/r_s)</label>
+        <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+          Adjust your observer position. r_s is the Schwarzschild radius (event horizon). Below 1.02 is unsafe.
+        </p>
         <div class="slider-container">
           <input 
             type="range" 
@@ -74,9 +87,9 @@
       </div>
       
       <div style="display: flex; gap: 12px; margin-top: 16px;">
-        <button class="glass-btn" id="btn-reset">Reset View</button>
-        <button class="glass-btn" onclick="window.location.href='./equations.html'">
-          How It Works
+        <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
+        <button class="glass-btn" onclick="window.location.href='./equations.html'" style="flex: 1;">
+          📊 View Equations
         </button>
       </div>
     </div>
