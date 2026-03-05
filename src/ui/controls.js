@@ -22,7 +22,6 @@ export class Controls {
     this.elements.resetBtn = document.getElementById('btn-reset');
     
     if (!this.elements.distanceSlider) {
-      console.error('Distance slider not found');
       return;
     }
     

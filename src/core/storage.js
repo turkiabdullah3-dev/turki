@@ -9,8 +9,8 @@ export const storage = {
   setSession(session) {
     try {
       sessionStorage.setItem('spacetime_session', JSON.stringify(session));
-    } catch (e) {
-      console.error('Failed to save session:', e);
+    } catch {
+      // Ignore storage failures in restricted environments
     }
   },
   
@@ -22,8 +22,7 @@ export const storage = {
     try {
       const data = sessionStorage.getItem('spacetime_session');
       return data ? JSON.parse(data) : null;
-    } catch (e) {
-      console.error('Failed to read session:', e);
+    } catch {
       return null;
     }
   },
@@ -34,8 +33,8 @@ export const storage = {
   clearSession() {
     try {
       sessionStorage.removeItem('spacetime_session');
-    } catch (e) {
-      console.error('Failed to clear session:', e);
+    } catch {
+      // Ignore storage failures in restricted environments
     }
   },
   
@@ -48,8 +47,8 @@ export const storage = {
       const existing = this.getSettings();
       const merged = { ...existing, ...settings };
       localStorage.setItem('spacetime_settings', JSON.stringify(merged));
-    } catch (e) {
-      console.error('Failed to save settings:', e);
+    } catch {
+      // Ignore storage failures in restricted environments
     }
   },
   
@@ -61,8 +60,7 @@ export const storage = {
     try {
       const data = localStorage.getItem('spacetime_settings');
       return data ? JSON.parse(data) : {};
-    } catch (e) {
-      console.error('Failed to read settings:', e);
+    } catch {
       return {};
     }
   },
