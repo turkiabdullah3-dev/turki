@@ -146,12 +146,13 @@ function updateWormholeHUD(state) {
   const distanceEl = document.getElementById('value-distance');
   const warpEl = document.getElementById('value-warp');
   const exoticEl = document.getElementById('value-exotic');
-  const throatEl = document.getElementById('value-throat');
+  const throatRadiusEl = document.getElementById('value-throat-radius');
 
-  if (distanceEl) sanitize.setText(distanceEl, `${state.r_normalized.toFixed(2)} r_0`);
-  if (warpEl) sanitize.setText(warpEl, `${(state.warpStrength * 100).toFixed(0)}%`);
-  if (exoticEl) sanitize.setText(exoticEl, state.exoticMatter < 0 ? 'Yes' : 'No');
-  if (throatEl) sanitize.setText(throatEl, state.atThroat ? 'Yes' : 'No');
+  // Values only - units are in HTML
+  if (distanceEl) sanitize.setText(distanceEl, state.r_normalized.toFixed(2));
+  if (warpEl) sanitize.setText(warpEl, (state.warpStrength * 100).toFixed(0));
+  if (exoticEl) sanitize.setText(exoticEl, state.exoticMatter < 0 ? 'Required' : 'Not Required');
+  if (throatRadiusEl) sanitize.setText(throatRadiusEl, '1.00'); // Throat radius is constant at 1.00 r₀
 }
 
 const initialDistance = controls.getValue();

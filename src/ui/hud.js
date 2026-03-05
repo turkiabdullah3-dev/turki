@@ -36,14 +36,27 @@ export class HUD {
   }
   
   /**
+   * Format scientific notation cleanly (e.g., 1.00e3 instead of 1.00e+3)
+   */
+  formatScientific(value, precision = 2) {
+    if (Math.abs(value) < 1e6 && Math.abs(value) >= 0.01) {
+      // Use regular notation for reasonable values
+      return value.toFixed(precision);
+    }
+    // Use clean scientific notation
+    const sci = value.toExponential(precision);
+    return sci.replace('e+', 'e');
+  }
+  
+  /**
    * Update values in DOM (throttled to 10 FPS)
    */
   updateValues() {
     if (!this.data) return;
     
-    // Distance
+    // Distance (value only, unit in HTML)
     if (this.elements.distance && this.data.r_normalized !== undefined) {
-      sanitize.setText(this.elements.distance, `${this.data.r_normalized.toFixed(2)} r_s`);
+      sanitize.setText(this.elements.distance, this.data.r_normalized.toFixed(2));
     }
     
     // Time dilation (alpha)
@@ -56,27 +69,26 @@ export class HUD {
       sanitize.setText(this.elements.redshift, this.data.redshift.toFixed(2));
     }
     
-    // Tidal force
+    // Tidal force (value only, unit in HTML)
     if (this.elements.tidal && this.data.tidalForce !== undefined) {
-      const tidal = this.data.tidalForce.toExponential(2);
-      sanitize.setText(this.elements.tidal, `${tidal} m/s²`);
+      sanitize.setText(this.elements.tidal, this.formatScientific(this.data.tidalForce, 2));
     }
     
-    // Warp strength (wormhole)
+    // Warp strength (wormhole - value only, unit in HTML)
     if (this.elements.warpStrength && this.data.warpStrength !== undefined) {
-      sanitize.setText(this.elements.warpStrength, `${(this.data.warpStrength * 100).toFixed(0)}%`);
+      sanitize.setText(this.elements.warpStrength, (this.data.warpStrength * 100).toFixed(0));
     }
     
     // Exotic matter (wormhole)
     if (this.elements.exoticMatter && this.data.exoticMatter !== undefined) {
-      const sign = this.data.exoticMatter < 0 ? 'Yes' : 'No';
+      const sign = this.data.exoticMatter < 0 ? 'Required' : 'Not Required';
       sanitize.setText(this.elements.exoticMatter, sign);
     }
     
-    // FPS
+    // FPS (value only, unit in HTML)
     if (this.elements.fps) {
       const fps = perf.fpsCounter.getFPS();
-      sanitize.setText(this.elements.fps, `${fps} FPS`);
+      sanitize.setText(this.elements.fps, fps.toString());
     }
   }
   
@@ -101,7 +113,7 @@ export class HUD {
   updateFPS() {
     if (this.elements.fps) {
       const fps = perf.fpsCounter.getFPS();
-      sanitize.setText(this.elements.fps, `${fps} FPS`);
+      sanitize.setText(this.elements.fps, fps.toString());
     }
   }
 }
