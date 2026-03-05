@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Equations - Spacetime Observatory</title>
   <script defer src="./vendor/katex/katex.min.js"></script>
   <script defer src="./vendor/katex/auto-render.min.js"></script>
-  <script type="module" crossorigin src="./assets/equations-JEGKRoCU.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-YP0FEG5d.js">
-  <link rel="modulepreload" crossorigin href="./assets/auth-CJU5ZZIH.js">
+  <script type="module" crossorigin src="./assets/equations-BqJQ6Sqs.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-bxv3GR7P.js">
   <link rel="stylesheet" crossorigin href="./assets/auth-DyyhmInB.css">
   <link rel="stylesheet" crossorigin href="./assets/equations-wZEtsSD-.css">
 </head>
@@ -18,7 +19,7 @@
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
       <h1 class="glass-title" style="font-size: 36px;">Equations Reference</h1>
-      <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
+      <button class="glass-btn" id="btn-home">← Home</button>
     </div>
     
     <!-- Tabs -->

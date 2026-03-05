@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-Bs-37XyX.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-YP0FEG5d.js">
-  <link rel="modulepreload" crossorigin href="./assets/auth-CJU5ZZIH.js">
-  <link rel="modulepreload" crossorigin href="./assets/sanitize-CX8BRHPO.js">
-  <link rel="modulepreload" crossorigin href="./assets/controls-DT4_Taxu.js">
+  <script type="module" crossorigin src="./assets/blackhole-D5oHA_7u.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-bxv3GR7P.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-BT6Tl42s.js">
+  <link rel="modulepreload" crossorigin href="./assets/controls-Dd38p7ji.js">
   <link rel="stylesheet" crossorigin href="./assets/auth-DyyhmInB.css">
 </head>
 <body>
@@ -20,8 +21,8 @@
     <div class="header">
       <div class="logo">Spacetime Observatory / Black Hole</div>
       <div class="user-info">
-        <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
-        <button class="glass-btn" onclick="window.location.href='./equations.html'">Equations</button>
+        <button class="glass-btn" id="btn-home">← Home</button>
+        <button class="glass-btn" id="btn-equations-header">Equations</button>
       </div>
     </div>
     
@@ -88,7 +89,7 @@
       
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
-        <button class="glass-btn" onclick="window.location.href='./equations.html'" style="flex: 1;">
+        <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">
           📊 View Equations
         </button>
       </div>
