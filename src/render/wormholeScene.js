@@ -2,8 +2,7 @@
 // Owner: Turki Abdullah © 2026
 
 import WormholePhysics from '../physics/wormhole.js';
-import { safeNumber } from '../physics/safety.js';
-import { sanitizeWormholeState, getVisualWarpAmount, getVisualRadius } from '../physics/renderSafety.js';
+import { clamp, safeNumber } from '../physics/safety.js';
 
 class WormholeScene {
   constructor(canvasRoot) {
@@ -12,6 +11,12 @@ class WormholeScene {
     this.distance = this.physics.r0 * 2; // Start at 2x throat
     this.traverseProgress = 0; // 0 to 1
     this.state = null;
+    this.qualityMode = 'glow';
+    this.isMobileDevice = false;
+    this.currentFPS = 60;
+    this.frameCount = 0;
+    this.offscreenCanvas = document.createElement('canvas');
+    this.offscreenCtx = this.offscreenCanvas.getContext('2d', { willReadFrequently: true });
   }
   
   /**
@@ -57,32 +62,61 @@ class WormholeScene {
   update(time) {
     // Animate warp effect
   }
+
+  /**
+   * Set quality mode
+   * @param {'glow' | 'high'} mode
+   */
+  setQualityMode(mode) {
+    this.qualityMode = mode === 'high' ? 'high' : 'glow';
+  }
+
+  /**
+   * Update performance context for quality gating
+   * @param {{ fps?: number, isMobile?: boolean }} metrics
+   */
+  setPerformanceContext(metrics = {}) {
+    this.currentFPS = safeNumber(metrics.fps, this.currentFPS);
+    this.isMobileDevice = Boolean(metrics.isMobile);
+  }
+
+  /**
+   * Whether optional high distortion should run this frame
+   * @returns {boolean}
+   */
+  shouldRunHighDistortion() {
+    return this.qualityMode === 'high' && !this.isMobileDevice && this.currentFPS > 45;
+  }
   
   /**
    * Render wormhole
    */
   render(time) {
-    // CRITICAL: Sanitize state before rendering to prevent Infinity/NaN
-    const safeState = sanitizeWormholeState(this.state);
-    this.state = safeState; // Update with safe values
+    const safeState = this.state || {};
     
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
     
     const centerX = width / 2;
     const centerY = height / 2;
+
+    const epsilon = 1e-6;
+    const distanceRatio = Math.max(safeNumber(safeState.r_normalized, 1), epsilon);
+    const intensity = clamp(safeNumber(safeState.warpStrength, 0), 0, 2);
+    const baseRadius = Math.min(width, height) * 0.15;
+    const throatRadius = baseRadius * clamp(1 / (distanceRatio + epsilon), 0.6, 1.6);
     
     // Draw starfield background
     this.drawEmbeddingDiagram(centerX, centerY, time);
     
-    // Draw throat indicator
-    this.drawThroat(centerX, centerY);
+    // Draw clear wormhole hero visual
+    this.drawThroatAndTunnel(ctx, centerX, centerY, throatRadius, time, intensity);
     
     // Draw observer position
     this.drawObserver(centerX, centerY);
     
-    // Draw warp effect with safe values
-    this.drawWarpEffect(time);
+    // Always-on cheap glow warp
+    this.drawWarpGlow(time, centerX, centerY, throatRadius, intensity);
   }
   
   /**
@@ -147,56 +181,48 @@ class WormholeScene {
   }
   
   /**
-   * Draw throat region with enhanced visuals
+   * Draw throat + tunnel hero visual (cheap: arcs + gradients only)
    */
-  drawThroat(x, y) {
-    const ctx = this.canvasRoot.getContext();
-    const { width, height } = this.canvasRoot.getDimensions();
-    const scale = Math.min(width, height) * 0.0015;
-    
-    const throatRadius = this.physics.r0 * scale;
-    const warpStrength = getVisualWarpAmount(this.state.warpStrength);
-    
-    // LAYER 1: Deep tunnel gradient (dark blue-purple core)
-    const tunnelGradient = ctx.createRadialGradient(x, y, 0, x, y, throatRadius * 3);
-    tunnelGradient.addColorStop(0, `rgba(50, 20, 120, ${0.4 * warpStrength})`);
-    tunnelGradient.addColorStop(0.3, `rgba(80, 40, 150, ${0.25 * warpStrength})`);
-    tunnelGradient.addColorStop(1, 'rgba(30, 10, 60, 0)');
-    
-    ctx.fillStyle = tunnelGradient;
+  drawThroatAndTunnel(ctx, centerX, centerY, radius, t, intensity) {
+    // Outer glow ring
+    const outerGlow = ctx.createRadialGradient(centerX, centerY, radius * 0.7, centerX, centerY, radius * 2.8);
+    outerGlow.addColorStop(0, `rgba(170, 120, 255, ${0.24 * intensity})`);
+    outerGlow.addColorStop(0.45, `rgba(120, 70, 210, ${0.18 * intensity})`);
+    outerGlow.addColorStop(1, 'rgba(30, 10, 80, 0)');
+    ctx.fillStyle = outerGlow;
     ctx.beginPath();
-    ctx.arc(x, y, throatRadius * 3, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, radius * 2.8, 0, Math.PI * 2);
     ctx.fill();
-    
-    // LAYER 2: Throat glow (main visual)
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, throatRadius * 2);
-    gradient.addColorStop(0, `rgba(200, 150, 255, ${0.7 * warpStrength})`);
-    gradient.addColorStop(0.3, `rgba(150, 100, 255, ${0.5 * warpStrength})`);
-    gradient.addColorStop(0.7, `rgba(100, 50, 200, ${0.25 * warpStrength})`);
-    gradient.addColorStop(1, 'rgba(50, 0, 150, 0)');
-    
-    ctx.fillStyle = gradient;
+
+    // Inner depth (dark center)
+    const depth = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 1.1);
+    depth.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
+    depth.addColorStop(0.5, 'rgba(18, 8, 40, 0.78)');
+    depth.addColorStop(1, 'rgba(70, 30, 130, 0.18)');
+    ctx.fillStyle = depth;
     ctx.beginPath();
-    ctx.arc(x, y, throatRadius * 2, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, radius * 1.1, 0, Math.PI * 2);
     ctx.fill();
-    
-    // LAYER 3: Sharp throat ring (critical visual - always visible)
-    ctx.strokeStyle = `rgba(220, 180, 255, ${0.8 + 0.2 * Math.sin(performance.now() * 0.003)})`;
-    ctx.lineWidth = 3;
+
+    // Crisp throat ring
+    const pulse = 0.82 + 0.18 * Math.sin(t * 0.004);
+    ctx.strokeStyle = `rgba(230, 190, 255, ${pulse})`;
+    ctx.lineWidth = 2.2;
     ctx.beginPath();
-    ctx.arc(x, y, throatRadius, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.stroke();
-    
-    // LAYER 4: Inner ring structure (high frequency detail)
-    ctx.strokeStyle = 'rgba(180, 130, 220, 0.4)';
-    ctx.lineWidth = 1;
+
+    // Rotating highlight (liquid energy illusion)
+    const highlightAngle = t * 0.0012;
+    const hx = centerX + Math.cos(highlightAngle) * radius * 0.86;
+    const hy = centerY + Math.sin(highlightAngle) * radius * 0.86;
+    const highlight = ctx.createRadialGradient(hx, hy, 0, hx, hy, radius * 0.55);
+    highlight.addColorStop(0, `rgba(255, 240, 255, ${0.34 * intensity})`);
+    highlight.addColorStop(1, 'rgba(255, 240, 255, 0)');
+    ctx.fillStyle = highlight;
     ctx.beginPath();
-    ctx.arc(x, y, throatRadius * 0.7, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(x, y, throatRadius * 0.3, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.arc(hx, hy, radius * 0.55, 0, Math.PI * 2);
+    ctx.fill();
   }
   
   /**
@@ -263,89 +289,94 @@ class WormholeScene {
   }
   
   /**
-   * Draw warp effect (tunnel distortion with localized effect)
+   * Always-on cheap glow overlay (no pixel readback)
    */
-  drawWarpEffect(time) {
+  drawWarpGlow(time, centerX, centerY, throatRadius, intensity) {
     const ctx = this.canvasRoot.getContext();
-    const { width, height } = this.canvasRoot.getDimensions();
-    
-    // Use safe warp strength that's guaranteed to be 0-1
-    const strength = getVisualWarpAmount(this.state.warpStrength);
-    
-    const centerX = width / 2;
-    const centerY = height / 2;
-    
-    // EFFECT 1: Localized warp distortion around throat (screen-space)
-    // Only affects a radius around the center
-    const warpRadius = Math.min(width, height) * 0.4 * strength;
-    
-    // Create pixel-level distortion effect
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const data = imageData.data;
-    
-    // Simple distortion: shift pixels radially based on distance from center
-    const distorted = ctx.createImageData(imageData);
-    const distortedData = distorted.data;
-    
-    // Pre-distort: sample from offset positions
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const dx = x - centerX;
-        const dy = y - centerY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        // Warp amount (decreases with distance, max at center)
-        const warpAmount = Math.max(0, 1 - dist / warpRadius) * strength * 15;
-        
-        // Sample offset
-        const angle = Math.atan2(dy, dx);
-        const sampX = Math.round(x + Math.cos(angle) * warpAmount);
-        const sampY = Math.round(y + Math.sin(angle) * warpAmount);
-        
-        // Bounds check
-        if (sampX >= 0 && sampX < width && sampY >= 0 && sampY < height) {
-          const srcIdx = (sampY * width + sampX) * 4;
-          const dstIdx = (y * width + x) * 4;
-          
-          distortedData[dstIdx] = data[srcIdx];
-          distortedData[dstIdx + 1] = data[srcIdx + 1];
-          distortedData[dstIdx + 2] = data[srcIdx + 2];
-          distortedData[dstIdx + 3] = data[srcIdx + 3];
-        }
-      }
-    }
-    
-    // Only apply distortion if performance allows (skip on low-end devices)
-    // For now, use a simpler approach: just add glow instead of pixel shifting
-    
-    // EFFECT 2: Radial tunnel depth illusion with pulsating glow
-    const gradient = ctx.createRadialGradient(
-      centerX, centerY, warpRadius * 0.2,
-      centerX, centerY, warpRadius * 2
+    const pulse = 0.86 + 0.14 * Math.sin(time * 0.003);
+
+    const glow = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      throatRadius * 0.8,
+      centerX,
+      centerY,
+      throatRadius * 5
     );
-    
-    // Pulsating effect with safe values
-    const pulse = Math.sin(time * 0.002) * 0.1 + 0.9;
-    const centerAlpha = Math.max(0, Math.min(1, strength * 0.25 * pulse));
-    const midAlpha = Math.max(0, Math.min(1, strength * 0.12 * pulse));
-    
-    gradient.addColorStop(0, `rgba(150, 80, 220, ${centerAlpha})`);
-    gradient.addColorStop(0.4, `rgba(100, 50, 180, ${midAlpha * 0.7})`);
-    gradient.addColorStop(1, 'rgba(30, 10, 80, 0)');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-    
-    // EFFECT 3: Add subtle animated rings for depth cues
-    ctx.strokeStyle = `rgba(120, 80, 200, ${strength * 0.15})`;
-    ctx.lineWidth = 2;
-    
+    glow.addColorStop(0, `rgba(150, 90, 240, ${0.24 * intensity * pulse})`);
+    glow.addColorStop(0.35, `rgba(110, 55, 190, ${0.14 * intensity * pulse})`);
+    glow.addColorStop(1, 'rgba(20, 5, 40, 0)');
+
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, this.canvasRoot.getDimensions().width, this.canvasRoot.getDimensions().height);
+
+    ctx.strokeStyle = `rgba(170, 120, 255, ${0.16 * intensity})`;
+    ctx.lineWidth = 1.2;
     for (let i = 1; i <= 3; i++) {
-      const ringRadius = warpRadius * (0.3 * i) * (0.9 + 0.1 * Math.sin(time * 0.001 + i));
+      const ringRadius = throatRadius * (1.45 + i * 0.55) * pulse;
       ctx.beginPath();
       ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
       ctx.stroke();
     }
+  }
+
+  /**
+   * Optional high-quality distortion (desktop-only, low-res, throttled)
+   */
+  applyHighDistortion(centerX, centerY, throatRadius, intensity) {
+    this.frameCount += 1;
+    if (this.frameCount % 3 !== 0) return;
+
+    const ctx = this.canvasRoot.getContext();
+    const { width, height } = this.canvasRoot.getDimensions();
+    const lowW = Math.max(1, Math.floor(width * 0.25));
+    const lowH = Math.max(1, Math.floor(height * 0.25));
+
+    if (this.offscreenCanvas.width !== lowW || this.offscreenCanvas.height !== lowH) {
+      this.offscreenCanvas.width = lowW;
+      this.offscreenCanvas.height = lowH;
+    }
+
+    this.offscreenCtx.clearRect(0, 0, lowW, lowH);
+    this.offscreenCtx.drawImage(this.canvasRoot.getCanvas(), 0, 0, lowW, lowH);
+
+    const src = this.offscreenCtx.getImageData(0, 0, lowW, lowH);
+    const dst = this.offscreenCtx.createImageData(src);
+    const srcData = src.data;
+    const dstData = dst.data;
+
+    const cX = (centerX / width) * lowW;
+    const cY = (centerY / height) * lowH;
+    const radius = (throatRadius / Math.min(width, height)) * Math.min(lowW, lowH) * 3.5;
+    const radiusSafe = Math.max(radius, 1e-6);
+
+    for (let y = 0; y < lowH; y++) {
+      for (let x = 0; x < lowW; x++) {
+        const dx = x - cX;
+        const dy = y - cY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const falloff = Math.max(0, 1 - dist / radiusSafe);
+        const shift = falloff * intensity * 2.2;
+
+        const angle = Math.atan2(dy, dx);
+        const sx = Math.round(clamp(x + Math.cos(angle) * shift, 0, lowW - 1));
+        const sy = Math.round(clamp(y + Math.sin(angle) * shift, 0, lowH - 1));
+
+        const sIdx = (sy * lowW + sx) * 4;
+        const dIdx = (y * lowW + x) * 4;
+        dstData[dIdx] = srcData[sIdx];
+        dstData[dIdx + 1] = srcData[sIdx + 1];
+        dstData[dIdx + 2] = srcData[sIdx + 2];
+        dstData[dIdx + 3] = srcData[sIdx + 3];
+      }
+    }
+
+    this.offscreenCtx.putImageData(dst, 0, 0);
+
+    ctx.save();
+    ctx.globalAlpha = 0.2;
+    ctx.drawImage(this.offscreenCanvas, 0, 0, width, height);
+    ctx.restore();
   }
 }
 

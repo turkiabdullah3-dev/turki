@@ -79,6 +79,15 @@
           <span class="slider-value" id="slider-value-distance">2.00 r₀</span>
         </div>
       </div>
+
+      <div class="control-group" style="margin-top: 14px;">
+        <label class="glass-label">Quality</label>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button class="glass-btn primary" id="btn-quality-glow" type="button" style="flex: 1;">Glow</button>
+          <button class="glass-btn" id="btn-quality-high" type="button" style="flex: 1;">High</button>
+        </div>
+        <p id="quality-hint" style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 8px; min-height: 16px;"></p>
+      </div>
       
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
@@ -131,6 +140,69 @@
     const hud = new HUD();
     hud.init();
     
+    const QUALITY_KEY = 'qualityMode';
+    const isTouchIPad = /Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document;
+    const isMobileOrTablet = perf.isMobileOrTablet() || isTouchIPad;
+    let qualityMode = localStorage.getItem(QUALITY_KEY) || 'glow';
+    let lowFpsSince = null;
+
+    function showQualityToast(message) {
+      let toast = document.getElementById('quality-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'quality-toast';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '24px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.padding = '10px 14px';
+        toast.style.borderRadius = '10px';
+        toast.style.background = 'rgba(15, 10, 40, 0.85)';
+        toast.style.border = '1px solid rgba(180, 140, 255, 0.45)';
+        toast.style.color = 'rgba(255,255,255,0.95)';
+        toast.style.fontSize = '12px';
+        toast.style.zIndex = '9999';
+        toast.style.pointerEvents = 'none';
+        document.body.appendChild(toast);
+      }
+
+      toast.textContent = message;
+      toast.style.opacity = '1';
+      clearTimeout(showQualityToast._timer);
+      showQualityToast._timer = setTimeout(() => {
+        toast.style.opacity = '0';
+      }, 2200);
+    }
+
+    function applyQualityMode(mode, withNotice = false) {
+      const glowBtn = document.getElementById('btn-quality-glow');
+      const highBtn = document.getElementById('btn-quality-high');
+      const hint = document.getElementById('quality-hint');
+
+      let nextMode = mode === 'high' ? 'high' : 'glow';
+      if (isMobileOrTablet && nextMode === 'high') {
+        nextMode = 'glow';
+        if (withNotice) {
+          showQualityToast('High mode is desktop-only. Using Glow mode.');
+        }
+      }
+
+      qualityMode = nextMode;
+      localStorage.setItem(QUALITY_KEY, qualityMode);
+      wormholeScene.setQualityMode(qualityMode);
+      wormholeScene.setPerformanceContext({ fps: perf.fpsCounter.getFPS(), isMobile: isMobileOrTablet });
+
+      if (glowBtn) glowBtn.classList.toggle('primary', qualityMode === 'glow');
+      if (highBtn) highBtn.classList.toggle('primary', qualityMode === 'high');
+      if (hint) {
+        hint.textContent = isMobileOrTablet
+          ? 'High mode is desktop-only on this device.'
+          : (qualityMode === 'high'
+            ? 'High mode: distortion enabled when FPS stays above 45.'
+            : 'Glow mode: best smoothness for all devices.');
+      }
+    }
+
     // Setup controls
     const controls = new Controls(
       (distance) => {
@@ -157,6 +229,11 @@
       }
     );
     controls.init('wormhole');
+
+    document.getElementById('btn-quality-glow')?.addEventListener('click', () => applyQualityMode('glow', false));
+    document.getElementById('btn-quality-high')?.addEventListener('click', () => applyQualityMode('high', true));
+
+    applyQualityMode(qualityMode, false);
     
     // Custom HUD update for wormhole
     function updateWormholeHUD(state) {
@@ -189,6 +266,10 @@
     function animate(time) {
       // Clear
       canvasRoot.clear('#000000');
+
+      // Update FPS early so quality gating uses freshest value
+      perf.fpsCounter.update();
+      const currentFPS = perf.fpsCounter.getFPS();
       
       // Update
       spaceBackground.update(time);
@@ -200,10 +281,26 @@
         ...rawState,
         r0: wormholeScene.physics.r0,
         distanceRatio: rawState.r_normalized,
-        fps: perf.fpsCounter.getFPS()
+        fps: currentFPS
       }, 'wormhole');
       wormholeScene.state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
+      wormholeScene.setPerformanceContext({ fps: currentFPS, isMobile: isMobileOrTablet });
       updateWormholeHUD(wormholeScene.state);
+
+      if (qualityMode === 'high' && !isMobileOrTablet) {
+        if (currentFPS < 40) {
+          lowFpsSince = lowFpsSince ?? time;
+          if (time - lowFpsSince > 1000) {
+            applyQualityMode('glow', false);
+            showQualityToast('Switched to Glow mode for performance.');
+            lowFpsSince = null;
+          }
+        } else {
+          lowFpsSince = null;
+        }
+      } else {
+        lowFpsSince = null;
+      }
       
       // Render
       spaceBackground.render(time);
@@ -211,8 +308,7 @@
       spaceBackground.renderNebula();
       postFX.apply(0.3, 0.2);
       
-      // Update FPS
-      perf.fpsCounter.update();
+      // Update FPS in HUD
       hud.updateFPS();
       
       requestAnimationFrame(animate);
