@@ -5,47 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <title>Login - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/login-CMmiynJZ.js"></script>
+  <script type="module" crossorigin src="./assets/login-Imps4A16.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-YP0FEG5d.js">
-  <link rel="modulepreload" crossorigin href="./assets/auth-CR3qn4r5.js">
-  <link rel="modulepreload" crossorigin href="./assets/sanitize-DCUV3enb.js">
-  <link rel="stylesheet" crossorigin href="./assets/auth-pA4yY1qD.css">
+  <link rel="modulepreload" crossorigin href="./assets/auth-CJU5ZZIH.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-CX8BRHPO.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-DyyhmInB.css">
 </head>
 <body>
   <div id="canvas-container"></div>
   
   <div class="login-container">
-    <div class="login-box glass-panel glow-border">
-      <h1 class="glass-title" style="font-size: 36px;">Spacetime Observatory</h1>
-      <p class="glass-subtitle" style="font-size: 16px; margin-bottom: 32px;">Interactive Physics Experience</p>
+    <!-- Header -->
+    <div class="login-header">
+      <h1 class="glass-title" style="font-size: 48px; margin: 0;">Spacetime Observatory</h1>
+      <p class="glass-subtitle" style="font-size: 18px; margin: 12px 0 0 0;">Interactive Physics Experience</p>
+    </div>
+    
+    <!-- Main content grid -->
+    <div class="login-grid">
+      <!-- Sign In Card (Left/Top) -->
+      <div class="login-box glass-panel glow-border">
+        <h2 class="section-title">Sign In</h2>
+        
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="cooldown-message" class="cooldown-message" style="display: none;"></div>
+        
+        <form id="login-form">
+          <div class="form-group">
+            <label class="glass-label">Username</label>
+            <input 
+              type="text" 
+              id="username" 
+              class="glass-input" 
+              placeholder="Enter username"
+              autocomplete="username"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="glass-label">Access Code</label>
+            <input 
+              type="password" 
+              id="password" 
+              class="glass-input" 
+              placeholder="Enter access code"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+          
+          <button type="submit" class="glass-btn primary btn-block" id="login-btn">
+            Enter Observatory
+          </button>
+        </form>
+        
+        <div class="guest-demo" style="margin-top: 24px;">
+          <p class="glass-text" style="font-size: 13px; color: rgba(255,255,255,0.6);">
+            <strong>Guest Demo:</strong> Use "mashael" to explore (view-only)
+          </p>
+        </div>
+      </div>
       
-      <div id="error-message" class="error-message" style="display: none;"></div>
-      
-      <form id="login-form">
-        <div class="form-group">
-          <label class="glass-label">Username</label>
-          <input 
-            type="text" 
-            id="username" 
-            class="glass-input" 
-            placeholder="Enter username"
-            autocomplete="username"
-            required
-          >
+      <!-- Info Cards (Right/Bottom) -->
+      <div class="login-info-grid">
+        <!-- What's Inside -->
+        <div class="glass-card">
+          <h3 class="card-title">What's Inside</h3>
+          <div class="card-content">
+            <div class="card-item">
+              <span class="card-icon">◊</span>
+              <div>
+                <strong>Black Hole</strong>
+                <p>Time dilation, redshift, photon sphere, tidal risk</p>
+              </div>
+            </div>
+            <div class="card-item">
+              <span class="card-icon">◇</span>
+              <div>
+                <strong>Wormhole</strong>
+                <p>Throat geometry, warp strength, exotic matter</p>
+              </div>
+            </div>
+            <div class="card-item">
+              <span class="card-icon">≈</span>
+              <div>
+                <strong>Equations</strong>
+                <p>Full GR reference with assumptions & derivations</p>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <button type="submit" class="glass-btn primary btn-block">
-          Enter Observatory
-        </button>
-      </form>
-      
-      <div style="margin-top: 24px; text-align: center;">
-        <p class="glass-text" style="font-size: 12px; color: rgba(255,255,255,0.5);">
-          Valid users: turki (owner), mashael (guest)
-        </p>
+        <!-- How to Get Access -->
+        <div class="glass-card">
+          <h3 class="card-title">How to Get Access</h3>
+          <div class="card-content">
+            <p style="margin: 0 0 12px 0; font-size: 14px;">
+              This is a <strong>private demo</strong>. To get access:
+            </p>
+            <ul class="access-list">
+              <li>Request the password from the project owner</li>
+              <li>If you are <strong>Mashael</strong> (invited guest), use credentials shared privately</li>
+            </ul>
+            <p style="margin: 12px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.5);">
+              Your access request is kept confidential.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Scientific Note -->
+        <div class="glass-card">
+          <h3 class="card-title">Scientific Accuracy</h3>
+          <div class="card-content">
+            <ul class="science-list">
+              <li><strong>Equations:</strong> Real General Relativity (GR) relations</li>
+              <li><strong>Visualization:</strong> Performance-optimized mapping, not full ray-traced GR</li>
+              <li><strong>Purpose:</strong> Educational exploration, not simulation</li>
+            </ul>
+            <p style="margin: 12px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.6);">
+              See <a href="./equations.html" style="color: rgba(100, 150, 255, 0.8); text-decoration: none;">Equations</a> for full references and assumptions.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  
+  <!-- Footer -->
+  <footer class="login-footer">
+    <p>© 2026 Turki Abdullah. All Rights Reserved.</p>
+    <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px;">
+      Design and implementation proprietary. No reproduction without permission.
+    </p>
+  </footer>
   
 </body>
 </html>
