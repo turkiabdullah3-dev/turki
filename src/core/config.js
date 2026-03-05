@@ -33,7 +33,7 @@ export const CONFIG = {
   
   csp: {
     // Content Security Policy
-    meta: "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;"
+    meta: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
   },
   
   rights: {

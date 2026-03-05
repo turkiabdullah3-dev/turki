@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
 </head>
 <body>
@@ -14,8 +16,8 @@
     <div class="header">
       <div class="logo">Spacetime Observatory / Black Hole</div>
       <div class="user-info">
-        <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
-        <button class="glass-btn" onclick="window.location.href='./equations.html'">Equations</button>
+        <button class="glass-btn" id="btn-home">← Home</button>
+        <button class="glass-btn" id="btn-equations-header">Equations</button>
       </div>
     </div>
     
@@ -82,7 +84,7 @@
       
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
-        <button class="glass-btn" onclick="window.location.href='./equations.html'" style="flex: 1;">
+        <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">
           📊 View Equations
         </button>
       </div>
@@ -93,115 +95,6 @@
     <p>© 2026 Turki Abdullah. All Rights Reserved.</p>
   </div>
   
-  <script type="module">
-    // Import styles
-    import './styles/app.css';
-    import './styles/glass.css';
-    
-    import auth from './src/core/auth.js';
-    import CanvasRoot from './src/render/canvasRoot.js';
-    import SpaceBackground from './src/render/spaceBackground.js';
-    import BlackHoleScene from './src/render/blackholeScene.js';
-    import PostFX from './src/render/postFX.js';
-    import HUD from './src/ui/hud.js';
-    import Controls from './src/ui/controls.js';
-    import perf from './src/core/perf.js';
-    import { sanitizeState } from './src/physics/safety.js';
-    
-    // Require login
-    auth.requireLogin();
-    
-    // Setup canvas
-    const container = document.getElementById('canvas-container');
-    const canvasRoot = new CanvasRoot(container);
-    if (!canvasRoot.init()) {
-      alert('Failed to initialize canvas');
-    }
-    
-    // Create scene components
-    const spaceBackground = new SpaceBackground(canvasRoot);
-    const blackHoleScene = new BlackHoleScene(canvasRoot);
-    const postFX = new PostFX(canvasRoot);
-    
-    spaceBackground.init();
-    blackHoleScene.init();
-    
-    // Setup HUD
-    const hud = new HUD();
-    hud.init();
-    
-    // Setup controls
-    const controls = new Controls(
-      (distance) => {
-        blackHoleScene.setDistance(distance);
-        const rawState = blackHoleScene.getState();
-        const state = sanitizeState({
-          ...rawState,
-          rs: blackHoleScene.physics.r_s,
-          tidal: rawState.tidalForce
-        }, 'blackhole');
-        hud.setData({ ...rawState, ...state, tidalForce: state.tidal });
-      },
-      () => {
-        blackHoleScene.setDistance(5);
-        const rawState = blackHoleScene.getState();
-        const state = sanitizeState({
-          ...rawState,
-          rs: blackHoleScene.physics.r_s,
-          tidal: rawState.tidalForce
-        }, 'blackhole');
-        hud.setData({ ...rawState, ...state, tidalForce: state.tidal });
-      }
-    );
-    controls.init('blackhole');
-    
-    // Initial state
-    const initialDistance = controls.getValue();
-    blackHoleScene.setDistance(initialDistance);
-    {
-      const rawState = blackHoleScene.getState();
-      const state = sanitizeState({
-        ...rawState,
-        rs: blackHoleScene.physics.r_s,
-        tidal: rawState.tidalForce
-      }, 'blackhole');
-      hud.setData({ ...rawState, ...state, tidalForce: state.tidal });
-    }
-    
-    // Animation loop
-    function animate(time) {
-      // Clear
-      canvasRoot.clear('#000000');
-      
-      // Update
-      spaceBackground.update(time);
-      blackHoleScene.update(time);
-
-      // Sanitize frame state before render + HUD
-      const rawState = blackHoleScene.getState();
-      const state = sanitizeState({
-        ...rawState,
-        rs: blackHoleScene.physics.r_s,
-        tidal: rawState.tidalForce,
-        fps: perf.fpsCounter.getFPS()
-      }, 'blackhole');
-      blackHoleScene.state = { ...rawState, ...state, tidalForce: state.tidal };
-      hud.setData(blackHoleScene.state);
-      
-      // Render
-      spaceBackground.render(time);
-      blackHoleScene.render(time);
-      spaceBackground.renderNebula();
-      postFX.apply(0.4, 0.2);
-      
-      // Update FPS
-      perf.fpsCounter.update();
-      hud.updateFPS();
-      
-      requestAnimationFrame(animate);
-    }
-    
-    animate(0);
-  </script>
+  <script type="module" src="./src/pages/blackholePage.js"></script>
 </body>
 </html>

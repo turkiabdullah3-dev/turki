@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Equations - Spacetime Observatory</title>
   <link rel="stylesheet" href="./vendor/katex/katex.min.css">
   <script defer src="./vendor/katex/katex.min.js"></script>
@@ -14,7 +16,7 @@
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
       <h1 class="glass-title" style="font-size: 36px;">Equations Reference</h1>
-      <button class="glass-btn" onclick="window.location.href='./home.html'">← Home</button>
+      <button class="glass-btn" id="btn-home">← Home</button>
     </div>
     
     <!-- Tabs -->
@@ -248,42 +250,6 @@
     </div>
   </div>
   
-  <script type="module">
-    // Import styles
-    import './styles/app.css';
-    import './styles/glass.css';
-    
-    import auth from './src/core/auth.js';
-    import { equations } from './src/ui/equationsData.js';
-    import { renderEquations } from './src/ui/equationsRender.js';
-    
-    // Require login
-    auth.requireLogin();
-
-    document.addEventListener('DOMContentLoaded', () => {
-      renderEquations(equations);
-    });
-    
-    // Tab switching
-    document.querySelectorAll('[data-tab]').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        const tabName = e.target.dataset.tab;
-        
-        // Update buttons
-        document.querySelectorAll('[data-tab]').forEach(t => {
-          t.classList.remove('primary');
-        });
-        e.target.classList.add('primary');
-        
-        // Show content
-        document.querySelectorAll('[data-tab-content]').forEach(content => {
-          content.style.display = content.dataset.tabContent === tabName ? 'block' : 'none';
-        });
-      });
-    });
-    
-    // Set initial tab
-    document.querySelector('[data-tab="blackhole"]').classList.add('primary');
-  </script>
+  <script type="module" src="./src/pages/equationsPage.js"></script>
 </body>
 </html>

@@ -64,10 +64,19 @@ Spacetime Observatory is a scientifically accurate, interactive visualization of
    
    Production files will be in the `dist/` directory.
 
-### Login Credentials
+### Access
 
-- **Owner**: username `turki` (full access)
-- **Guest**: username `mashael` (view-only)
+- **Owner username**: `turki`
+- **Guest username**: `mashael` (view-only)
+- **Access codes** are shared privately by the owner and rotated regularly
+
+### Security Warning (Important)
+
+- This project runs on static hosting (GitHub Pages), so login is a **demo gate**, not true backend authentication.
+- Do **not** store real secrets in frontend code (API keys, private tokens, production passwords).
+- Keep access codes out of Git history and UI text; store only hashed comparisons in code.
+- Share access codes privately (DM/WhatsApp/email) and rotate weekly or monthly.
+- For real authentication, use a backend service with server-side validation and rate limiting.
 
 ---
 
@@ -205,6 +214,9 @@ All physics calculations include safety clamps to prevent:
 - **No innerHTML**: Safe DOM manipulation only
 - **Local Storage**: Only non-sensitive settings saved
 - **Demo Authentication**: Front-end only (not production-grade)
+- **Hashed Access Checks**: Plaintext access codes are not stored in repository files
+- **Session Expiry**: Login sessions expire automatically (short-lived token model)
+- **Brute-force Throttle**: Exponential lockout persisted across refresh
 
 ---
 
