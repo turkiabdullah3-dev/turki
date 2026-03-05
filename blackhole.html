@@ -7,11 +7,11 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-L_CxEH_k.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/auth-CtaUwVWU.js">
-  <link rel="modulepreload" crossorigin href="./assets/sanitize-BaCZz64s.js">
-  <link rel="modulepreload" crossorigin href="./assets/controls-BmoJQUUB.js">
-  <link rel="stylesheet" crossorigin href="./assets/auth-DE512wC6.css">
+  <script type="module" crossorigin src="./assets/blackhole-BfXYiJqI.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-ZcfAPaFd.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-CQGr0Y2P.js">
+  <link rel="modulepreload" crossorigin href="./assets/controls-6oXBubuo.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-BBE1HylC.css">
 </head>
 <body>
   <div id="canvas-container"></div>
@@ -34,29 +34,36 @@
         A non-rotating black hole described by the Schwarzschild metric. Observe gravitational time dilation, redshift, and tidal forces as you approach the event horizon.
       </p>
       
-      <div class="info-row">
-        <span class="glass-label">Distance from Center</span>
-        <span class="info-value" id="value-distance">5.00 r_s</span>
-      </div>
-      
-      <div class="info-row">
-        <span class="glass-label">Time Dilation Factor (α)</span>
-        <span class="info-value" id="value-alpha">0.8944</span>
-      </div>
-      
-      <div class="info-row">
-        <span class="glass-label">Gravitational Redshift</span>
-        <span class="info-value" id="value-redshift">0.12</span>
-      </div>
-      
-      <div class="info-row">
-        <span class="glass-label">Tidal Acceleration</span>
-        <span class="info-value" id="value-tidal">0.00e+0 m/s²</span>
-      </div>
-      
-      <div class="info-row">
-        <span class="glass-label">Frame Rate</span>
-        <span class="info-value" id="value-fps">60 FPS</span>
+      <div class="data-rows">
+        <div class="data-row">
+          <span class="data-label">Distance from Center</span>
+          <span class="data-value" id="value-distance">5.00</span>
+          <span class="data-unit">r_s</span>
+        </div>
+        
+        <div class="data-row">
+          <span class="data-label">Time Dilation (α)</span>
+          <span class="data-value" id="value-alpha">0.8944</span>
+          <span class="data-unit"></span>
+        </div>
+        
+        <div class="data-row">
+          <span class="data-label">Gravitational Redshift</span>
+          <span class="data-value" id="value-redshift">0.12</span>
+          <span class="data-unit"></span>
+        </div>
+        
+        <div class="data-row">
+          <span class="data-label">Tidal Acceleration</span>
+          <span class="data-value" id="value-tidal">0.00e+0</span>
+          <span class="data-unit">m/s²</span>
+        </div>
+        
+        <div class="data-row">
+          <span class="data-label">Frame Rate</span>
+          <span class="data-value" id="value-fps">60</span>
+          <span class="data-unit">FPS</span>
+        </div>
       </div>
       
       <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
