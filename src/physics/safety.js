@@ -9,9 +9,8 @@
  * @param {number} max 
  * @returns {number}
  */
-export function clamp(value, min, max) {
-  if (!isFinite(value)) return min;
-  return Math.max(min, Math.min(max, value));
+export function clamp(x, min, max) {
+  return Math.max(min, Math.min(max, x));
 }
 
 /**
@@ -20,8 +19,75 @@ export function clamp(value, min, max) {
  * @param {number} defaultValue 
  * @returns {number}
  */
-export function safeNumber(value, defaultValue = 0) {
-  return isFinite(value) ? value : defaultValue;
+export function safeNumber(x, fallback = 0) {
+  return Number.isFinite(x) ? x : fallback;
+}
+
+/**
+ * Sanitizes physics output so rendering never receives NaN/Infinity.
+ * mode:
+ *  - "blackhole": clamps radius outside horizon for the external model
+ *  - "wormhole": clamps denominators near throat and warp
+ */
+export function sanitizeState(state, mode) {
+  // copy to avoid accidental mutation bugs
+  const s = { ...state };
+
+  // General numeric safety
+  s.fps = safeNumber(s.fps, 0);
+
+  // --- BLACK HOLE SAFETY ---
+  if (mode === 'blackhole') {
+    // Require rs and r
+    s.rs = safeNumber(s.rs, 0);
+    s.r = safeNumber(s.r, s.rs * 2);
+
+    // Prevent crossing the horizon in the external model
+    // Use a small safety margin to avoid sqrt(negative) and division blow-ups.
+    const minR = s.rs > 0 ? s.rs * 1.02 : 0.001;
+    s.r = Math.max(s.r, minR);
+
+    // Clamp alpha to avoid 0/NaN
+    s.alpha = safeNumber(s.alpha, 1e-6);
+    s.alpha = Math.max(s.alpha, 1e-6);
+
+    // Clamp redshift and tidal to safe display/render ranges
+    s.redshift = safeNumber(s.redshift, 0);
+    s.redshift = clamp(s.redshift, 0, 1e4);
+
+    s.tidal = safeNumber(s.tidal, 0);
+    s.tidal = clamp(s.tidal, 0, 1e12);
+
+    // Any warp strength used in rendering should be clamped too (if present)
+    if ('warpStrength' in s) {
+      s.warpStrength = safeNumber(s.warpStrength, 0);
+      s.warpStrength = clamp(s.warpStrength, 0, 2.0);
+    }
+  }
+
+  // --- WORMHOLE SAFETY ---
+  if (mode === 'wormhole') {
+    // Typical fields might be: r0, distanceRatio, warpStrength, stabilityCost
+    if ('r0' in s) s.r0 = Math.max(safeNumber(s.r0, 1), 1e-6);
+
+    if ('distanceRatio' in s) {
+      s.distanceRatio = safeNumber(s.distanceRatio, 1);
+      // avoid 0 or negative ratios that could feed denominators or logs
+      s.distanceRatio = Math.max(s.distanceRatio, 1e-6);
+    }
+
+    if ('warpStrength' in s) {
+      s.warpStrength = safeNumber(s.warpStrength, 0);
+      s.warpStrength = clamp(s.warpStrength, 0, 2.0);
+    }
+
+    if ('stabilityCost' in s) {
+      s.stabilityCost = safeNumber(s.stabilityCost, 0);
+      s.stabilityCost = clamp(s.stabilityCost, 0, 1e6);
+    }
+  }
+
+  return s;
 }
 
 /**
@@ -79,6 +145,7 @@ export function makeSafe(obj, defaultValue = 0) {
 export default {
   clamp,
   safeNumber,
+  sanitizeState,
   safeDivide,
   safeSqrt,
   isSafe,

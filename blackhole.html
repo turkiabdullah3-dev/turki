@@ -106,6 +106,7 @@
     import HUD from './src/ui/hud.js';
     import Controls from './src/ui/controls.js';
     import perf from './src/core/perf.js';
+    import { sanitizeState } from './src/physics/safety.js';
     
     // Require login
     auth.requireLogin();
@@ -133,13 +134,23 @@
     const controls = new Controls(
       (distance) => {
         blackHoleScene.setDistance(distance);
-        const state = blackHoleScene.getState();
-        hud.setData(state);
+        const rawState = blackHoleScene.getState();
+        const state = sanitizeState({
+          ...rawState,
+          rs: blackHoleScene.physics.r_s,
+          tidal: rawState.tidalForce
+        }, 'blackhole');
+        hud.setData({ ...rawState, ...state, tidalForce: state.tidal });
       },
       () => {
         blackHoleScene.setDistance(5);
-        const state = blackHoleScene.getState();
-        hud.setData(state);
+        const rawState = blackHoleScene.getState();
+        const state = sanitizeState({
+          ...rawState,
+          rs: blackHoleScene.physics.r_s,
+          tidal: rawState.tidalForce
+        }, 'blackhole');
+        hud.setData({ ...rawState, ...state, tidalForce: state.tidal });
       }
     );
     controls.init('blackhole');
@@ -147,7 +158,15 @@
     // Initial state
     const initialDistance = controls.getValue();
     blackHoleScene.setDistance(initialDistance);
-    hud.setData(blackHoleScene.getState());
+    {
+      const rawState = blackHoleScene.getState();
+      const state = sanitizeState({
+        ...rawState,
+        rs: blackHoleScene.physics.r_s,
+        tidal: rawState.tidalForce
+      }, 'blackhole');
+      hud.setData({ ...rawState, ...state, tidalForce: state.tidal });
+    }
     
     // Animation loop
     function animate(time) {
@@ -157,6 +176,17 @@
       // Update
       spaceBackground.update(time);
       blackHoleScene.update(time);
+
+      // Sanitize frame state before render + HUD
+      const rawState = blackHoleScene.getState();
+      const state = sanitizeState({
+        ...rawState,
+        rs: blackHoleScene.physics.r_s,
+        tidal: rawState.tidalForce,
+        fps: perf.fpsCounter.getFPS()
+      }, 'blackhole');
+      blackHoleScene.state = { ...rawState, ...state, tidalForce: state.tidal };
+      hud.setData(blackHoleScene.state);
       
       // Render
       spaceBackground.render(time);

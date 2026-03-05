@@ -107,6 +107,7 @@
     import Controls from './src/ui/controls.js';
     import perf from './src/core/perf.js';
     import { sanitize } from './src/core/sanitize.js';
+    import { sanitizeState } from './src/physics/safety.js';
     
     // Require login
     auth.requireLogin();
@@ -134,12 +135,24 @@
     const controls = new Controls(
       (distance) => {
         wormholeScene.setDistance(distance);
-        const state = wormholeScene.getState();
+        const rawState = wormholeScene.getState();
+        const safeState = sanitizeState({
+          ...rawState,
+          r0: wormholeScene.physics.r0,
+          distanceRatio: rawState.r_normalized
+        }, 'wormhole');
+        const state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
         updateWormholeHUD(state);
       },
       () => {
         wormholeScene.setDistance(2);
-        const state = wormholeScene.getState();
+        const rawState = wormholeScene.getState();
+        const safeState = sanitizeState({
+          ...rawState,
+          r0: wormholeScene.physics.r0,
+          distanceRatio: rawState.r_normalized
+        }, 'wormhole');
+        const state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
         updateWormholeHUD(state);
       }
     );
@@ -161,7 +174,16 @@
     // Initial state
     const initialDistance = controls.getValue();
     wormholeScene.setDistance(initialDistance);
-    updateWormholeHUD(wormholeScene.getState());
+    {
+      const rawState = wormholeScene.getState();
+      const safeState = sanitizeState({
+        ...rawState,
+        r0: wormholeScene.physics.r0,
+        distanceRatio: rawState.r_normalized
+      }, 'wormhole');
+      const state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
+      updateWormholeHUD(state);
+    }
     
     // Animation loop
     function animate(time) {
@@ -171,6 +193,17 @@
       // Update
       spaceBackground.update(time);
       wormholeScene.update(time);
+
+      // Sanitize frame state before render + HUD
+      const rawState = wormholeScene.getState();
+      const safeState = sanitizeState({
+        ...rawState,
+        r0: wormholeScene.physics.r0,
+        distanceRatio: rawState.r_normalized,
+        fps: perf.fpsCounter.getFPS()
+      }, 'wormhole');
+      wormholeScene.state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
+      updateWormholeHUD(wormholeScene.state);
       
       // Render
       spaceBackground.render(time);
