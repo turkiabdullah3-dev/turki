@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:;">
   <title>Equations - Spacetime Observatory</title>
+  <link rel="stylesheet" href="./vendor/katex/katex.min.css">
+  <script defer src="./vendor/katex/katex.min.js"></script>
+  <script defer src="./vendor/katex/auto-render.min.js"></script>
 </head>
 <body style="background: #000;">
   <div class="equations-container">
@@ -251,72 +254,15 @@
     import './styles/glass.css';
     
     import auth from './src/core/auth.js';
+    import { equations } from './src/ui/equationsData.js';
+    import { renderEquations } from './src/ui/equationsRender.js';
     
     // Require login
     auth.requireLogin();
-    
-    // Load KaTeX CSS dynamically
-    const katexCSS = document.createElement('link');
-    katexCSS.rel = 'stylesheet';
-    katexCSS.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
-    document.head.appendChild(katexCSS);
-    
-    // Load KaTeX script dynamically
-    const katexScript = document.createElement('script');
-    katexScript.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
-    
-    const autoRenderScript = document.createElement('script');
-    autoRenderScript.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js';
-    
-    // Store equation definitions
-    const equations = {
-      'eq-schwarzschild': '$$r_s = \\frac{2GM}{c^2}$$',
-      'eq-time-dilation': '$$\\alpha(r) = \\sqrt{1 - \\frac{r_s}{r}}$$',
-      'eq-redshift': '$$1 + z = \\frac{1}{\\sqrt{1 - \\frac{r_s}{r}}}$$',
-      'eq-photon': '$$r_{\\text{ph}} = \\frac{3GM}{c^2} = \\frac{3}{2}r_s$$',
-      'eq-tidal': '$$a_{\\text{tidal}} \\approx \\frac{2GML}{r^3}$$',
-      'eq-mt-metric': '$$ds^2 = -e^{2\\Phi(r)}c^2dt^2 + \\frac{dr^2}{1 - \\frac{b(r)}{r}} + r^2d\\Omega^2$$',
-      'eq-throat': '$$b(r_0) = r_0$$',
-      'eq-flare': '$$b\'(r_0) < 1$$',
-      'eq-nec': '$$\\rho + p_r < 0$$'
-    };
-    
-    function renderEquations() {
-      if (typeof katex === 'undefined') {
-        console.warn('KaTeX not loaded, retrying...');
-        setTimeout(renderEquations, 100);
-        return;
-      }
-      
-      // Use auto-render to render all equations
-      try {
-        // Render each equation directly into its container
-        Object.entries(equations).forEach(([id, tex]) => {
-          const elem = document.getElementById(id);
-          if (elem) {
-            try {
-              katex.render(tex.replace(/\$\$/g, ''), elem, { displayMode: true });
-            } catch (e) {
-              console.error(`Failed to render ${id}:`, e);
-              elem.textContent = tex; // Fallback to raw LaTeX
-            }
-          }
-        });
-      } catch (e) {
-        console.error('KaTeX rendering error:', e);
-      }
-    }
-    
-    // Load scripts in order
-    katexScript.onload = () => {
-      autoRenderScript.onload = () => {
-        // Render equations once both scripts are loaded
-        renderEquations();
-      };
-      document.head.appendChild(autoRenderScript);
-    };
-    
-    document.head.appendChild(katexScript);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderEquations(equations);
+    });
     
     // Tab switching
     document.querySelectorAll('[data-tab]').forEach(tab => {
