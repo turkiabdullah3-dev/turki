@@ -117,6 +117,11 @@ class WormholeScene {
     
     // Always-on cheap glow warp
     this.drawWarpGlow(time, centerX, centerY, throatRadius, intensity);
+
+    // Optional high-quality distortion (desktop + healthy FPS only)
+    if (this.shouldRunHighDistortion()) {
+      this.applyHighDistortion(centerX, centerY, throatRadius, intensity);
+    }
   }
   
   /**
