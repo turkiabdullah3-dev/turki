@@ -136,6 +136,33 @@
             <p id="mass-info" style="font-size: 11px; color: rgba(180,200,255,0.7); margin-top: 8px; min-height: 16px;">r_s = 29.53 km</p>
           </div>
 
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Black Hole Model</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="glass-btn primary" id="btn-model-schwarzschild" type="button" style="flex: 1;">Schwarzschild</button>
+              <button class="glass-btn" id="btn-model-kerr" type="button" style="flex: 1;">Kerr</button>
+            </div>
+          </div>
+
+          <div class="control-group" id="spin-control-group" style="margin-top: 14px; display: none;">
+            <label class="glass-label">Spin (a)</label>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+              Kerr spin parameter, where a = J / (Mc). Higher values produce stronger rotational visual effects.
+            </p>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="slider-spin"
+                class="glass-slider"
+                min="0"
+                max="0.99"
+                step="0.01"
+                value="0.50"
+              >
+              <span class="slider-value" id="slider-value-spin">0.50</span>
+            </div>
+          </div>
+
           <div style="display: flex; gap: 12px; margin-top: 16px;">
             <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
             <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">📊 View Equations</button>

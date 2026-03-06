@@ -49,6 +49,16 @@ export class ScientificMode {
           explanation: 'The differential gravitational force across an extended object. This "spaghettification" effect increases rapidly as r decreases.',
           getValue: (state) => state.tidal != null ? state.tidal.toExponential(2) : '—',
           symbol: 'F_tidal'
+        },
+        {
+          title: 'Kerr Spin Parameter',
+          formula: 'a = J / (Mc)',
+          explanation: 'A rotating black hole drags spacetime around it. This phenomenon is called frame dragging.',
+          getValue: (state) => {
+            const spin = state.spinParameter != null ? state.spinParameter : 0;
+            return `${spin.toFixed(2)} (${state.blackHoleModel === 'kerr' ? 'Kerr' : 'Schwarzschild'})`;
+          },
+          symbol: 'a'
         }
       ];
     } else if (this.mode === 'wormhole') {

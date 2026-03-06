@@ -146,6 +146,43 @@ if (sliderMass && sliderValueMass) {
   });
 }
 
+const btnModelSchwarzschild = document.getElementById('btn-model-schwarzschild');
+const btnModelKerr = document.getElementById('btn-model-kerr');
+const spinControlGroup = document.getElementById('spin-control-group');
+const sliderSpin = document.getElementById('slider-spin');
+const sliderValueSpin = document.getElementById('slider-value-spin');
+
+function applyBlackHoleModelUI(model) {
+  const isKerr = model === 'kerr';
+  btnModelSchwarzschild?.classList.toggle('primary', !isKerr);
+  btnModelKerr?.classList.toggle('primary', isKerr);
+  if (spinControlGroup) {
+    spinControlGroup.style.display = isKerr ? 'block' : 'none';
+  }
+}
+
+if (sliderSpin && sliderValueSpin) {
+  sliderSpin.value = blackHoleScene.getSpinParameter().toFixed(2);
+  sliderValueSpin.textContent = blackHoleScene.getSpinParameter().toFixed(2);
+  sliderSpin.addEventListener('input', (event) => {
+    const spin = parseFloat(event.target.value);
+    blackHoleScene.setSpinParameter(spin);
+    sliderValueSpin.textContent = spin.toFixed(2);
+  });
+}
+
+btnModelSchwarzschild?.addEventListener('click', () => {
+  blackHoleScene.setBlackHoleModel('schwarzschild');
+  applyBlackHoleModelUI('schwarzschild');
+});
+
+btnModelKerr?.addEventListener('click', () => {
+  blackHoleScene.setBlackHoleModel('kerr');
+  applyBlackHoleModelUI('kerr');
+});
+
+applyBlackHoleModelUI(blackHoleScene.getBlackHoleModel());
+
 // Initialize scientific mode
 const scientificMode = new ScientificMode('blackhole');
 scientificMode.init();
