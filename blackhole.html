@@ -8,11 +8,11 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-BwcLaXhz.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/auth-BJBqW4hE.js">
-  <link rel="modulepreload" crossorigin href="./assets/sanitize-C66EXt5K.js">
-  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-C6LYwAZ4.js">
-  <link rel="stylesheet" crossorigin href="./assets/auth-DYGL5IqF.css">
+  <script type="module" crossorigin src="./assets/blackhole-Bn40NKx1.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-BZhxXvHs.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-BLmeiCNK.js">
+  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-Btbs1S-q.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-B0PgFye2.css">
 </head>
 <body>
   <div id="canvas-container"></div>
@@ -164,6 +164,21 @@
             <div style="display: flex; gap: 8px; margin-top: 8px;">
               <button class="glass-btn primary" id="btn-model-schwarzschild" type="button" style="flex: 1;">Schwarzschild</button>
               <button class="glass-btn" id="btn-model-kerr" type="button" style="flex: 1;">Kerr</button>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Observation Mode</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="glass-btn primary" id="btn-mode-simulation" type="button" style="flex: 1;">Simulation View</button>
+              <button class="glass-btn" id="btn-mode-telescope" type="button" style="flex: 1;">Telescope View</button>
+            </div>
+          </div>
+
+          <div class="control-group eht-info-panel" id="eht-info-panel" style="margin-top: 12px; display: none;">
+            <div style="font-size: 12px; color: rgba(200, 200, 255, 0.9); font-weight: 500; margin-bottom: 8px;">📡 Event Horizon Telescope</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4;">
+              Simulated telescope view based on Event Horizon Telescope observations. The photon ring represents the path of photons grazing the black hole's edge.
             </div>
           </div>
 
