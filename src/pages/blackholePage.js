@@ -11,6 +11,7 @@ import Controls from '../ui/controls.js';
 import ScientificMode from '../ui/scientificMode.js';
 import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
+import UnitsConverter, { UnitMode } from '../core/unitsConverter.js';
 import { sanitizeState } from '../physics/safety.js';
 
 auth.requireLogin();
@@ -72,6 +73,58 @@ blackHoleScene.init();
 
 const hud = new HUD();
 hud.init();
+
+// Initialize units converter
+const unitsConverter = new UnitsConverter('blackhole');
+unitsConverter.loadPreferences();
+hud.setUnitsConverter(unitsConverter);
+
+// Units toggle buttons
+const btnUnitsRelative = document.getElementById('btn-units-relative');
+const btnUnitsPhysical = document.getElementById('btn-units-physical');
+if (btnUnitsRelative && btnUnitsPhysical) {
+  btnUnitsRelative.addEventListener('click', () => {
+    unitsConverter.setUnitMode(UnitMode.RELATIVE);
+    btnUnitsRelative.classList.add('primary');
+    btnUnitsPhysical.classList.remove('primary');
+    hud.setData(blackHoleScene.state || blackHoleScene.getState());
+  });
+  btnUnitsPhysical.addEventListener('click', () => {
+    unitsConverter.setUnitMode(UnitMode.PHYSICAL);
+    btnUnitsPhysical.classList.add('primary');
+    btnUnitsRelative.classList.remove('primary');
+    hud.setData(blackHoleScene.state || blackHoleScene.getState());
+  });
+  // Set initial state
+  if (unitsConverter.getUnitMode() === UnitMode.PHYSICAL) {
+    btnUnitsPhysical.classList.add('primary');
+    btnUnitsRelative.classList.remove('primary');
+  }
+}
+
+// Mass parameter slider
+const sliderMass = document.getElementById('slider-mass');
+const sliderValueMass = document.getElementById('slider-value-mass');
+const massInfo = document.getElementById('mass-info');
+if (sliderMass && sliderValueMass) {
+  sliderMass.value = unitsConverter.getBlackHoleMass().toString();
+  sliderValueMass.textContent = `${unitsConverter.getBlackHoleMass().toFixed(0)} M☉`;
+  if (massInfo) {
+    const rs_km = (unitsConverter.schwarzschildRadius / 1000).toFixed(2);
+    massInfo.textContent = `r_s = ${rs_km} km`;
+  }
+  
+  sliderMass.addEventListener('input', (e) => {
+    const mass = parseFloat(e.target.value);
+    unitsConverter.setBlackHoleMass(mass);
+    sliderValueMass.textContent = `${mass.toFixed(0)} M☉`;
+    if (massInfo) {
+      const rs_km = (unitsConverter.schwarzschildRadius / 1000).toFixed(2);
+      massInfo.textContent = `r_s = ${rs_km} km`;
+    }
+    hud.setData(blackHoleScene.state || blackHoleScene.getState());
+  });
+}
 
 // Initialize scientific mode
 const scientificMode = new ScientificMode('blackhole');

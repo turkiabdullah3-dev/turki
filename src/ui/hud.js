@@ -9,6 +9,7 @@ export class HUD {
     this.elements = {};
     this.updateThrottled = perf.throttle(() => this.updateValues(), 100);
     this.data = {};
+    this.unitsConverter = null; // Set externally
   }
   
   /**
@@ -23,8 +24,18 @@ export class HUD {
       fps: document.getElementById('value-fps'),
       // Optional elements
       warpStrength: document.getElementById('value-warp'),
-      exoticMatter: document.getElementById('value-exotic')
+      exoticMatter: document.getElementById('value-exotic'),
+      // Unit labels
+      distanceUnit: document.querySelector('#value-distance').parentElement.querySelector('.data-unit'),
+      throatRadiusUnit: document.getElementById('value-throat-radius')?.parentElement.querySelector('.data-unit')
     };
+  }
+  
+  /**
+   * Set units converter
+   */
+  setUnitsConverter(converter) {
+    this.unitsConverter = converter;
   }
   
   /**
@@ -54,9 +65,17 @@ export class HUD {
   updateValues() {
     if (!this.data) return;
     
-    // Distance (value only, unit in HTML)
+    // Distance (with unit conversion if converter available)
     if (this.elements.distance && this.data.r_normalized !== undefined) {
-      sanitize.setText(this.elements.distance, this.data.r_normalized.toFixed(2));
+      if (this.unitsConverter) {
+        const converted = this.unitsConverter.convertDistance(this.data.r_normalized, 'distance');
+        sanitize.setText(this.elements.distance, converted.value);
+        if (this.elements.distanceUnit) {
+          sanitize.setText(this.elements.distanceUnit, converted.unit);
+        }
+      } else {
+        sanitize.setText(this.elements.distance, this.data.r_normalized.toFixed(2));
+      }
     }
     
     // Time dilation (alpha)

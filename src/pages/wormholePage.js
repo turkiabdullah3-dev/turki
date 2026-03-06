@@ -11,6 +11,7 @@ import Controls from '../ui/controls.js';
 import ScientificMode from '../ui/scientificMode.js';
 import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
+import UnitsConverter, { UnitMode } from '../core/unitsConverter.js';
 import { sanitize } from '../core/sanitize.js';
 import { sanitizeState } from '../physics/safety.js';
 
@@ -73,6 +74,49 @@ wormholeScene.init();
 
 const hud = new HUD();
 hud.init();
+
+// Initialize units converter
+const unitsConverter = new UnitsConverter('wormhole');
+unitsConverter.loadPreferences();
+hud.setUnitsConverter(unitsConverter);
+
+// Units toggle buttons
+const btnUnitsRelative = document.getElementById('btn-units-relative');
+const btnUnitsPhysical = document.getElementById('btn-units-physical');
+if (btnUnitsRelative && btnUnitsPhysical) {
+  btnUnitsRelative.addEventListener('click', () => {
+    unitsConverter.setUnitMode(UnitMode.RELATIVE);
+    btnUnitsRelative.classList.add('primary');
+    btnUnitsPhysical.classList.remove('primary');
+    updateWormholeHUD(wormholeScene.state || wormholeScene.getState());
+  });
+  btnUnitsPhysical.addEventListener('click', () => {
+    unitsConverter.setUnitMode(UnitMode.PHYSICAL);
+    btnUnitsPhysical.classList.add('primary');
+    btnUnitsRelative.classList.remove('primary');
+    updateWormholeHUD(wormholeScene.state || wormholeScene.getState());
+  });
+  // Set initial state
+  if (unitsConverter.getUnitMode() === UnitMode.PHYSICAL) {
+    btnUnitsPhysical.classList.add('primary');
+    btnUnitsRelative.classList.remove('primary');
+  }
+}
+
+// Throat radius parameter slider
+const sliderThroat = document.getElementById('slider-throat');
+const sliderValueThroat = document.getElementById('slider-value-throat');
+if (sliderThroat && sliderValueThroat) {
+  sliderThroat.value = unitsConverter.getWormholeThroatRadius().toString();
+  sliderValueThroat.textContent = `${unitsConverter.getWormholeThroatRadius().toFixed(0)} m`;
+  
+  sliderThroat.addEventListener('input', (e) => {
+    const throat = parseFloat(e.target.value);
+    unitsConverter.setWormholeThroatRadius(throat);
+    sliderValueThroat.textContent = `${throat.toFixed(0)} m`;
+    updateWormholeHUD(wormholeScene.state || wormholeScene.getState());
+  });
+}
 
 // Initialize scientific mode
 const scientificMode = new ScientificMode('wormhole');
@@ -196,11 +240,31 @@ function updateWormholeHUD(state) {
   const exoticEl = document.getElementById('value-exotic');
   const throatRadiusEl = document.getElementById('value-throat-radius');
 
-  // Values only - units are in HTML
-  if (distanceEl) sanitize.setText(distanceEl, state.r_normalized.toFixed(2));
+  // Distance with unit conversion
+  if (distanceEl && state.r_normalized !== undefined) {
+    const converted = unitsConverter.convertDistance(state.r_normalized, 'distance');
+    sanitize.setText(distanceEl, converted.value);
+    const distanceUnit = distanceEl.parentElement.querySelector('.data-unit');
+    if (distanceUnit) {
+      sanitize.setText(distanceUnit, converted.unit);
+    }
+  }
+  
+  // Warp strength
   if (warpEl) sanitize.setText(warpEl, (state.warpStrength * 100).toFixed(0));
+  
+  // Exotic matter
   if (exoticEl) sanitize.setText(exoticEl, state.exoticMatter < 0 ? 'Required' : 'Not Required');
-  if (throatRadiusEl) sanitize.setText(throatRadiusEl, '1.00'); // Throat radius is constant at 1.00 r₀
+  
+  // Throat radius with unit conversion
+  if (throatRadiusEl) {
+    const converted = unitsConverter.convertThroatRadius();
+    sanitize.setText(throatRadiusEl, converted.value);
+    const throatUnit = throatRadiusEl.parentElement.querySelector('.data-unit');
+    if (throatUnit) {
+      sanitize.setText(throatUnit, converted.unit);
+    }
+  }
 }
 
 const initialDistance = controls.getValue();

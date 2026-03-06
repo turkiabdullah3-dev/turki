@@ -92,6 +92,33 @@
           </div>
 
           <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Units</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="glass-btn primary" id="btn-units-relative" type="button" style="flex: 1;">Relative</button>
+              <button class="glass-btn" id="btn-units-physical" type="button" style="flex: 1;">Physical</button>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Throat Radius (r₀)</label>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+              Set throat radius in meters. Affects physical unit conversions.
+            </p>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="slider-throat" 
+                class="glass-slider" 
+                min="100" 
+                max="10000" 
+                step="100" 
+                value="1000"
+              >
+              <span class="slider-value" id="slider-value-throat">1000 m</span>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
             <label class="glass-label">Quality</label>
             <div style="display: flex; gap: 8px; margin-top: 8px;">
               <button class="glass-btn primary" id="btn-quality-glow" type="button" style="flex: 1;">Glow</button>
