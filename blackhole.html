@@ -7,11 +7,11 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-BfXYiJqI.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/auth-ZcfAPaFd.js">
-  <link rel="modulepreload" crossorigin href="./assets/sanitize-CQGr0Y2P.js">
-  <link rel="modulepreload" crossorigin href="./assets/controls-6oXBubuo.js">
-  <link rel="stylesheet" crossorigin href="./assets/auth-BBE1HylC.css">
+  <script type="module" crossorigin src="./assets/blackhole-CL0T9YrX.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-Bt5E5-hp.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-PNe2G5gO.js">
+  <link rel="modulepreload" crossorigin href="./assets/controls-BhYMSjxa.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-Cb6U2Y0f.css">
 </head>
 <body>
   <div id="canvas-container"></div>
@@ -20,86 +20,92 @@
     <!-- Header -->
     <div class="header">
       <div class="logo">Spacetime Observatory / Black Hole</div>
-      <div class="user-info">
-        <button class="glass-btn" id="btn-home">← Home</button>
-        <button class="glass-btn" id="btn-equations-header">Equations</button>
-      </div>
     </div>
     
-    <!-- Info Panel -->
-    <div class="info-panel glass-panel">
-      <h3 style="margin-bottom: 16px; font-size: 18px;">🕳️ Schwarzschild Black Hole</h3>
-      
-      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
-        A non-rotating black hole described by the Schwarzschild metric. Observe gravitational time dilation, redshift, and tidal forces as you approach the event horizon.
-      </p>
-      
-      <div class="data-rows">
-        <div class="data-row">
-          <span class="data-label">Distance from Center</span>
-          <span class="data-value" id="value-distance">5.00</span>
-          <span class="data-unit">r_s</span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Time Dilation (α)</span>
-          <span class="data-value" id="value-alpha">0.8944</span>
-          <span class="data-unit"></span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Gravitational Redshift</span>
-          <span class="data-value" id="value-redshift">0.12</span>
-          <span class="data-unit"></span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Tidal Acceleration</span>
-          <span class="data-value" id="value-tidal">0.00e+0</span>
-          <span class="data-unit">m/s²</span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Frame Rate</span>
-          <span class="data-value" id="value-fps">60</span>
-          <span class="data-unit">FPS</span>
-        </div>
+    <div class="dock-panel glass-panel left-panel">
+      <div class="dock-tabs">
+        <button class="dock-tab active" type="button" data-dock-tab="overview">Overview</button>
+        <button class="dock-tab" type="button" data-dock-tab="controls">Controls</button>
       </div>
-      
-      <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-        📌 Tip: r_s is the Schwarzschild radius (event horizon). Move closer to see increasing time dilation and redshift effects.
-      </p>
-    </div>
-    
-    <!-- Controls -->
-    <div class="controls glass-panel">
-      <h4 style="margin-bottom: 12px; font-size: 14px;">⚙️ Interactive Controls</h4>
-      
-      <div class="control-group">
-        <label class="glass-label">Distance from Center (r/r_s)</label>
-        <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-          Adjust your observer position. r_s is the Schwarzschild radius (event horizon). Below 1.02 is unsafe.
+
+      <section class="dock-content active" data-dock-content="overview">
+        <h3 style="margin-bottom: 16px; font-size: 18px;">🕳️ Schwarzschild Black Hole</h3>
+
+        <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+          A non-rotating black hole described by the Schwarzschild metric. Observe gravitational time dilation, redshift, and tidal forces as you approach the event horizon.
         </p>
-        <div class="slider-container">
-          <input 
-            type="range" 
-            id="slider-distance" 
-            class="glass-slider" 
-            min="1.02" 
-            max="50" 
-            step="0.1" 
-            value="5"
-          >
-          <span class="slider-value" id="slider-value-distance">5.00 r_s</span>
+
+        <div class="data-rows">
+          <div class="data-row">
+            <span class="data-label">Distance from Center</span>
+            <span class="data-value" id="value-distance">5.00</span>
+            <span class="data-unit">r_s</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Time Dilation (α)</span>
+            <span class="data-value" id="value-alpha">0.8944</span>
+            <span class="data-unit"></span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Gravitational Redshift</span>
+            <span class="data-value" id="value-redshift">0.12</span>
+            <span class="data-unit"></span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Tidal Acceleration</span>
+            <span class="data-value" id="value-tidal">0.00e+0</span>
+            <span class="data-unit">m/s²</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Frame Rate</span>
+            <span class="data-value" id="value-fps">60</span>
+            <span class="data-unit">FPS</span>
+          </div>
         </div>
-      </div>
-      
-      <div style="display: flex; gap: 12px; margin-top: 16px;">
-        <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
-        <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">
-          📊 View Equations
-        </button>
-      </div>
+
+        <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+          📌 Tip: r_s is the Schwarzschild radius (event horizon). Move closer to see increasing time dilation and redshift effects.
+        </p>
+      </section>
+
+      <section class="dock-content" data-dock-content="controls">
+        <div class="dock-controls">
+          <h4 style="margin-bottom: 12px; font-size: 14px;">⚙️ Interactive Controls</h4>
+
+          <div class="control-group">
+            <label class="glass-label">Distance from Center (r/r_s)</label>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+              Adjust your observer position. r_s is the Schwarzschild radius (event horizon). Below 1.02 is unsafe.
+            </p>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="slider-distance" 
+                class="glass-slider" 
+                min="1.02" 
+                max="50" 
+                step="0.1" 
+                value="5"
+              >
+              <span class="slider-value" id="slider-value-distance">5.00 r_s</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
+            <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">📊 View Equations</button>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 12px;">
+            <button class="glass-btn" id="btn-home" style="flex: 1;">← Home</button>
+            <button class="glass-btn" id="btn-equations-header" style="flex: 1;">Equations</button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
   
