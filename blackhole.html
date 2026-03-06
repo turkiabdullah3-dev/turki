@@ -8,10 +8,10 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-p70FTyg_.js"></script>
+  <script type="module" crossorigin src="./assets/blackhole-CSCqM2EU.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/auth-4xbw2wC0.js">
   <link rel="modulepreload" crossorigin href="./assets/sanitize-CgBkavPt.js">
-  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-uwAnp0xV.js">
+  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-C4y-xXTQ.js">
   <link rel="stylesheet" crossorigin href="./assets/auth-CGYfq_P4.css">
 </head>
 <body>
@@ -139,6 +139,33 @@
               <span class="slider-value" id="slider-value-mass">10 M☉</span>
             </div>
             <p id="mass-info" style="font-size: 11px; color: rgba(180,200,255,0.7); margin-top: 8px; min-height: 16px;">r_s = 29.53 km</p>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Black Hole Model</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="glass-btn primary" id="btn-model-schwarzschild" type="button" style="flex: 1;">Schwarzschild</button>
+              <button class="glass-btn" id="btn-model-kerr" type="button" style="flex: 1;">Kerr</button>
+            </div>
+          </div>
+
+          <div class="control-group" id="spin-control-group" style="margin-top: 14px; display: none;">
+            <label class="glass-label">Spin (a)</label>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+              Kerr spin parameter, where a = J / (Mc). Higher values produce stronger rotational visual effects.
+            </p>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="slider-spin"
+                class="glass-slider"
+                min="0"
+                max="0.99"
+                step="0.01"
+                value="0.50"
+              >
+              <span class="slider-value" id="slider-value-spin">0.50</span>
+            </div>
           </div>
 
           <div style="display: flex; gap: 12px; margin-top: 16px;">
