@@ -8,6 +8,7 @@ import BlackHoleScene from '../render/blackholeScene.js';
 import PostFX from '../render/postFX.js';
 import HUD from '../ui/hud.js';
 import Controls from '../ui/controls.js';
+import ScientificMode from '../ui/scientificMode.js';
 import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
 import { sanitizeState } from '../physics/safety.js';
@@ -71,6 +72,22 @@ blackHoleScene.init();
 
 const hud = new HUD();
 hud.init();
+
+// Initialize scientific mode
+const scientificMode = new ScientificMode('blackhole');
+scientificMode.init();
+scientificMode.loadPreference();
+
+// Scientific mode button
+const btnScientific = document.getElementById('btn-scientific');
+if (btnScientific) {
+  btnScientific.addEventListener('click', () => {
+    const isActive = scientificMode.toggle();
+    btnScientific.classList.toggle('active', isActive);
+  });
+  // Set initial state
+  btnScientific.classList.toggle('active', scientificMode.isActive);
+}
 
 const controls = new Controls(
   (distance) => {
@@ -138,6 +155,7 @@ function animate(time) {
   );
   blackHoleScene.state = { ...rawState, ...state, tidalForce: state.tidal };
   hud.setData(blackHoleScene.state);
+  scientificMode.updateState(blackHoleScene.state);
 
   spaceBackground.render(time);
   blackHoleScene.render(time);

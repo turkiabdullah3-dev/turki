@@ -8,6 +8,7 @@ import WormholeScene from '../render/wormholeScene.js';
 import PostFX from '../render/postFX.js';
 import HUD from '../ui/hud.js';
 import Controls from '../ui/controls.js';
+import ScientificMode from '../ui/scientificMode.js';
 import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
 import { sanitize } from '../core/sanitize.js';
@@ -72,6 +73,22 @@ wormholeScene.init();
 
 const hud = new HUD();
 hud.init();
+
+// Initialize scientific mode
+const scientificMode = new ScientificMode('wormhole');
+scientificMode.init();
+scientificMode.loadPreference();
+
+// Scientific mode button
+const btnScientific = document.getElementById('btn-scientific');
+if (btnScientific) {
+  btnScientific.addEventListener('click', () => {
+    const isActive = scientificMode.toggle();
+    btnScientific.classList.toggle('active', isActive);
+  });
+  // Set initial state
+  btnScientific.classList.toggle('active', scientificMode.isActive);
+}
 
 const QUALITY_KEY = 'qualityMode';
 const isTouchIPad = /Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document;
@@ -224,6 +241,7 @@ function animate(time) {
   wormholeScene.state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
   wormholeScene.setPerformanceContext({ fps: currentFPS, isMobile: isMobileOrTablet });
   updateWormholeHUD(wormholeScene.state);
+  scientificMode.updateState(wormholeScene.state);
 
   if (qualityMode === 'high' && !isMobileOrTablet) {
     if (currentFPS < 40) {
