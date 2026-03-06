@@ -9,6 +9,7 @@ import PostFX from '../render/postFX.js';
 import HUD from '../ui/hud.js';
 import Controls from '../ui/controls.js';
 import ScientificMode from '../ui/scientificMode.js';
+import GuidedJourney from '../ui/guidedJourney.js';
 import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
 import UnitsConverter, { UnitMode } from '../core/unitsConverter.js';
@@ -134,6 +135,10 @@ if (btnScientific) {
   btnScientific.classList.toggle('active', scientificMode.isActive);
 }
 
+// Initialize guided journey
+const guidedJourney = new GuidedJourney('wormhole');
+guidedJourney.init();
+
 const QUALITY_KEY = 'qualityMode';
 const isTouchIPad = /Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document;
 const isMobileOrTablet = perf.isMobileOrTablet() || isTouchIPad;
@@ -229,6 +234,27 @@ const controls = new Controls(
 );
 controls.init('wormhole');
 
+// Journey button
+const btnJourneyStart = document.getElementById('btn-journey-start');
+if (btnJourneyStart) {
+  btnJourneyStart.addEventListener('click', () => {
+    if (guidedJourney.isJourneyActive()) {
+      guidedJourney.exit();
+      btnJourneyStart.textContent = '🎬 Start Journey';
+      btnJourneyStart.classList.remove('active');
+    } else {
+      guidedJourney.start(controls.getDistance());
+      btnJourneyStart.textContent = '✕ Exit Journey';
+      btnJourneyStart.classList.add('active');
+    }
+  });
+}
+
+// Connect journey distance updates to controls
+guidedJourney.onDistanceUpdate((newDistance) => {
+  controls.setDistance(newDistance);
+});
+
 document.getElementById('btn-quality-glow')?.addEventListener('click', () => applyQualityMode('glow', false));
 document.getElementById('btn-quality-high')?.addEventListener('click', () => applyQualityMode('high', true));
 
@@ -288,6 +314,12 @@ function animate(time) {
 
   // Update performance monitor
   const currentFPS = performanceMonitor.update();
+  
+  // Update guided journey (if active)
+  if (guidedJourney.isJourneyActive()) {
+    const currentDistance = controls.getDistance();
+    guidedJourney.update(time, currentDistance);
+  }
 
   spaceBackground.update(time);
   wormholeScene.update(time);
