@@ -62,7 +62,7 @@ export class UnitsConverter {
    * Set black hole mass (in solar masses)
    */
   setBlackHoleMass(solarMasses) {
-    this.blackHoleMass = Math.max(0.1, Math.min(1000, solarMasses)); // Clamp 0.1-1000 M☉
+    this.blackHoleMass = Math.max(0.1, Math.min(1e11, solarMasses)); // Clamp 0.1 - 100 billion M☉
     this.schwarzschildRadius = this.calculateSchwarzschildRadius();
     localStorage.setItem('blackHoleMass', this.blackHoleMass.toString());
   }

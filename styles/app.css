@@ -129,6 +129,52 @@ html, body {
   margin-bottom: 0;
 }
 
+.slider-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.observed-object-select {
+  font-size: 13px;
+}
+
+.observed-object-panel {
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  background: rgba(90, 140, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.observed-object-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: rgba(220, 235, 255, 0.95);
+}
+
+.observed-object-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.observed-object-row:last-child {
+  margin-bottom: 0;
+}
+
+.observed-object-row span:first-child {
+  color: rgba(180, 210, 255, 0.75);
+  min-width: 98px;
+}
+
+.observed-object-row span:last-child {
+  text-align: right;
+}
+
 .slider-container {
   display: flex;
   gap: 16px;

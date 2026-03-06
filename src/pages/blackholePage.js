@@ -11,6 +11,7 @@ import HUD from '../ui/hud.js';
 import Controls from '../ui/controls.js';
 import ScientificMode from '../ui/scientificMode.js';
 import GuidedJourney from '../ui/guidedJourney.js';
+import { OBSERVED_BLACK_HOLES } from '../data/observedBlackHoles.js';
 import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
 import UnitsConverter, { UnitMode } from '../core/unitsConverter.js';
@@ -126,23 +127,123 @@ if (btnUnitsRelative && btnUnitsPhysical) {
 const sliderMass = document.getElementById('slider-mass');
 const sliderValueMass = document.getElementById('slider-value-mass');
 const massInfo = document.getElementById('mass-info');
-if (sliderMass && sliderValueMass) {
-  sliderMass.value = unitsConverter.getBlackHoleMass().toString();
-  sliderValueMass.textContent = `${unitsConverter.getBlackHoleMass().toFixed(0)} M☉`;
-  if (massInfo) {
-    const rs_km = (unitsConverter.schwarzschildRadius / 1000).toFixed(2);
-    massInfo.textContent = `r_s = ${rs_km} km`;
+const selectObservedObject = document.getElementById('select-observed-object');
+const observedName = document.getElementById('observed-name');
+const observedType = document.getElementById('observed-type');
+const observedMass = document.getElementById('observed-mass');
+const observedLocation = document.getElementById('observed-location');
+const observedDistance = document.getElementById('observed-distance');
+
+const OBSERVED_OBJECT_KEY = 'observedBlackHoleObject';
+const CUSTOM_MASS_KEY = 'customBlackHoleMass';
+
+function clampCustomMass(value) {
+  if (!sliderMass) return value;
+  const min = parseFloat(sliderMass.min);
+  const max = parseFloat(sliderMass.max);
+  return Math.min(max, Math.max(min, value));
+}
+
+function formatMassSolar(mass) {
+  if (mass >= 1e9) {
+    return `${(mass / 1e9).toFixed(2)} billion M☉`;
   }
-  
+  if (mass >= 1e6) {
+    return `${(mass / 1e6).toFixed(2)} million M☉`;
+  }
+  return `${mass.toLocaleString('en-US', { maximumFractionDigits: 2 })} M☉`;
+}
+
+function formatSchwarzschildKm(km) {
+  if (km >= 1e9) {
+    return `${(km / 1e9).toFixed(2)} billion km`;
+  }
+  if (km >= 1e6) {
+    return `${(km / 1e6).toFixed(2)} million km`;
+  }
+  return `${km.toFixed(2)} km`;
+}
+
+function updateMassInfoLabel() {
+  if (!massInfo) return;
+  const rsKm = unitsConverter.schwarzschildRadius / 1000;
+  massInfo.textContent = `r_s = ${formatSchwarzschildKm(rsKm)}`;
+}
+
+function renderObservedObjectInfo(objectConfig) {
+  if (observedName) observedName.textContent = objectConfig.name;
+  if (observedType) observedType.textContent = objectConfig.type;
+  if (observedMass) observedMass.textContent = objectConfig.massLabel;
+  if (observedLocation) observedLocation.textContent = objectConfig.location;
+  if (observedDistance) observedDistance.textContent = objectConfig.distanceFromEarth;
+}
+
+let customMass = parseFloat(localStorage.getItem(CUSTOM_MASS_KEY) || '10');
+if (Number.isNaN(customMass) || customMass <= 0) {
+  customMass = 10;
+}
+customMass = clampCustomMass(customMass);
+
+function applyObservedObjectSelection(key) {
+  const objectConfig = OBSERVED_BLACK_HOLES[key] || OBSERVED_BLACK_HOLES.custom;
+  const isCustom = objectConfig.key === 'custom';
+
+  localStorage.setItem(OBSERVED_OBJECT_KEY, objectConfig.key);
+  renderObservedObjectInfo(objectConfig);
+
+  if (sliderMass) {
+    sliderMass.disabled = !isCustom;
+    sliderMass.classList.toggle('slider-disabled', !isCustom);
+  }
+
+  if (isCustom) {
+    unitsConverter.setBlackHoleMass(customMass);
+    if (sliderMass) {
+      sliderMass.value = customMass.toString();
+    }
+    if (sliderValueMass) {
+      sliderValueMass.textContent = `${customMass.toFixed(0)} M☉`;
+    }
+  } else {
+    unitsConverter.setBlackHoleMass(objectConfig.massSolar);
+    if (sliderValueMass) {
+      sliderValueMass.textContent = formatMassSolar(objectConfig.massSolar);
+    }
+  }
+
+  updateMassInfoLabel();
+  hud.setData(blackHoleScene.state || blackHoleScene.getState());
+}
+
+if (sliderMass && sliderValueMass) {
+  sliderMass.value = customMass.toString();
+  sliderValueMass.textContent = `${customMass.toFixed(0)} M☉`;
+  updateMassInfoLabel();
+
   sliderMass.addEventListener('input', (e) => {
-    const mass = parseFloat(e.target.value);
+    const selectedKey = localStorage.getItem(OBSERVED_OBJECT_KEY) || 'custom';
+    if (selectedKey !== 'custom') {
+      return;
+    }
+
+    const mass = clampCustomMass(parseFloat(e.target.value));
+    customMass = mass;
+    localStorage.setItem(CUSTOM_MASS_KEY, customMass.toString());
+
     unitsConverter.setBlackHoleMass(mass);
     sliderValueMass.textContent = `${mass.toFixed(0)} M☉`;
-    if (massInfo) {
-      const rs_km = (unitsConverter.schwarzschildRadius / 1000).toFixed(2);
-      massInfo.textContent = `r_s = ${rs_km} km`;
-    }
+    updateMassInfoLabel();
     hud.setData(blackHoleScene.state || blackHoleScene.getState());
+  });
+}
+
+if (selectObservedObject) {
+  const savedSelection = localStorage.getItem(OBSERVED_OBJECT_KEY) || 'custom';
+  selectObservedObject.value = OBSERVED_BLACK_HOLES[savedSelection] ? savedSelection : 'custom';
+  applyObservedObjectSelection(selectObservedObject.value);
+
+  selectObservedObject.addEventListener('change', (event) => {
+    applyObservedObjectSelection(event.target.value);
   });
 }
 

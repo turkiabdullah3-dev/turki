@@ -137,6 +137,24 @@
           </div>
 
           <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Observed Objects</label>
+            <select id="select-observed-object" class="glass-input observed-object-select" style="width: 100%; margin-top: 8px;">
+              <option value="custom">Custom</option>
+              <option value="sagittariusA">Sagittarius A*</option>
+              <option value="m87">M87*</option>
+              <option value="cygnusX1">Cygnus X-1</option>
+            </select>
+          </div>
+
+          <div class="control-group observed-object-panel" id="observed-object-panel" style="margin-top: 12px;">
+            <div class="observed-object-title" id="observed-name">Custom</div>
+            <div class="observed-object-row"><span>Type:</span><span id="observed-type">User-defined</span></div>
+            <div class="observed-object-row"><span>Mass:</span><span id="observed-mass">Custom</span></div>
+            <div class="observed-object-row"><span>Location:</span><span id="observed-location">User Simulation</span></div>
+            <div class="observed-object-row"><span>Distance from Earth:</span><span id="observed-distance">N/A</span></div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
             <label class="glass-label">Black Hole Model</label>
             <div style="display: flex; gap: 8px; margin-top: 8px;">
               <button class="glass-btn primary" id="btn-model-schwarzschild" type="button" style="flex: 1;">Schwarzschild</button>
