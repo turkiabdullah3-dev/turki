@@ -17,6 +17,7 @@ class WormholeScene {
     this.frameCount = 0;
     this.offscreenCanvas = document.createElement('canvas');
     this.offscreenCtx = this.offscreenCanvas.getContext('2d', { willReadFrequently: true });
+    this.performanceMonitor = null; // Set externally
   }
   
   /**
@@ -24,6 +25,13 @@ class WormholeScene {
    */
   init() {
     this.updatePhysics();
+  }
+  
+  /**
+   * Set performance monitor
+   */
+  setPerformanceMonitor(monitor) {
+    this.performanceMonitor = monitor;
   }
   
   /**
@@ -85,6 +93,13 @@ class WormholeScene {
    * @returns {boolean}
    */
   shouldRunHighDistortion() {
+    // Use performance monitor if available
+    if (this.performanceMonitor) {
+      const settings = this.performanceMonitor.getQualitySettings();
+      const fps = this.performanceMonitor.getFPS();
+      return settings.enableDistortion && !this.isMobileDevice && fps > 45;
+    }
+    // Fallback to old logic
     return this.qualityMode === 'high' && !this.isMobileDevice && this.currentFPS > 45;
   }
   
@@ -190,10 +205,17 @@ class WormholeScene {
    * Draw throat + tunnel hero visual (cheap: arcs + gradients only)
    */
   drawThroatAndTunnel(ctx, centerX, centerY, radius, t, intensity) {
+    // Get quality settings
+    const qualitySettings = this.performanceMonitor 
+      ? this.performanceMonitor.getQualitySettings() 
+      : { enableGlow: true, glowIntensity: 1.0, effectsMultiplier: 1.0 };
+    
+    const glowMultiplier = qualitySettings.glowIntensity;
+    
     // Outer glow ring
     const outerGlow = ctx.createRadialGradient(centerX, centerY, radius * 0.7, centerX, centerY, radius * 2.8);
-    outerGlow.addColorStop(0, `rgba(170, 120, 255, ${0.24 * intensity})`);
-    outerGlow.addColorStop(0.45, `rgba(120, 70, 210, ${0.18 * intensity})`);
+    outerGlow.addColorStop(0, `rgba(170, 120, 255, ${0.24 * intensity * glowMultiplier})`);
+    outerGlow.addColorStop(0.45, `rgba(120, 70, 210, ${0.18 * intensity * glowMultiplier})`);
     outerGlow.addColorStop(1, 'rgba(30, 10, 80, 0)');
     ctx.fillStyle = outerGlow;
     ctx.beginPath();
@@ -210,21 +232,24 @@ class WormholeScene {
     ctx.arc(centerX, centerY, radius * 1.1, 0, Math.PI * 2);
     ctx.fill();
 
-    // Gentle pulsing shimmer glow around throat
-    const pulse = 0.82 + 0.18 * Math.sin(t * 0.004);
-    const shimmer = ctx.createRadialGradient(
-      centerX, centerY, radius * 0.6,
-      centerX, centerY, radius * 1.5
-    );
-    shimmer.addColorStop(0, `rgba(230, 190, 255, ${0.3 * pulse})`);
-    shimmer.addColorStop(0.5, `rgba(180, 140, 220, ${0.18 * pulse})`);
-    shimmer.addColorStop(1, 'rgba(140, 100, 180, 0)');
-    ctx.fillStyle = shimmer;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2);
-    ctx.fill();
+    // Gentle pulsing shimmer glow around throat (quality-dependent)
+    if (qualitySettings.enableGlow && qualitySettings.effectsMultiplier > 0.5) {
+      const pulse = 0.82 + 0.18 * Math.sin(t * 0.004);
+      const shimmer = ctx.createRadialGradient(
+        centerX, centerY, radius * 0.6,
+        centerX, centerY, radius * 1.5
+      );
+      shimmer.addColorStop(0, `rgba(230, 190, 255, ${0.3 * pulse * glowMultiplier})`);
+      shimmer.addColorStop(0.5, `rgba(180, 140, 220, ${0.18 * pulse * glowMultiplier})`);
+      shimmer.addColorStop(1, 'rgba(140, 100, 180, 0)');
+      ctx.fillStyle = shimmer;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
     
     // Crisp throat ring
+    const pulse = 0.82 + 0.18 * Math.sin(t * 0.004);
     ctx.strokeStyle = `rgba(230, 190, 255, ${pulse})`;
     ctx.lineWidth = 2.2;
     ctx.beginPath();

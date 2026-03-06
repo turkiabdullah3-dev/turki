@@ -9,6 +9,7 @@ import PostFX from '../render/postFX.js';
 import HUD from '../ui/hud.js';
 import Controls from '../ui/controls.js';
 import perf from '../core/perf.js';
+import PerformanceMonitor from '../core/performanceMonitor.js';
 import { sanitizeState } from '../physics/safety.js';
 
 auth.requireLogin();
@@ -59,6 +60,11 @@ if (!canvasRoot.init()) {
 const spaceBackground = new SpaceBackground(canvasRoot);
 const blackHoleScene = new BlackHoleScene(canvasRoot);
 const postFX = new PostFX(canvasRoot);
+
+// Initialize performance monitor
+const performanceMonitor = new PerformanceMonitor();
+spaceBackground.setPerformanceMonitor(performanceMonitor);
+blackHoleScene.setPerformanceMonitor(performanceMonitor);
 
 spaceBackground.init();
 blackHoleScene.init();
@@ -114,6 +120,9 @@ blackHoleScene.setDistance(initialDistance);
 function animate(time) {
   canvasRoot.clear('#000000');
 
+  // Update performance monitor
+  const currentFPS = performanceMonitor.update();
+
   spaceBackground.update(time);
   blackHoleScene.update(time);
 
@@ -123,7 +132,7 @@ function animate(time) {
       ...rawState,
       rs: blackHoleScene.physics.r_s,
       tidal: rawState.tidalForce,
-      fps: perf.fpsCounter.getFPS()
+      fps: currentFPS
     },
     'blackhole'
   );
@@ -135,7 +144,6 @@ function animate(time) {
   spaceBackground.renderNebula();
   postFX.apply(0.4, 0.2);
 
-  perf.fpsCounter.update();
   hud.updateFPS();
 
   requestAnimationFrame(animate);

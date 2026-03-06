@@ -9,6 +9,7 @@ import PostFX from '../render/postFX.js';
 import HUD from '../ui/hud.js';
 import Controls from '../ui/controls.js';
 import perf from '../core/perf.js';
+import PerformanceMonitor from '../core/performanceMonitor.js';
 import { sanitize } from '../core/sanitize.js';
 import { sanitizeState } from '../physics/safety.js';
 
@@ -60,6 +61,11 @@ if (!canvasRoot.init()) {
 const spaceBackground = new SpaceBackground(canvasRoot);
 const wormholeScene = new WormholeScene(canvasRoot);
 const postFX = new PostFX(canvasRoot);
+
+// Initialize performance monitor
+const performanceMonitor = new PerformanceMonitor();
+spaceBackground.setPerformanceMonitor(performanceMonitor);
+wormholeScene.setPerformanceMonitor(performanceMonitor);
 
 spaceBackground.init();
 wormholeScene.init();
@@ -199,8 +205,8 @@ wormholeScene.setDistance(initialDistance);
 function animate(time) {
   canvasRoot.clear('#000000');
 
-  perf.fpsCounter.update();
-  const currentFPS = perf.fpsCounter.getFPS();
+  // Update performance monitor
+  const currentFPS = performanceMonitor.update();
 
   spaceBackground.update(time);
   wormholeScene.update(time);

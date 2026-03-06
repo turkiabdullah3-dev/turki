@@ -14,25 +14,30 @@ export const perf = {
   
   /**
    * Get adaptive star count based on device
+   * @param {number} qualityMultiplier - Quality multiplier (0.4 to 1.0)
    * @returns {number}
    */
-  getAdaptiveStarCount() {
+  getAdaptiveStarCount(qualityMultiplier = 1.0) {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const pixels = width * height;
     
+    let baseCount;
     // Mobile/small screens
     if (pixels < 500000) {
-      return CONFIG.performance.starCount.mobile;
+      baseCount = CONFIG.performance.starCount.mobile;
     }
     // Tablet/medium screens
     else if (pixels < 1500000) {
-      return CONFIG.performance.starCount.tablet;
+      baseCount = CONFIG.performance.starCount.tablet;
     }
     // Desktop/large screens
     else {
-      return CONFIG.performance.starCount.desktop;
+      baseCount = CONFIG.performance.starCount.desktop;
     }
+    
+    // Apply quality multiplier
+    return Math.floor(baseCount * qualityMultiplier);
   },
   
   /**

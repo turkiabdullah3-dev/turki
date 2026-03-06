@@ -11,13 +11,18 @@ export class SpaceBackground {
     this.mouseY = 0;
     this.targetMouseX = 0;
     this.targetMouseY = 0;
+    this.performanceMonitor = null; // Set externally
+    this.lastQualityCheck = 0;
   }
   
   /**
    * Initialize stars
    */
   init() {
-    const count = perf.getAdaptiveStarCount();
+    const qualityMultiplier = this.performanceMonitor 
+      ? this.performanceMonitor.getQualitySettings().starMultiplier 
+      : 1.0;
+    const count = perf.getAdaptiveStarCount(qualityMultiplier);
     const { width, height } = this.canvasRoot.getDimensions();
     
     this.stars = [];
@@ -38,6 +43,35 @@ export class SpaceBackground {
         this.targetMouseY = (e.touches[0].clientY / window.innerHeight) * 2 - 1;
       }
     }, { passive: true });
+  }
+  
+  /**
+   * Set performance monitor
+   */
+  setPerformanceMonitor(monitor) {
+    this.performanceMonitor = monitor;
+  }
+  
+  /**
+   * Adjust star count based on quality changes
+   */
+  adjustStarCount() {
+    if (!this.performanceMonitor) return;
+    
+    const qualityMultiplier = this.performanceMonitor.getQualitySettings().starMultiplier;
+    const targetCount = perf.getAdaptiveStarCount(qualityMultiplier);
+    const currentCount = this.stars.length;
+    
+    if (targetCount > currentCount) {
+      // Add stars
+      const { width, height } = this.canvasRoot.getDimensions();
+      for (let i = 0; i < targetCount - currentCount; i++) {
+        this.stars.push(this.createStar(width, height));
+      }
+    } else if (targetCount < currentCount) {
+      // Remove stars
+      this.stars = this.stars.slice(0, targetCount);
+    }
   }
   
   /**
@@ -62,6 +96,12 @@ export class SpaceBackground {
     // Smooth mouse follow
     this.mouseX += (this.targetMouseX - this.mouseX) * 0.05;
     this.mouseY += (this.targetMouseY - this.mouseY) * 0.05;
+    
+    // Check quality changes every 2 seconds
+    if (time - this.lastQualityCheck > 2000) {
+      this.adjustStarCount();
+      this.lastQualityCheck = time;
+    }
     
     const { width, height } = this.canvasRoot.getDimensions();
     

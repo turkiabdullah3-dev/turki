@@ -12,6 +12,7 @@ class BlackHoleScene {
     this.distance = this.physics.r_s * 5; // Start at 5 r_s
     this.angle = 0;
     this.state = null;
+    this.performanceMonitor = null; // Set externally
   }
   
   /**
@@ -19,6 +20,13 @@ class BlackHoleScene {
    */
   init() {
     this.updatePhysics();
+  }
+  
+  /**
+   * Set performance monitor
+   */
+  setPerformanceMonitor(monitor) {
+    this.performanceMonitor = monitor;
   }
   
   /**
@@ -122,6 +130,13 @@ class BlackHoleScene {
   drawEventHorizon(x, y, radius) {
     const ctx = this.canvasRoot.getContext();
     
+    // Get quality settings
+    const qualitySettings = this.performanceMonitor 
+      ? this.performanceMonitor.getQualitySettings() 
+      : { enableGlow: true, glowIntensity: 1.0 };
+    
+    const glowMultiplier = qualitySettings.glowIntensity;
+    
     // LAYER 1: Deep shadow core
     const shadowGradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 1.5);
     shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
@@ -136,7 +151,7 @@ class BlackHoleScene {
     // LAYER 2: Main glow gradient
     const gradient = ctx.createRadialGradient(x, y, radius * 0.8, x, y, radius * 1.3);
     gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-    gradient.addColorStop(0.5, `rgba(80, 40, 120, ${Math.min(1, 0.6 + this.state.alpha * 0.4)})`);
+    gradient.addColorStop(0.5, `rgba(80, 40, 120, ${Math.min(1, (0.6 + this.state.alpha * 0.4) * glowMultiplier)})`);
     gradient.addColorStop(1, 'rgba(100, 50, 150, 0)');
     
     ctx.fillStyle = gradient;
@@ -150,21 +165,23 @@ class BlackHoleScene {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
     
-    // LAYER 4: Subtle rotating glow halo
-    const shimmerAngle = performance.now() * 0.0008;
-    const shimmerGradient = ctx.createRadialGradient(
-      x + Math.cos(shimmerAngle) * radius * 0.3,
-      y + Math.sin(shimmerAngle) * radius * 0.3,
-      radius * 0.5,
-      x, y, radius * 1.8
-    );
-    shimmerGradient.addColorStop(0, 'rgba(200, 120, 240, 0.25)');
-    shimmerGradient.addColorStop(0.5, 'rgba(160, 80, 200, 0.12)');
-    shimmerGradient.addColorStop(1, 'rgba(100, 50, 150, 0)');
-    ctx.fillStyle = shimmerGradient;
-    ctx.beginPath();
-    ctx.arc(x, y, radius * 1.8, 0, Math.PI * 2);
-    ctx.fill();
+    // LAYER 4: Subtle rotating glow halo (quality-dependent)
+    if (qualitySettings.enableGlow && qualitySettings.effectsMultiplier > 0.5) {
+      const shimmerAngle = performance.now() * 0.0008;
+      const shimmerGradient = ctx.createRadialGradient(
+        x + Math.cos(shimmerAngle) * radius * 0.3,
+        y + Math.sin(shimmerAngle) * radius * 0.3,
+        radius * 0.5,
+        x, y, radius * 1.8
+      );
+      shimmerGradient.addColorStop(0, `rgba(200, 120, 240, ${0.25 * glowMultiplier})`);
+      shimmerGradient.addColorStop(0.5, `rgba(160, 80, 200, ${0.12 * glowMultiplier})`);
+      shimmerGradient.addColorStop(1, 'rgba(100, 50, 150, 0)');
+      ctx.fillStyle = shimmerGradient;
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
     
     // LAYER 5: Event horizon ring (always visible, subtle)
     ctx.strokeStyle = `rgba(200, 100, 200, ${0.3 + 0.2 * Math.sin(performance.now() * 0.002)})`;
