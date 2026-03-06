@@ -321,36 +321,114 @@ class BlackHoleScene {
   }
   
   /**
-   * Draw accretion disk with enhanced visuals
+   * Draw accretion disk with enhanced visuals, Doppler boosting, and gravitational redshift
    */
   drawAccretionDisk(x, y, innerRadius, outerRadius, time, kerrVisual = { isKerr: false, spin: 0, kerrTwist: 0 }) {
     const ctx = this.canvasRoot.getContext();
+    const { width, height } = this.canvasRoot.getDimensions();
     
-    // Disk rotation
-    const rotation = time * 0.0002 + (kerrVisual.isKerr ? kerrVisual.spin * 0.65 : 0);
+    // Disk rotation - faster near horizon, slower at outer edges (realistic Keplerian)
+    const baseRotation = time * 0.0002 + (kerrVisual.isKerr ? kerrVisual.spin * 0.65 : 0);
     
     // ENHANCEMENT: Add glow effect proportional to time dilation distortion
     const glowStrength = Math.max(0.1, Math.min(1, this.state.alpha)); // More glow when alpha is lower (closer to horizon)
     
-    // Draw disk as multiple ellipses with enhanced color/glow
-    for (let i = 0; i < 25; i++) {
-      const t = i / 25;
+    // Draw disk as multiple concentric rings with realistic plasma physics
+    const ringCount = 28;
+    for (let i = 0; i < ringCount; i++) {
+      const t = i / ringCount;
       const radius = innerRadius + (outerRadius - innerRadius) * t;
-      const alpha = 0.15 * (1 - t) * glowStrength;
       
-      // Color shifts from hot orange (inner) to cool red (outer), with time dilation brightness
-      const hue = 30 - t * 25; // Orange to red to dark
-      const saturation = 100 - t * 30; // More saturated inner disk
-      const lightness = 55 + t * 5; // Slightly brighter outer disk
+      // Keplerian rotation: slower at outer edges (v ∝ 1/√r)
+      const keperianFactor = Math.sqrt(1 - t * 0.4);
+      const layerRotation = baseRotation * keperianFactor + (kerrVisual.isKerr ? t * 0.22 * kerrVisual.spin : 0);
       
-      ctx.strokeStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
-      ctx.lineWidth = 2.5 + t * 1.5; // Thicker outer rings
-      ctx.beginPath();
-      const diskY = radius * (0.25 - (kerrVisual.isKerr ? 0.07 * kerrVisual.spin : 0));
-      const layerRotation = rotation + (kerrVisual.isKerr ? t * 0.22 * kerrVisual.spin : 0);
-      const offsetX = kerrVisual.isKerr ? Math.cos(layerRotation * 2.0) * innerRadius * 0.08 * kerrVisual.spin : 0;
-      ctx.ellipse(x + offsetX, y, radius, diskY, layerRotation, 0, Math.PI * 2);
-      ctx.stroke();
+      // ===== DOPPLER BOOSTING =====
+      // Brighter on the approaching side (blueward), dimmer on receding side (redward)
+      // Maximum boost at 0° (right), maximum dimming at 180° (left)
+      let dopplerBoost = 1.0;
+      let colorShift = 0;
+      
+      // Draw disk segment by segment to apply Doppler effect
+      const segmentCount = 32;
+      for (let seg = 0; seg < segmentCount; seg++) {
+        const angle1 = (seg / segmentCount) * Math.PI * 2 + layerRotation;
+        const angle2 = ((seg + 1) / segmentCount) * Math.PI * 2 + layerRotation;
+        
+        // Doppler effect: cos(angle) gives max boost at 0° (approaching), max dimming at 180° (receding)
+        const dopplerAngle = angle1 + (angle2 - angle1) / 2;
+        const cosDoppler = Math.cos(dopplerAngle);
+        dopplerBoost = 1.0 + 0.5 * cosDoppler; // Range: 0.5 to 1.5
+        colorShift = cosDoppler * 15; // Blueshift (positive) to redshift (negative)
+        
+        // ===== GRAVITATIONAL REDSHIFT =====
+        // Regions closer to event horizon are redshifted and darkened
+        const horizonProximity = (radius - innerRadius) / (outerRadius - innerRadius);
+        const redshiftFactor = Math.pow(0.7, 1 - horizonProximity); // Stronger redshift near horizon
+        const finalRedshift = colorShift + (1 - horizonProximity) * 30 * (1 - redshiftFactor);
+        
+        // ===== REALISTIC PLASMA COLORS =====
+        // Inner disk: blue-white hot plasma (inner accretion)
+        // Middle disk: orange-yellow (mid-temperature)
+        // Outer disk: deep red (cooler, outer accretion)
+        let hue, saturation, lightness, baseAlpha;
+        
+        if (horizonProximity < 0.33) {
+          // Inner hot plasma: blue-white
+          hue = 200 - horizonProximity * 50 + finalRedshift * 0.3;
+          saturation = 80 - horizonProximity * 20;
+          lightness = 70 - horizonProximity * 20;
+          baseAlpha = 0.22 * dopplerBoost;
+        } else if (horizonProximity < 0.66) {
+          // Mid-range: orange-yellow
+          hue = 30 + (horizonProximity - 0.33) * 20 + finalRedshift * 0.3;
+          saturation = 95;
+          lightness = 65 - (horizonProximity - 0.33) * 15;
+          baseAlpha = 0.18 * dopplerBoost;
+        } else {
+          // Outer cooler disk: red
+          hue = 15 + (horizonProximity - 0.66) * 30 + finalRedshift * 0.3;
+          saturation = 85;
+          lightness = 55 - (horizonProximity - 0.66) * 10;
+          baseAlpha = 0.14 * dopplerBoost;
+        }
+        
+        // Apply time dilation brightness based on observer distance
+        const finalAlpha = baseAlpha * glowStrength * (0.8 + 0.2 * Math.sin(performance.now() * 0.0008 + seg * 0.2));
+        
+        // Draw segment
+        ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${finalAlpha})`;
+        ctx.beginPath();
+        
+        // Ellipse parameters for flat disk perspective
+        const diskY = radius * (0.25 - (kerrVisual.isKerr ? 0.07 * kerrVisual.spin : 0));
+        const diskScaleX = 1 + (kerrVisual.isKerr ? kerrVisual.spin * 0.12 : 0);
+        
+        // Draw curved segment of ring
+        const x1 = x + radius * Math.cos(angle1) * diskScaleX;
+        const y1 = y + diskY * Math.sin(angle1);
+        const x2 = x + radius * Math.cos(angle2) * diskScaleX;
+        const y2 = y + diskY * Math.sin(angle2);
+        
+        // Create radial gradient for each segment for smooth color transitions
+        const segGradient = ctx.createLinearGradient(x1, y1, x2, y2);
+        segGradient.addColorStop(0, `hsla(${hue}, ${saturation}%, ${lightness}%, ${finalAlpha})`);
+        segGradient.addColorStop(1, `hsla(${hue + 5}, ${saturation - 5}%, ${lightness - 5}%, ${finalAlpha * 0.7})`);
+        
+        ctx.fillStyle = segGradient;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        
+        // Inner and outer radius
+        const x1Inner = x + (radius - 1.5) * Math.cos(angle1) * diskScaleX;
+        const y1Inner = y + (diskY * 0.95) * Math.sin(angle1);
+        const x2Inner = x + (radius - 1.5) * Math.cos(angle2) * diskScaleX;
+        const y2Inner = y + (diskY * 0.95) * Math.sin(angle2);
+        
+        ctx.lineTo(x2Inner, y2Inner);
+        ctx.lineTo(x1Inner, y1Inner);
+        ctx.fill();
+      }
     }
     
     // ENHANCEMENT: Adds a subtle photon sphere glow inside the accretion disk
@@ -370,6 +448,15 @@ class BlackHoleScene {
     ctx.beginPath();
     ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
     ctx.fill();
+    
+    // Add relativistic jets if quality allows
+    const qualitySettings = this.performanceMonitor
+      ? this.performanceMonitor.getQualitySettings()
+      : { effectsMultiplier: 1 };
+    
+    if (qualitySettings.effectsMultiplier > 0.5) {
+      this.drawRelativisticJets(x, y, innerRadius, outerRadius, baseRotation, kerrVisual);
+    }
   }
   
   /**
@@ -726,6 +813,93 @@ class BlackHoleScene {
       ctx.beginPath();
       ctx.arc(centerX, centerY, ringRadiusVar, 0, Math.PI * 2);
       ctx.stroke();
+    }
+  }
+
+  /**
+   * Draw relativistic jets emerging from black hole poles
+   * These represent high-energy particle flows in active galactic nuclei
+   */
+  drawRelativisticJets(x, y, innerRadius, outerRadius, time, kerrVisual) {
+    const ctx = this.canvasRoot.getContext();
+    const { height } = this.canvasRoot.getDimensions();
+
+    const jetScale = outerRadius * 2.5;
+    const jetWidth = innerRadius * 0.35;
+
+    // North jet
+    this.drawJet(ctx, x, y - jetScale, x, y - height / 2, jetWidth, time, 'north', kerrVisual);
+    
+    // South jet
+    this.drawJet(ctx, x, y + jetScale, x, y + height / 2, jetWidth, time, 'south', kerrVisual);
+  }
+
+  /**
+   * Helper to draw a single relativistic jet with energy flow animation
+   */
+  drawJet(ctx, startX, startY, endX, endY, width, time, direction, kerrVisual) {
+    const isNorth = direction === 'north';
+    const jetLength = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
+
+    // Jet color: white-blue high-energy plasma
+    const jetGradient = ctx.createLinearGradient(startX, startY, endX, endY);
+    
+    // Animation: flowing particles moving along jet
+    const flowPhase = (time * 0.001) % 1;
+    
+    jetGradient.addColorStop(0, `rgba(150, 200, 255, 0.4)`);
+    jetGradient.addColorStop(0.2, `rgba(200, 220, 255, 0.35)`);
+    jetGradient.addColorStop(0.5, `rgba(180, 200, 255, 0.2)`);
+    jetGradient.addColorStop(0.8, `rgba(150, 180, 255, 0.1)`);
+    jetGradient.addColorStop(1, `rgba(100, 150, 255, 0)`);
+
+    ctx.fillStyle = jetGradient;
+    ctx.strokeStyle = `rgba(200, 220, 255, 0.25)`;
+    ctx.lineWidth = 1;
+
+    // Draw jet cone (wider at base, narrower at tip)
+    const baseWidth = width;
+    const tipWidth = width * 0.3;
+    
+    const dx = (endX - startX) / jetLength;
+    const dy = (endY - startY) / jetLength;
+    const perpX = -dy;
+    const perpY = dx;
+
+    ctx.beginPath();
+    ctx.moveTo(startX - perpX * baseWidth, startY - perpY * baseWidth);
+    ctx.lineTo(startX + perpX * baseWidth, startY + perpY * baseWidth);
+    ctx.lineTo(endX + perpX * tipWidth, endY + perpY * tipWidth);
+    ctx.lineTo(endX - perpX * tipWidth, endY - perpY * tipWidth);
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw animated flow particles
+    const particleCount = 5;
+    for (let p = 0; p < particleCount; p++) {
+      const particlePhase = (flowPhase + p / particleCount) % 1;
+      const particleX = startX + (endX - startX) * particlePhase;
+      const particleY = startY + (endY - startY) * particlePhase;
+      
+      const particleAlpha = Math.sin(particlePhase * Math.PI) * 0.5;
+      const particleSize = (1 - particlePhase) * width * 0.4;
+
+      ctx.fillStyle = `rgba(220, 240, 255, ${particleAlpha})`;
+      ctx.beginPath();
+      ctx.arc(particleX, particleY, particleSize, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Glow around particles
+      const glowGradient = ctx.createRadialGradient(
+        particleX, particleY, 0,
+        particleX, particleY, particleSize * 1.5
+      );
+      glowGradient.addColorStop(0, `rgba(200, 230, 255, ${particleAlpha * 0.4})`);
+      glowGradient.addColorStop(1, `rgba(150, 200, 255, 0)`);
+      ctx.fillStyle = glowGradient;
+      ctx.beginPath();
+      ctx.arc(particleX, particleY, particleSize * 1.5, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 }

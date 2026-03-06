@@ -82,6 +82,18 @@ export class ScientificMode {
             return mode === 'telescope' ? 'Telescope Mode Active' : 'Simulation Mode';
           },
           symbol: 'I(θ)'
+        },
+        {
+          title: 'Accretion Disk',
+          formula: 'F(r) = (GM/r²)√(1 − r_s/r)',
+          explanation: 'Matter spiraling into the black hole forms a hot, glowing accretion disk. The approaching side appears brighter due to relativistic Doppler boosting (blueshift), while the receding side is dimmer (redshift). Regions closer to the event horizon are strongly redshifted by gravitational effects.',
+          getValue: (state) => {
+            if (state.alpha != null && state.alpha < 0.95) {
+              return `T ∼ 10⁶ K (approaching: blue, receding: red)`;
+            }
+            return 'Disk visible';
+          },
+          symbol: 'F'
         }
       ];
     } else if (this.mode === 'wormhole') {
