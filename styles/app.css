@@ -1,5 +1,5 @@
 /* Main Application Styles */
-/* Owner: Turki Abdullah © 2026 */
+/* © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved */
 
 * {
   margin: 0;
@@ -227,6 +227,55 @@ html, body {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
+}
+
+/* Intro presentation layer */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(14, 18, 36, 0.75), rgba(0, 0, 0, 0.92));
+  padding: 24px;
+  transition: opacity 0.35s ease;
+}
+
+.intro-overlay.hidden {
+  opacity: 0;
+}
+
+.intro-card {
+  width: min(720px, 92vw);
+  text-align: center;
+  padding: 30px 26px;
+}
+
+.intro-title {
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.intro-subtitle {
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.intro-created-by {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.intro-authors {
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.5;
+  margin-bottom: 20px;
 }
 
 /* Login page */

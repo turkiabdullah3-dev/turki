@@ -1,3 +1,4 @@
+// © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved
 import '../../styles/app.css';
 import '../../styles/glass.css';
 
@@ -53,6 +54,24 @@ document.getElementById('btn-equations-header')?.addEventListener('click', () =>
 document.getElementById('btn-equations-footer')?.addEventListener('click', () => {
   window.location.href = './equations.html';
 });
+
+function setupIntroOverlay() {
+  const introOverlay = document.getElementById('intro-overlay');
+  const enterButton = document.getElementById('btn-enter-simulation');
+
+  if (!introOverlay || !enterButton) {
+    return;
+  }
+
+  enterButton.addEventListener('click', () => {
+    introOverlay.classList.add('hidden');
+    setTimeout(() => {
+      introOverlay.style.display = 'none';
+    }, 350);
+  });
+}
+
+setupIntroOverlay();
 
 const container = document.getElementById('canvas-container');
 const canvasRoot = new CanvasRoot(container);

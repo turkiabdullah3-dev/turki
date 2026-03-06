@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -10,6 +11,19 @@
 </head>
 <body>
   <div id="canvas-container"></div>
+  
+  <div class="intro-overlay" id="intro-overlay" role="dialog" aria-modal="true" aria-label="Simulation Introduction">
+    <div class="intro-card glass-panel glow-border">
+      <h1 class="intro-title">Cosmic Gravity Explorer</h1>
+      <p class="intro-subtitle">
+        Interactive visualization of black holes and wormholes
+        based on general relativity concepts.
+      </p>
+      <p class="intro-created-by">Created by</p>
+      <p class="intro-authors">Turki Abdullah<br>Mashael Abdullah</p>
+      <button class="glass-btn primary" id="btn-enter-simulation" type="button">Enter Simulation</button>
+    </div>
+  </div>
   
   <div id="hud">
     <!-- Header -->
@@ -137,7 +151,8 @@
   </div>
   
   <div class="footer">
-    <p>© 2026 Turki Abdullah. All Rights Reserved.</p>
+    <p>© 2026 Turki Abdullah & Mashael Abdullah</p>
+    <p>All Rights Reserved</p>
   </div>
   
   <script type="module" src="./src/pages/blackholePage.js"></script>

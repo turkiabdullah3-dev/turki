@@ -1,3 +1,4 @@
+// © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved
 import '../../styles/app.css';
 import '../../styles/glass.css';
 
