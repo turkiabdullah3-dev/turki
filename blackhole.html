@@ -7,10 +7,10 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-BlXgD7uy.js"></script>
+  <script type="module" crossorigin src="./assets/blackhole-DsA7jYpe.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/auth-CXQHwBDi.js">
   <link rel="modulepreload" crossorigin href="./assets/sanitize-CW6c9_Sk.js">
-  <link rel="modulepreload" crossorigin href="./assets/performanceMonitor-BlWn0tNv.js">
+  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-CHWLHZXW.js">
   <link rel="stylesheet" crossorigin href="./assets/auth-ax7OYFUN.css">
 </head>
 <body>
@@ -94,6 +94,34 @@
               >
               <span class="slider-value" id="slider-value-distance">5.00 r_s</span>
             </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Units</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="glass-btn primary" id="btn-units-relative" type="button" style="flex: 1;">Relative</button>
+              <button class="glass-btn" id="btn-units-physical" type="button" style="flex: 1;">Physical</button>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Black Hole Mass (M☉)</label>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+              Set mass in solar masses. Affects physical unit conversions.
+            </p>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="slider-mass" 
+                class="glass-slider" 
+                min="1" 
+                max="100" 
+                step="1" 
+                value="10"
+              >
+              <span class="slider-value" id="slider-value-mass">10 M☉</span>
+            </div>
+            <p id="mass-info" style="font-size: 11px; color: rgba(180,200,255,0.7); margin-top: 8px; min-height: 16px;">r_s = 29.53 km</p>
           </div>
 
           <div style="display: flex; gap: 12px; margin-top: 16px;">
