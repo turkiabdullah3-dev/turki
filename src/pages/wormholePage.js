@@ -14,6 +14,31 @@ import { sanitizeState } from '../physics/safety.js';
 
 auth.requireLogin();
 
+function setupDockTabs() {
+  const tabButtons = document.querySelectorAll('[data-dock-tab]');
+  const tabPanels = document.querySelectorAll('[data-dock-content]');
+
+  if (!tabButtons.length || !tabPanels.length) {
+    return;
+  }
+
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const nextTab = button.getAttribute('data-dock-tab');
+
+      tabButtons.forEach((tabButton) => {
+        tabButton.classList.toggle('active', tabButton === button);
+      });
+
+      tabPanels.forEach((panel) => {
+        panel.classList.toggle('active', panel.getAttribute('data-dock-content') === nextTab);
+      });
+    });
+  });
+}
+
+setupDockTabs();
+
 document.getElementById('btn-home')?.addEventListener('click', () => {
   window.location.href = './home.html';
 });

@@ -15,95 +15,101 @@
     <!-- Header -->
     <div class="header">
       <div class="logo">Spacetime Observatory / Wormhole</div>
-      <div class="user-info">
-        <button class="glass-btn" id="btn-home">← Home</button>
-        <button class="glass-btn" id="btn-equations-header">Equations</button>
-      </div>
     </div>
     
-    <!-- Info Panel -->
-    <div class="info-panel glass-panel">
-      <h3 style="margin-bottom: 16px; font-size: 18px;">🌀 Morris-Thorne Wormhole</h3>
-      
-      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
-        A theoretical passage through spacetime connecting two regions. This visualization shows the classic Morris-Thorne geometry with exotic matter at the throat.
-      </p>
-      
-      <div class="data-rows">
-        <div class="data-row">
-          <span class="data-label">Distance from Throat</span>
-          <span class="data-value" id="value-distance">2.00</span>
-          <span class="data-unit">r₀</span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Throat Radius</span>
-          <span class="data-value" id="value-throat-radius">1.00</span>
-          <span class="data-unit">r₀</span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Spacetime Curvature</span>
-          <span class="data-value" id="value-warp">25</span>
-          <span class="data-unit">%</span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Exotic Matter</span>
-          <span class="data-value" id="value-exotic">Required</span>
-          <span class="data-unit">⚠️</span>
-        </div>
-        
-        <div class="data-row">
-          <span class="data-label">Frame Rate</span>
-          <span class="data-value" id="value-fps">60</span>
-          <span class="data-unit">FPS</span>
-        </div>
-      </div>
-      
-      <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-        📌 Tip: Move the slider to explore different distances from the wormhole throat. Note the exotic matter (negative energy) required to keep it open.
-      </p>
-    </div>
-    
-    <!-- Controls -->
-    <div class="controls glass-panel">
-      <h4 style="margin-bottom: 12px; font-size: 14px;">⚙️ Interactive Controls</h4>
-      
-      <div class="control-group">
-        <label class="glass-label">Distance from Throat (r/r₀)</label>
-        <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-          Adjust your position relative to the wormhole throat. The throat is at r₀.
-        </p>
-        <div class="slider-container">
-          <input 
-            type="range" 
-            id="slider-distance" 
-            class="glass-slider" 
-            min="0.5" 
-            max="5" 
-            step="0.1" 
-            value="2"
-          >
-          <span class="slider-value" id="slider-value-distance">2.00 r₀</span>
-        </div>
+    <div class="dock-panel glass-panel left-panel">
+      <div class="dock-tabs">
+        <button class="dock-tab active" type="button" data-dock-tab="overview">Overview</button>
+        <button class="dock-tab" type="button" data-dock-tab="controls">Controls</button>
       </div>
 
-      <div class="control-group" style="margin-top: 14px;">
-        <label class="glass-label">Quality</label>
-        <div style="display: flex; gap: 8px; margin-top: 8px;">
-          <button class="glass-btn primary" id="btn-quality-glow" type="button" style="flex: 1;">Glow</button>
-          <button class="glass-btn" id="btn-quality-high" type="button" style="flex: 1;">High</button>
+      <section class="dock-content active" data-dock-content="overview">
+        <h3 style="margin-bottom: 16px; font-size: 18px;">🌀 Morris-Thorne Wormhole</h3>
+
+        <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+          A theoretical passage through spacetime connecting two regions. This visualization shows the classic Morris-Thorne geometry with exotic matter at the throat.
+        </p>
+
+        <div class="data-rows">
+          <div class="data-row">
+            <span class="data-label">Distance from Throat</span>
+            <span class="data-value" id="value-distance">2.00</span>
+            <span class="data-unit">r₀</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Throat Radius</span>
+            <span class="data-value" id="value-throat-radius">1.00</span>
+            <span class="data-unit">r₀</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Spacetime Curvature</span>
+            <span class="data-value" id="value-warp">25</span>
+            <span class="data-unit">%</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Exotic Matter</span>
+            <span class="data-value" id="value-exotic">Required</span>
+            <span class="data-unit">⚠️</span>
+          </div>
+
+          <div class="data-row">
+            <span class="data-label">Frame Rate</span>
+            <span class="data-value" id="value-fps">60</span>
+            <span class="data-unit">FPS</span>
+          </div>
         </div>
-        <p id="quality-hint" style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 8px; min-height: 16px;"></p>
-      </div>
-      
-      <div style="display: flex; gap: 12px; margin-top: 16px;">
-        <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
-        <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">
-          📊 View Equations
-        </button>
-      </div>
+
+        <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+          📌 Tip: Move the slider to explore different distances from the wormhole throat. Note the exotic matter (negative energy) required to keep it open.
+        </p>
+      </section>
+
+      <section class="dock-content" data-dock-content="controls">
+        <div class="dock-controls">
+          <h4 style="margin-bottom: 12px; font-size: 14px;">⚙️ Interactive Controls</h4>
+
+          <div class="control-group">
+            <label class="glass-label">Distance from Throat (r/r₀)</label>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+              Adjust your position relative to the wormhole throat. The throat is at r₀.
+            </p>
+            <div class="slider-container">
+              <input 
+                type="range" 
+                id="slider-distance" 
+                class="glass-slider" 
+                min="0.5" 
+                max="5" 
+                step="0.1" 
+                value="2"
+              >
+              <span class="slider-value" id="slider-value-distance">2.00 r₀</span>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Quality</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="glass-btn primary" id="btn-quality-glow" type="button" style="flex: 1;">Glow</button>
+              <button class="glass-btn" id="btn-quality-high" type="button" style="flex: 1;">High</button>
+            </div>
+            <p id="quality-hint" style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 8px; min-height: 16px;"></p>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <button class="glass-btn" id="btn-reset" style="flex: 1;">↻ Reset Position</button>
+            <button class="glass-btn" id="btn-equations-footer" style="flex: 1;">📊 View Equations</button>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 12px;">
+            <button class="glass-btn" id="btn-home" style="flex: 1;">← Home</button>
+            <button class="glass-btn" id="btn-equations-header" style="flex: 1;">Equations</button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
   
