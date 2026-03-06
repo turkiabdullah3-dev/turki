@@ -103,7 +103,8 @@ class WormholeScene {
     const epsilon = 1e-6;
     const distanceRatio = Math.max(safeNumber(safeState.r_normalized, 1), epsilon);
     const intensity = clamp(safeNumber(safeState.warpStrength, 0), 0, 2);
-    const baseRadius = Math.min(width, height) * 0.15;
+    // VISUAL SCALE: Increased from 0.15 to 0.19 for better hero prominence
+    const baseRadius = Math.min(width, height) * 0.19;
     const throatRadius = baseRadius * clamp(1 / (distanceRatio + epsilon), 0.6, 1.6);
     
     // Draw starfield background
@@ -209,8 +210,21 @@ class WormholeScene {
     ctx.arc(centerX, centerY, radius * 1.1, 0, Math.PI * 2);
     ctx.fill();
 
-    // Crisp throat ring
+    // Gentle pulsing shimmer glow around throat
     const pulse = 0.82 + 0.18 * Math.sin(t * 0.004);
+    const shimmer = ctx.createRadialGradient(
+      centerX, centerY, radius * 0.6,
+      centerX, centerY, radius * 1.5
+    );
+    shimmer.addColorStop(0, `rgba(230, 190, 255, ${0.3 * pulse})`);
+    shimmer.addColorStop(0.5, `rgba(180, 140, 220, ${0.18 * pulse})`);
+    shimmer.addColorStop(1, 'rgba(140, 100, 180, 0)');
+    ctx.fillStyle = shimmer;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Crisp throat ring
     ctx.strokeStyle = `rgba(230, 190, 255, ${pulse})`;
     ctx.lineWidth = 2.2;
     ctx.beginPath();

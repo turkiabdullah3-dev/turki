@@ -47,8 +47,8 @@ export class SpaceBackground {
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      size: Math.random() * 2 + 0.5,
-      brightness: Math.random() * 0.8 + 0.2,
+      size: Math.random() * 1.5 + 0.3,
+      brightness: Math.random() * 0.5 + 0.15,
       depth: Math.random(), // For parallax (0 = far, 1 = near)
       twinkleSpeed: Math.random() * 0.02 + 0.01,
       twinkleOffset: Math.random() * Math.PI * 2
@@ -74,9 +74,9 @@ export class SpaceBackground {
       star.renderX = star.x + parallaxX;
       star.renderY = star.y + parallaxY;
       
-      // Twinkle brightness
+      // Twinkle brightness (reduced for subtlety)
       star.currentBrightness = star.brightness + 
-        Math.sin(time * star.twinkleSpeed + star.twinkleOffset) * 0.2;
+        Math.sin(time * star.twinkleSpeed + star.twinkleOffset) * 0.12;
     });
   }
   
@@ -87,9 +87,9 @@ export class SpaceBackground {
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
     
-    // Draw stars
+    // Draw stars (reduced opacity for subtlety)
     this.stars.forEach(star => {
-      const alpha = Math.max(0, Math.min(1, star.currentBrightness));
+      const alpha = Math.max(0, Math.min(1, star.currentBrightness)) * 0.65;
       ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
       
       ctx.beginPath();

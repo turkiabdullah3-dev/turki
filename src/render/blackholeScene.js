@@ -48,8 +48,10 @@ class BlackHoleScene {
    * Update scene
    */
   update(time) {
-    // Slow rotation
+    // Slow rotation for observer position
     this.angle += 0.0005;
+    // Store time for accretion disk rotation
+    this.renderTime = time;
   }
   
   /**
@@ -67,7 +69,8 @@ class BlackHoleScene {
     const centerY = height / 2;
     
     // Calculate visual sizes using safe getVisualRadius
-    const horizonRadius = getVisualRadius(this.physics.r_s, this.physics.r_s, Math.min(width, height) * 0.2);
+    // VISUAL SCALE: Increased from 0.2 to 0.26 for better hero prominence
+    const horizonRadius = getVisualRadius(this.physics.r_s, this.physics.r_s, Math.min(width, height) * 0.26);
     const photonRadius = getVisualRadius(this.physics.r_photon, this.physics.r_s, Math.min(width, height) * 0.2);
     const observerRadius = getVisualRadius(this.distance, this.physics.r_s, Math.min(width, height) * 0.2);
     
@@ -75,7 +78,7 @@ class BlackHoleScene {
     this.drawPhotonSphere(centerX, centerY, photonRadius);
     
     // Draw accretion disk (simplified)
-    this.drawAccretionDisk(centerX, centerY, horizonRadius, photonRadius, time);
+    this.drawAccretionDisk(centerX, centerY, horizonRadius, photonRadius, this.renderTime || time);
     
     // Draw event horizon (black circle with glow)
     this.drawEventHorizon(centerX, centerY, horizonRadius);
@@ -147,7 +150,23 @@ class BlackHoleScene {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
     
-    // LAYER 4: Event horizon ring (always visible, subtle)
+    // LAYER 4: Subtle rotating glow halo
+    const shimmerAngle = performance.now() * 0.0008;
+    const shimmerGradient = ctx.createRadialGradient(
+      x + Math.cos(shimmerAngle) * radius * 0.3,
+      y + Math.sin(shimmerAngle) * radius * 0.3,
+      radius * 0.5,
+      x, y, radius * 1.8
+    );
+    shimmerGradient.addColorStop(0, 'rgba(200, 120, 240, 0.25)');
+    shimmerGradient.addColorStop(0.5, 'rgba(160, 80, 200, 0.12)');
+    shimmerGradient.addColorStop(1, 'rgba(100, 50, 150, 0)');
+    ctx.fillStyle = shimmerGradient;
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // LAYER 5: Event horizon ring (always visible, subtle)
     ctx.strokeStyle = `rgba(200, 100, 200, ${0.3 + 0.2 * Math.sin(performance.now() * 0.002)})`;
     ctx.lineWidth = 2;
     ctx.beginPath();
