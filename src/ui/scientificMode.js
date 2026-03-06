@@ -44,6 +44,19 @@ export class ScientificMode {
           symbol: 'r_s'
         },
         {
+          title: 'Photon Sphere',
+          formula: 'r_ph = 3GM / c²',
+          explanation: 'Light bending becomes extreme near the photon sphere.',
+          getValue: (state) => {
+            if (state.rs == null) {
+              return '—';
+            }
+            const photonSphereKm = (1.5 * state.rs) / 1000;
+            return `${photonSphereKm.toFixed(2)} km`;
+          },
+          symbol: 'r_ph'
+        },
+        {
           title: 'Tidal Force',
           formula: 'F_tidal ∝ M / r³',
           explanation: 'The differential gravitational force across an extended object. This "spaghettification" effect increases rapidly as r decreases.',
