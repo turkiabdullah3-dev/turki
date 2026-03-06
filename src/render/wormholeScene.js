@@ -18,6 +18,22 @@ class WormholeScene {
     this.offscreenCanvas = document.createElement('canvas');
     this.offscreenCtx = this.offscreenCanvas.getContext('2d', { willReadFrequently: true });
     this.performanceMonitor = null; // Set externally
+    this.viewMode = localStorage.getItem('wormholeViewMode') === 'interior' ? 'interior' : 'exterior';
+    this.interiorParticles = this.createInteriorParticles(42);
+  }
+
+  createInteriorParticles(count) {
+    const particles = [];
+    for (let i = 0; i < count; i += 1) {
+      particles.push({
+        seed: (i + 1) * 0.173,
+        phase: (i / count) * Math.PI * 2,
+        radiusFactor: 0.35 + ((i * 17) % 60) / 100,
+        depthOffset: ((i * 37) % 100) / 100,
+        brightness: 0.4 + ((i * 13) % 40) / 100
+      });
+    }
+    return particles;
   }
   
   /**
@@ -42,6 +58,16 @@ class WormholeScene {
     this.distance = this.physics.r0 * radiusRatio;
     this.updatePhysics();
   }
+
+  setViewMode(mode) {
+    this.viewMode = mode === 'interior' ? 'interior' : 'exterior';
+    localStorage.setItem('wormholeViewMode', this.viewMode);
+    this.updatePhysics();
+  }
+
+  getViewMode() {
+    return this.viewMode;
+  }
   
   /**
    * Set traverse progress (0 = one side, 1 = other side)
@@ -54,7 +80,10 @@ class WormholeScene {
    * Update physics state
    */
   updatePhysics() {
-    this.state = this.physics.getState(this.distance);
+    this.state = {
+      ...this.physics.getState(this.distance),
+      viewMode: this.viewMode
+    };
   }
   
   /**
@@ -121,6 +150,11 @@ class WormholeScene {
     // VISUAL SCALE: Increased from 0.15 to 0.19 for better hero prominence
     const baseRadius = Math.min(width, height) * 0.19;
     const throatRadius = baseRadius * clamp(1 / (distanceRatio + epsilon), 0.6, 1.6);
+
+    if (this.viewMode === 'interior') {
+      this.drawInteriorJourney(ctx, centerX, centerY, throatRadius, time, intensity, distanceRatio);
+      return;
+    }
     
     // Draw starfield background
     this.drawEmbeddingDiagram(centerX, centerY, time);
@@ -138,6 +172,115 @@ class WormholeScene {
     if (this.shouldRunHighDistortion()) {
       this.applyHighDistortion(centerX, centerY, throatRadius, intensity);
     }
+  }
+
+  drawInteriorJourney(ctx, centerX, centerY, throatRadius, time, intensity, distanceRatio) {
+    const { width, height } = this.canvasRoot.getDimensions();
+    const qualitySettings = this.performanceMonitor
+      ? this.performanceMonitor.getQualitySettings()
+      : { effectsMultiplier: 1, enableGlow: true };
+
+    const effects = clamp(qualitySettings.effectsMultiplier ?? 1, 0.4, 1);
+    const forwardSpeed = 0.00022 + (1 / Math.max(distanceRatio, 0.5)) * 0.00025;
+    const depthScale = 1 + intensity * 0.55;
+    const shiftPhase = time * 0.00045;
+
+    // Background tunnel ambience
+    const ambience = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      throatRadius * 0.1,
+      centerX,
+      centerY,
+      Math.max(width, height) * 0.75
+    );
+    ambience.addColorStop(0, 'rgba(12, 8, 28, 0.95)');
+    ambience.addColorStop(0.45, 'rgba(30, 14, 55, 0.65)');
+    ambience.addColorStop(1, 'rgba(8, 6, 16, 0.88)');
+    ctx.fillStyle = ambience;
+    ctx.fillRect(0, 0, width, height);
+
+    // Endpoint transition cue (far region glow tone)
+    const endpointTone = ctx.createRadialGradient(
+      centerX + Math.sin(shiftPhase * 1.3) * throatRadius * 0.14,
+      centerY - Math.cos(shiftPhase) * throatRadius * 0.1,
+      throatRadius * 0.15,
+      centerX,
+      centerY,
+      throatRadius * 2.8
+    );
+    endpointTone.addColorStop(0, `rgba(130, 240, 255, ${0.14 * effects})`);
+    endpointTone.addColorStop(0.35, `rgba(110, 190, 255, ${0.09 * effects})`);
+    endpointTone.addColorStop(1, 'rgba(80, 120, 210, 0)');
+    ctx.fillStyle = endpointTone;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, throatRadius * 2.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Layered interior rings for depth and forward motion illusion
+    const ringCount = Math.floor(28 * effects);
+    for (let i = 0; i < ringCount; i += 1) {
+      const depth = (i / ringCount + (time * forwardSpeed) % 1) % 1;
+      const perspective = Math.pow(1 - depth, 1.45);
+      const ringRadius = throatRadius * (0.35 + perspective * 2.7) * depthScale;
+      const alpha = (0.03 + 0.18 * perspective) * effects;
+      const hue = 250 + Math.sin(depth * 8 + shiftPhase) * 22;
+
+      ctx.strokeStyle = `hsla(${hue.toFixed(0)}, 80%, ${48 + perspective * 18}%, ${alpha})`;
+      ctx.lineWidth = 0.9 + perspective * 2.0;
+      ctx.beginPath();
+      ctx.ellipse(
+        centerX + Math.sin(shiftPhase + depth * 6) * throatRadius * 0.08,
+        centerY + Math.cos(shiftPhase * 0.8 + depth * 5) * throatRadius * 0.06,
+        ringRadius,
+        ringRadius * (0.76 + 0.08 * Math.sin(shiftPhase + depth * 10)),
+        shiftPhase * 0.35 + depth * 0.22,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+    }
+
+    // Subtle flowing star/light streak particles
+    const particleCount = Math.floor(this.interiorParticles.length * (0.55 + effects * 0.45));
+    for (let i = 0; i < particleCount; i += 1) {
+      const particle = this.interiorParticles[i];
+      const travel = (particle.depthOffset + time * forwardSpeed * (0.8 + particle.seed)) % 1;
+      const perspective = Math.pow(1 - travel, 1.7);
+      const radius = throatRadius * particle.radiusFactor * (0.6 + perspective * 1.8);
+      const angle = particle.phase + shiftPhase * (0.4 + particle.seed);
+
+      const px = centerX + Math.cos(angle) * radius;
+      const py = centerY + Math.sin(angle) * radius * 0.78;
+      const streak = 4 + perspective * 18;
+
+      ctx.strokeStyle = `rgba(190, 225, 255, ${(0.08 + perspective * 0.26) * particle.brightness * effects})`;
+      ctx.lineWidth = 0.6 + perspective * 1.4;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(
+        px - Math.cos(angle) * streak,
+        py - Math.sin(angle) * streak * 0.75
+      );
+      ctx.stroke();
+    }
+
+    // Inner throat glow for cinematic center
+    const innerGlow = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      throatRadius * 0.08,
+      centerX,
+      centerY,
+      throatRadius * 1.4
+    );
+    innerGlow.addColorStop(0, `rgba(235, 255, 255, ${0.28 * effects})`);
+    innerGlow.addColorStop(0.35, `rgba(170, 220, 255, ${0.16 * effects})`);
+    innerGlow.addColorStop(1, 'rgba(120, 170, 255, 0)');
+    ctx.fillStyle = innerGlow;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, throatRadius * 1.4, 0, Math.PI * 2);
+    ctx.fill();
   }
   
   /**

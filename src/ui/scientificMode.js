@@ -103,6 +103,13 @@ export class ScientificMode {
           explanation: 'Wormholes require exotic matter with negative energy density to remain open. This violates the weak energy condition and has never been observed in nature.',
           getValue: (state) => state.exoticMatter != null && state.exoticMatter < 0 ? 'Required' : 'Not Required',
           symbol: 'ρ_exotic'
+        },
+        {
+          title: 'Interior Geometry',
+          formula: 'dz/dr = ±1 / √(r/b(r) − 1)',
+          explanation: 'This embedding relation describes the wormhole interior geometry. In interior view, it represents traversal through curved spacetime between regions.',
+          getValue: (state) => state.viewMode === 'interior' ? 'Interior traversal active' : 'Exterior embedding view',
+          symbol: 'dz/dr'
         }
       ];
     }

@@ -279,6 +279,31 @@ document.getElementById('btn-quality-high')?.addEventListener('click', () => app
 
 applyQualityMode(qualityMode, false);
 
+const btnViewExterior = document.getElementById('btn-view-exterior');
+const btnViewInterior = document.getElementById('btn-view-interior');
+const viewModeHint = document.getElementById('viewmode-hint');
+
+function applyViewMode(mode) {
+  const nextMode = mode === 'interior' ? 'interior' : 'exterior';
+  wormholeScene.setViewMode(nextMode);
+
+  if (btnViewExterior) {
+    btnViewExterior.classList.toggle('primary', nextMode === 'exterior');
+  }
+  if (btnViewInterior) {
+    btnViewInterior.classList.toggle('primary', nextMode === 'interior');
+  }
+  if (viewModeHint) {
+    viewModeHint.textContent = nextMode === 'interior'
+      ? 'Interior mode: cinematic traversal through the wormhole tunnel.'
+      : 'Exterior mode: classic throat embedding view.';
+  }
+}
+
+btnViewExterior?.addEventListener('click', () => applyViewMode('exterior'));
+btnViewInterior?.addEventListener('click', () => applyViewMode('interior'));
+applyViewMode(wormholeScene.getViewMode());
+
 function updateWormholeHUD(state) {
   const distanceEl = document.getElementById('value-distance');
   const warpEl = document.getElementById('value-warp');
@@ -354,6 +379,7 @@ function animate(time) {
     'wormhole'
   );
   wormholeScene.state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
+  wormholeScene.state.viewMode = wormholeScene.getViewMode();
   wormholeScene.setPerformanceContext({ fps: currentFPS, isMobile: isMobileOrTablet });
   updateWormholeHUD(wormholeScene.state);
   scientificMode.updateState(wormholeScene.state);
