@@ -8,11 +8,11 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Black Hole - Spacetime Observatory</title>
-  <script type="module" crossorigin src="./assets/blackhole-CSCqM2EU.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/auth-4xbw2wC0.js">
-  <link rel="modulepreload" crossorigin href="./assets/sanitize-CgBkavPt.js">
-  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-C4y-xXTQ.js">
-  <link rel="stylesheet" crossorigin href="./assets/auth-CGYfq_P4.css">
+  <script type="module" crossorigin src="./assets/blackhole-C_0xgwq7.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-BJBqW4hE.js">
+  <link rel="modulepreload" crossorigin href="./assets/sanitize-C66EXt5K.js">
+  <link rel="modulepreload" crossorigin href="./assets/unitsConverter-CsNY4cT_.js">
+  <link rel="stylesheet" crossorigin href="./assets/auth-DYGL5IqF.css">
 </head>
 <body>
   <div id="canvas-container"></div>
@@ -139,6 +139,24 @@
               <span class="slider-value" id="slider-value-mass">10 M☉</span>
             </div>
             <p id="mass-info" style="font-size: 11px; color: rgba(180,200,255,0.7); margin-top: 8px; min-height: 16px;">r_s = 29.53 km</p>
+          </div>
+
+          <div class="control-group" style="margin-top: 14px;">
+            <label class="glass-label">Observed Objects</label>
+            <select id="select-observed-object" class="glass-input observed-object-select" style="width: 100%; margin-top: 8px;">
+              <option value="custom">Custom</option>
+              <option value="sagittariusA">Sagittarius A*</option>
+              <option value="m87">M87*</option>
+              <option value="cygnusX1">Cygnus X-1</option>
+            </select>
+          </div>
+
+          <div class="control-group observed-object-panel" id="observed-object-panel" style="margin-top: 12px;">
+            <div class="observed-object-title" id="observed-name">Custom</div>
+            <div class="observed-object-row"><span>Type:</span><span id="observed-type">User-defined</span></div>
+            <div class="observed-object-row"><span>Mass:</span><span id="observed-mass">Custom</span></div>
+            <div class="observed-object-row"><span>Location:</span><span id="observed-location">User Simulation</span></div>
+            <div class="observed-object-row"><span>Distance from Earth:</span><span id="observed-distance">N/A</span></div>
           </div>
 
           <div class="control-group" style="margin-top: 14px;">
