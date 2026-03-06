@@ -15,6 +15,7 @@ class BlackHoleScene {
     this.performanceMonitor = null; // Set externally
     this.blackHoleModel = localStorage.getItem('blackHoleModel') || 'schwarzschild';
     this.spinParameter = Math.max(0, Math.min(0.99, parseFloat(localStorage.getItem('blackHoleSpin') || '0') || 0));
+    this.observationMode = localStorage.getItem('observationMode') || 'simulation';
     this.lensingSamples = this.createLensingSamples(96);
   }
 
@@ -79,6 +80,15 @@ class BlackHoleScene {
   getSpinParameter() {
     return this.spinParameter;
   }
+
+  setObservationMode(mode) {
+    this.observationMode = mode === 'telescope' ? 'telescope' : 'simulation';
+    localStorage.setItem('observationMode', this.observationMode);
+  }
+
+  getObservationMode() {
+    return this.observationMode;
+  }
   
   /**
    * Update physics state
@@ -87,7 +97,8 @@ class BlackHoleScene {
     this.state = {
       ...this.physics.getState(this.distance),
       blackHoleModel: this.blackHoleModel,
-      spinParameter: this.spinParameter
+      spinParameter: this.spinParameter,
+      observationMode: this.observationMode
     };
   }
   
@@ -158,6 +169,11 @@ class BlackHoleScene {
 
     if (isKerr && spin > 0.02) {
       this.drawErgosphereOverlay(centerX, centerY, horizonRadius, kerrVisual);
+    }
+    
+    // Apply telescope observation effects if enabled
+    if (this.observationMode === 'telescope') {
+      this.drawTelescopeEffects(centerX, centerY, horizonRadius, photonRadius, kerrVisual);
     }
     
     // Draw observer position
@@ -592,6 +608,125 @@ class BlackHoleScene {
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
+  }
+
+  /**
+   * Draw telescope observation effects
+   * Simulates how a real telescope would observe a black hole
+   */
+  drawTelescopeEffects(centerX, centerY, horizonRadius, photonRadius, kerrVisual) {
+    const ctx = this.canvasRoot.getContext();
+    const { width, height } = this.canvasRoot.getDimensions();
+
+    const qualitySettings = this.performanceMonitor
+      ? this.performanceMonitor.getQualitySettings()
+      : { effectsMultiplier: 1, enableDistortion: true };
+
+    // 1. Emphasize photon ring with bright halo
+    const ringEmphasisGradient = ctx.createRadialGradient(
+      centerX, centerY, photonRadius * 0.92,
+      centerX, centerY, photonRadius * 1.25
+    );
+    ringEmphasisGradient.addColorStop(0, 'rgba(255, 200, 100, 0.35)');
+    ringEmphasisGradient.addColorStop(0.5, 'rgba(255, 180, 80, 0.15)');
+    ringEmphasisGradient.addColorStop(1, 'rgba(220, 150, 60, 0)');
+
+    ctx.fillStyle = ringEmphasisGradient;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, photonRadius * 1.25, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Strong black hole shadow emphasis
+    const shadowGradient = ctx.createRadialGradient(
+      centerX, centerY, horizonRadius * 0.5,
+      centerX, centerY, horizonRadius * 1.1
+    );
+    shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.95)');
+    shadowGradient.addColorStop(0.7, 'rgba(10, 5, 20, 0.88)');
+    shadowGradient.addColorStop(1, 'rgba(30, 20, 50, 0.4)');
+
+    ctx.save();
+    if (kerrVisual.isKerr) {
+      ctx.translate(centerX, centerY);
+      ctx.rotate(kerrVisual.kerrTwist * 0.4);
+      ctx.scale(1 + kerrVisual.spin * 0.08, 1 - kerrVisual.spin * 0.08);
+      ctx.translate(-centerX, -centerY);
+    }
+    ctx.fillStyle = shadowGradient;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, horizonRadius * 1.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // 3. Add subtle blur-like effect via soft edges
+    const blurGradient = ctx.createRadialGradient(
+      centerX, centerY, photonRadius * 0.8,
+      centerX, centerY, photonRadius * 1.5
+    );
+    blurGradient.addColorStop(0, 'rgba(0, 0, 0, 0.08)');
+    blurGradient.addColorStop(0.6, 'rgba(20, 10, 40, 0.12)');
+    blurGradient.addColorStop(1, 'rgba(40, 20, 60, 0.06)');
+
+    ctx.fillStyle = blurGradient;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, photonRadius * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 4. Add subtle observational artifacts (random noise layer)
+    if (qualitySettings.effectsMultiplier > 0.4) {
+      this.drawObservationArtifacts(centerX, centerY, horizonRadius, photonRadius);
+    }
+
+    // 5. Reduce background star field brightness (simulate observational focus)
+    const backdropDim = ctx.createRadialGradient(
+      centerX, centerY, 0,
+      centerX, centerY, Math.max(width, height)
+    );
+    backdropDim.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    backdropDim.addColorStop(0.4, 'rgba(0, 0, 0, 0.15)');
+    backdropDim.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+
+    ctx.fillStyle = backdropDim;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  /**
+   * Draw subtle observational artifacts (sensor noise, diffraction)
+   */
+  drawObservationArtifacts(centerX, centerY, horizonRadius, photonRadius) {
+    const ctx = this.canvasRoot.getContext();
+    const artifactRadius = horizonRadius * 1.8;
+    const artifactCount = 12;
+
+    // Subtle diffraction-like spikes
+    for (let i = 0; i < artifactCount; i++) {
+      const angle = (i / artifactCount) * Math.PI * 2;
+      const x1 = centerX + Math.cos(angle) * artifactRadius * 0.6;
+      const y1 = centerY + Math.sin(angle) * artifactRadius * 0.6;
+      const x2 = centerX + Math.cos(angle) * artifactRadius * 1.1;
+      const y2 = centerY + Math.sin(angle) * artifactRadius * 1.1;
+
+      ctx.strokeStyle = `rgba(200, 200, 200, ${0.06 + 0.04 * Math.sin(performance.now() * 0.001 + i)})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    // Subtle luminosity variation rings (sensor artifacts)
+    for (let ring = 0; ring < 3; ring++) {
+      const variation = 0.02 * (ring + 1);
+      const noisePhase = performance.now() * 0.0003 + ring * 1.2;
+      const ringradiusBase = horizonRadius * (1.2 + ring * 0.35);
+      const ringRadiusVar = ringradiusBase + Math.sin(noisePhase) * photonRadius * variation;
+
+      ctx.strokeStyle = `rgba(150, 150, 200, ${0.035 + 0.025 * Math.sin(noisePhase * 0.5)})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, ringRadiusVar, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
 }
 

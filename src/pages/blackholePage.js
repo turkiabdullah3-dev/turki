@@ -284,6 +284,34 @@ btnModelKerr?.addEventListener('click', () => {
 
 applyBlackHoleModelUI(blackHoleScene.getBlackHoleModel());
 
+// Observation mode toggle
+const btnModeSimulation = document.getElementById('btn-mode-simulation');
+const btnModeTelescope = document.getElementById('btn-mode-telescope');
+const ehtInfoPanel = document.getElementById('eht-info-panel');
+
+function applyObservationModeUI(mode) {
+  const isTelescope = mode === 'telescope';
+  btnModeSimulation?.classList.toggle('primary', !isTelescope);
+  btnModeTelescope?.classList.toggle('primary', isTelescope);
+  
+  // Show EHT info panel only when telescope mode is active
+  if (ehtInfoPanel) {
+    ehtInfoPanel.style.display = isTelescope ? 'block' : 'none';
+  }
+}
+
+btnModeSimulation?.addEventListener('click', () => {
+  blackHoleScene.setObservationMode('simulation');
+  applyObservationModeUI('simulation');
+});
+
+btnModeTelescope?.addEventListener('click', () => {
+  blackHoleScene.setObservationMode('telescope');
+  applyObservationModeUI('telescope');
+});
+
+applyObservationModeUI(blackHoleScene.getObservationMode());
+
 // Initialize scientific mode
 const scientificMode = new ScientificMode('blackhole');
 scientificMode.init();

@@ -72,6 +72,16 @@ export class ScientificMode {
             return `${spin.toFixed(2)} (${state.blackHoleModel === 'kerr' ? 'Kerr' : 'Schwarzschild'})`;
           },
           symbol: 'a'
+        },
+        {
+          title: 'Photon Ring & Observation',
+          formula: 'Image(θ) ∝ e^{−τ(θ)}',
+          explanation: 'Telescope observations reveal the photon ring—the path of photons grazing the black hole\'s edge. The "shadow" is not the black hole itself, but our view of the empty space inside the photon sphere, backlit by distant matter. Event Horizon Telescope observations show this ring structure.',
+          getValue: (state) => {
+            const mode = state.observationMode || 'simulation';
+            return mode === 'telescope' ? 'Telescope Mode Active' : 'Simulation Mode';
+          },
+          symbol: 'I(θ)'
         }
       ];
     } else if (this.mode === 'wormhole') {
