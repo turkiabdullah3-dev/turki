@@ -206,6 +206,7 @@ class WormholeScene {
       : { effectsMultiplier: 1, enableGlow: true };
 
     const effects = clamp(qualitySettings.effectsMultiplier ?? 1, 0.4, 1);
+    const particleMultiplier = clamp(qualitySettings.particleMultiplier ?? 1, 0.45, 1);
     const forwardSpeed = 0.00022 + (1 / Math.max(distanceRatio, 0.5)) * 0.00025;
     const depthScale = 1 + intensity * 0.55;
     const shiftPhase = time * 0.00045;
@@ -243,7 +244,7 @@ class WormholeScene {
     ctx.fill();
 
     // Layered interior rings for depth and forward motion illusion
-    const ringCount = Math.floor(28 * effects);
+    const ringCount = Math.floor(28 * effects * particleMultiplier);
     for (let i = 0; i < ringCount; i += 1) {
       const depth = (i / ringCount + (time * forwardSpeed) % 1) % 1;
       const perspective = Math.pow(1 - depth, 1.45);
@@ -267,7 +268,7 @@ class WormholeScene {
     }
 
     // Subtle flowing star/light streak particles
-    const particleCount = Math.floor(this.interiorParticles.length * (0.55 + effects * 0.45));
+    const particleCount = Math.floor(this.interiorParticles.length * (0.55 + effects * 0.45) * particleMultiplier);
     for (let i = 0; i < particleCount; i += 1) {
       const particle = this.interiorParticles[i];
       const travel = (particle.depthOffset + time * forwardSpeed * (0.8 + particle.seed)) % 1;
@@ -541,8 +542,13 @@ class WormholeScene {
 
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
-    const lowW = Math.max(1, Math.floor(width * 0.25));
-    const lowH = Math.max(1, Math.floor(height * 0.25));
+    const qualitySettings = this.performanceMonitor
+      ? this.performanceMonitor.getQualitySettings()
+      : { distortionSampleScale: 1 };
+    const distortionScale = clamp(qualitySettings.distortionSampleScale ?? 1, 0.45, 1);
+    const sampleScale = 0.25 * distortionScale;
+    const lowW = Math.max(1, Math.floor(width * sampleScale));
+    const lowH = Math.max(1, Math.floor(height * sampleScale));
 
     if (this.offscreenCanvas.width !== lowW || this.offscreenCanvas.height !== lowH) {
       this.offscreenCanvas.width = lowW;

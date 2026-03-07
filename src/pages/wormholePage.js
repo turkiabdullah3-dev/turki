@@ -108,6 +108,13 @@ const timelinePanel = document.getElementById('timeline-panel');
 const timelineCanvas = document.getElementById('timeline-canvas');
 const timelineCtx = timelineCanvas ? timelineCanvas.getContext('2d') : null;
 let currentGraphType = 'distance';
+const NON_CRITICAL_INTERVAL_MS = 250;
+const TIMELINE_RENDER_INTERVAL_MS = 250;
+const RECORDER_UPDATE_INTERVAL_MS = 250;
+let lastNonCriticalUpdateMs = 0;
+let lastTimelineRenderMs = 0;
+let lastRecorderUpdateMs = 0;
+let recorderAccumulatedDelta = 0;
 
 // Timeline button
 document.getElementById('btn-timeline')?.addEventListener('click', () => {
@@ -666,6 +673,11 @@ wormholeScene.setDistance(initialDistance);
 }
 
 function animate(time) {
+  if (document.visibilityState !== 'visible') {
+    requestAnimationFrame(animate);
+    return;
+  }
+
   canvasRoot.clear('#000000');
 
   // Update performance monitor
@@ -675,7 +687,9 @@ function animate(time) {
   currentObserverFrame.update(0.016, wormholeScene.state);
   
   // Update experiments lab
-  experimentsLab.update(0.016);
+  if (experimentsLab.isExperimentRunning()) {
+    experimentsLab.update(0.016);
+  }
   
   // Update guided journey (if active)
   if (guidedJourney.isJourneyActive()) {
@@ -743,10 +757,21 @@ function animate(time) {
     throatRadius: wormholeScene.physics.r0 || 5,
     isWormhole: true
   };
-  simulationRecorder.update(deltaTime, stateForRecorder);
+  recorderAccumulatedDelta += deltaTime;
+  if (time - lastRecorderUpdateMs >= RECORDER_UPDATE_INTERVAL_MS) {
+    simulationRecorder.update(recorderAccumulatedDelta, stateForRecorder);
+    recorderAccumulatedDelta = 0;
+    lastRecorderUpdateMs = time;
+  }
 
   // Render timeline if visible
-  if (timelinePanel && timelinePanel.style.display !== 'none' && timelineCtx) {
+  if (
+    timelinePanel
+    && timelinePanel.style.display !== 'none'
+    && timelineCtx
+    && timelineCanvas?.style.display !== 'none'
+    && (time - lastTimelineRenderMs >= TIMELINE_RENDER_INTERVAL_MS)
+  ) {
     const mapProperty = {
       distance: 'distance',
       warpStrength: 'warpStrength',
@@ -771,9 +796,14 @@ function animate(time) {
     if (pointCountEl) {
       pointCountEl.textContent = simulationRecorder.getDataPointCount();
     }
+
+    lastTimelineRenderMs = time;
   }
 
-  hud.updateFPS();
+  if (time - lastNonCriticalUpdateMs >= NON_CRITICAL_INTERVAL_MS) {
+    hud.updateFPS();
+    lastNonCriticalUpdateMs = time;
+  }
 
   requestAnimationFrame(animate);
 }

@@ -110,6 +110,13 @@ const timelineCtx = timelineCanvas ? timelineCanvas.getContext('2d') : null;
 const timelineBody = document.getElementById('timeline-body');
 const btnTimelineToggle = document.getElementById('btn-timeline-toggle');
 let currentGraphType = 'redshift';
+const NON_CRITICAL_INTERVAL_MS = 250;
+const TIMELINE_RENDER_INTERVAL_MS = 250;
+const RECORDER_UPDATE_INTERVAL_MS = 250;
+let lastNonCriticalUpdateMs = 0;
+let lastTimelineRenderMs = 0;
+let lastRecorderUpdateMs = 0;
+let recorderAccumulatedDelta = 0;
 
 function setTimelineCollapsed(collapsed) {
   if (!timelinePanel) {
@@ -729,6 +736,11 @@ blackHoleScene.setDistance(initialDistance);
 }
 
 function animate(time) {
+  if (document.visibilityState !== 'visible') {
+    requestAnimationFrame(animate);
+    return;
+  }
+
   canvasRoot.clear('#000000');
 
   // Update performance monitor
@@ -738,7 +750,9 @@ function animate(time) {
   currentObserverFrame.update(0.016, blackHoleScene.state);
   
   // Update experiments lab
-  experimentsLab.update(0.016);
+  if (experimentsLab.isExperimentRunning()) {
+    experimentsLab.update(0.016);
+  }
   
   // Update guided journey (if active)
   if (guidedJourney.isJourneyActive()) {
@@ -785,10 +799,20 @@ function animate(time) {
     schwarzschildRadius: blackHoleScene.physics.r_s,
     isBlackHole: true
   };
-  simulationRecorder.update(deltaTime, stateForRecorder);
+  recorderAccumulatedDelta += deltaTime;
+  if (time - lastRecorderUpdateMs >= RECORDER_UPDATE_INTERVAL_MS) {
+    simulationRecorder.update(recorderAccumulatedDelta, stateForRecorder);
+    recorderAccumulatedDelta = 0;
+    lastRecorderUpdateMs = time;
+  }
 
   // Render timeline if visible
-  if (timelinePanel && !timelinePanel.classList.contains('timeline-collapsed') && timelineCtx) {
+  if (
+    timelinePanel
+    && !timelinePanel.classList.contains('timeline-collapsed')
+    && timelineCtx
+    && (time - lastTimelineRenderMs >= TIMELINE_RENDER_INTERVAL_MS)
+  ) {
     const mapProperty = {
       redshift: 'redshift',
       distance: 'distance',
@@ -814,9 +838,14 @@ function animate(time) {
     if (pointCountEl) {
       pointCountEl.textContent = simulationRecorder.getDataPointCount();
     }
+
+    lastTimelineRenderMs = time;
   }
 
-  hud.updateFPS();
+  if (time - lastNonCriticalUpdateMs >= NON_CRITICAL_INTERVAL_MS) {
+    hud.updateFPS();
+    lastNonCriticalUpdateMs = time;
+  }
 
   requestAnimationFrame(animate);
 }

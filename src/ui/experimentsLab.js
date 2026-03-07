@@ -247,6 +247,10 @@ export class ExperimentsLab {
       this.activeExperimentInstance.update(deltaTime);
     }
   }
+
+  isExperimentRunning() {
+    return Boolean(this.isActive && this.activeExperimentInstance);
+  }
 }
 
 /**

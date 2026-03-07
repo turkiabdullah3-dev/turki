@@ -373,6 +373,10 @@ class BlackHoleScene {
   drawAccretionDisk(x, y, innerRadius, outerRadius, time, kerrVisual = { isKerr: false, spin: 0, kerrTwist: 0 }) {
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
+    const qualitySettings = this.performanceMonitor
+      ? this.performanceMonitor.getQualitySettings()
+      : { effectsMultiplier: 1, particleMultiplier: 1 };
+    const particleMultiplier = qualitySettings.particleMultiplier ?? 1;
     
     // Disk rotation - faster near horizon, slower at outer edges (realistic Keplerian)
     const baseRotation = time * 0.0002 + (kerrVisual.isKerr ? kerrVisual.spin * 0.65 : 0);
@@ -381,7 +385,7 @@ class BlackHoleScene {
     const glowStrength = Math.max(0.1, Math.min(1, this.state.alpha)); // More glow when alpha is lower (closer to horizon)
     
     // Draw disk as multiple concentric rings with realistic plasma physics
-    const ringCount = 28;
+    const ringCount = Math.max(16, Math.floor(28 * particleMultiplier));
     for (let i = 0; i < ringCount; i++) {
       const t = i / ringCount;
       const radius = innerRadius + (outerRadius - innerRadius) * t;
@@ -397,7 +401,7 @@ class BlackHoleScene {
       let colorShift = 0;
       
       // Draw disk segment by segment to apply Doppler effect
-      const segmentCount = 32;
+      const segmentCount = Math.max(18, Math.floor(32 * particleMultiplier));
       for (let seg = 0; seg < segmentCount; seg++) {
         const angle1 = (seg / segmentCount) * Math.PI * 2 + layerRotation;
         const angle2 = ((seg + 1) / segmentCount) * Math.PI * 2 + layerRotation;
@@ -497,10 +501,6 @@ class BlackHoleScene {
     ctx.fill();
     
     // Add relativistic jets if quality allows
-    const qualitySettings = this.performanceMonitor
-      ? this.performanceMonitor.getQualitySettings()
-      : { effectsMultiplier: 1 };
-    
     if (qualitySettings.effectsMultiplier > 0.5) {
       this.drawRelativisticJets(x, y, innerRadius, outerRadius, baseRotation, kerrVisual);
     }
@@ -646,9 +646,10 @@ class BlackHoleScene {
     ctx.fill();
     ctx.restore();
 
+    const distortionScale = qualitySettings.distortionSampleScale ?? 1;
     const tracerCount = qualitySettings.enableDistortion
-      ? Math.floor(72 * effectsLevel)
-      : Math.floor(34 * effectsLevel + 12);
+      ? Math.floor(72 * effectsLevel * distortionScale)
+      : Math.floor((34 * effectsLevel + 12) * distortionScale);
     const activeSamples = this.lensingSamples.slice(0, Math.max(16, tracerCount));
     const sigma = photonRadius * 0.45;
 

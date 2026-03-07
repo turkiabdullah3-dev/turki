@@ -190,38 +190,60 @@ export class PerformanceMonitor {
    */
   getQualitySettings() {
     const quality = this.actualQuality;
-    
+
+    let baseSettings;
     switch (quality) {
       case QualityLevel.LOW:
-        return {
+        baseSettings = {
           starMultiplier: 0.4,      // 40% stars
           enableGlow: false,         // Minimal glow
           enableDistortion: false,   // No distortion
           glowIntensity: 0.3,       // Reduced glow
           effectsMultiplier: 0.5     // Half effects
         };
+        break;
       
       case QualityLevel.AUTO:
-        return {
+        baseSettings = {
           starMultiplier: 0.7,      // 70% stars
           enableGlow: true,          // Basic glow
           enableDistortion: false,   // Distortion off in AUTO
           glowIntensity: 0.7,       // Moderate glow
           effectsMultiplier: 0.8     // Most effects
         };
+        break;
       
       case QualityLevel.HIGH:
-        return {
+        baseSettings = {
           starMultiplier: 1.0,      // 100% stars
           enableGlow: true,          // Full glow
           enableDistortion: true,    // Distortion enabled
           glowIntensity: 1.0,       // Full glow
           effectsMultiplier: 1.0     // All effects
         };
+        break;
       
       default:
-        return this.getQualitySettings.call({ actualQuality: QualityLevel.AUTO });
+        baseSettings = {
+          starMultiplier: 0.7,
+          enableGlow: true,
+          enableDistortion: false,
+          glowIntensity: 0.7,
+          effectsMultiplier: 0.8
+        };
+        break;
     }
+
+    const fps = this.currentFPS;
+    const emergencyScale = fps < 40 ? Math.max(0.45, fps / 40) : 1;
+
+    return {
+      ...baseSettings,
+      glowIntensity: baseSettings.glowIntensity * emergencyScale,
+      effectsMultiplier: baseSettings.effectsMultiplier * emergencyScale,
+      distortionSampleScale: emergencyScale,
+      particleMultiplier: emergencyScale
+    };
   }
   
   /**
