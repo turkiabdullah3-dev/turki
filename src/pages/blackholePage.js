@@ -16,6 +16,7 @@ import perf from '../core/perf.js';
 import PerformanceMonitor from '../core/performanceMonitor.js';
 import UnitsConverter, { UnitMode } from '../core/unitsConverter.js';
 import { sanitizeState } from '../physics/safety.js';
+import navigationHelper from '../ui/navigationHelper.js';
 
 auth.requireLogin();
 
@@ -45,15 +46,15 @@ function setupDockTabs() {
 setupDockTabs();
 
 document.getElementById('btn-home')?.addEventListener('click', () => {
-  window.location.href = './home.html';
+  navigationHelper.navigateWithTransition('./home.html');
 });
 
 document.getElementById('btn-equations-header')?.addEventListener('click', () => {
-  window.location.href = './equations.html';
+  navigationHelper.navigateWithTransition('./equations.html');
 });
 
 document.getElementById('btn-equations-footer')?.addEventListener('click', () => {
-  window.location.href = './equations.html';
+  navigationHelper.navigateWithTransition('./equations.html');
 });
 
 function setupIntroOverlay() {
@@ -446,3 +447,6 @@ function animate(time) {
 }
 
 animate(0);
+
+// Setup page load fade-in transition
+navigationHelper.setupPageLoadFadeIn();

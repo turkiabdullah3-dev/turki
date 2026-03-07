@@ -6,6 +6,7 @@ import CanvasRoot from '../render/canvasRoot.js';
 import SpaceBackground from '../render/spaceBackground.js';
 import auth from '../core/auth.js';
 import { sanitize } from '../core/sanitize.js';
+import navigationHelper from '../ui/navigationHelper.js';
 
 auth.requireLogin();
 
@@ -19,33 +20,33 @@ document.getElementById('btn-logout')?.addEventListener('click', () => {
 });
 
 document.getElementById('card-blackhole')?.addEventListener('click', () => {
-  window.location.href = './blackhole.html';
+  navigationHelper.navigateWithTransition('./blackhole.html');
 });
 
 document.getElementById('card-wormhole')?.addEventListener('click', () => {
-  window.location.href = './wormhole.html';
+  navigationHelper.navigateWithTransition('./wormhole.html');
 });
 
 document.getElementById('card-blackhole')?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
-    window.location.href = './blackhole.html';
+    navigationHelper.navigateWithTransition('./blackhole.html');
   }
 });
 
 document.getElementById('card-wormhole')?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
-    window.location.href = './wormhole.html';
+    navigationHelper.navigateWithTransition('./wormhole.html');
   }
 });
 
 document.getElementById('btn-equations')?.addEventListener('click', () => {
-  window.location.href = './equations.html';
+  navigationHelper.navigateWithTransition('./equations.html');
 });
 
 document.getElementById('btn-about')?.addEventListener('click', () => {
-  window.location.href = './about.html';
+  navigationHelper.navigateWithTransition('./about.html');
 });
 
 const container = document.getElementById('canvas-container');
@@ -63,3 +64,6 @@ function animate(time) {
   requestAnimationFrame(animate);
 }
 animate(0);
+
+// Setup page load fade-in transition
+navigationHelper.setupPageLoadFadeIn();
