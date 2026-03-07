@@ -494,4 +494,27 @@ if (!localStorage.getItem(INTRO_FLY_IN_KEY)) {
       }
     );
   }
+} else {
+  // If not first load, still animate UI layers on normal page load
+  setTimeout(() => {
+    const transitionMgr = navigationHelper.getTransitionManager();
+    
+    // Slide in dock panel from left
+    const dockPanel = document.querySelector('.dock-panel');
+    if (dockPanel) {
+      transitionMgr.slideInElement(dockPanel, 'left', 40, 500, 100);
+    }
+    
+    // Fade in header
+    const header = document.querySelector('.header');
+    if (header) {
+      transitionMgr.fadeInElement(header, 400, 50);
+    }
+    
+    // Slide in controls panel
+    const hudData = document.querySelector('.hud-data');
+    if (hudData) {
+      transitionMgr.slideInElement(hudData, 'right', 40, 500, 150);
+    }
+  }, 100);
 }
