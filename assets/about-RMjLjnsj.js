@@ -1,0 +1,1 @@
+var e;import{a}from"./auth-BZhxXvHs.js";import{n as t}from"./navigationHelper-jIkYxdjO.js";a.requireLogin(),null==(e=document.getElementById("btn-home"))||e.addEventListener("click",()=>{t.navigateWithTransition("./home.html")}),t.setupPageLoadFadeIn();
