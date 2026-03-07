@@ -1295,3 +1295,156 @@ html, body {
     width: 100%;
   }
 }
+
+.btn-presentation {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(200, 120, 50, 0.28), rgba(210, 150, 80, 0.28));
+  border: 1px solid rgba(240, 180, 100, 0.42);
+  border-radius: 8px;
+  color: rgba(255, 232, 200, 0.94);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.btn-presentation:hover {
+  background: linear-gradient(135deg, rgba(220, 140, 70, 0.36), rgba(235, 165, 95, 0.36));
+  border-color: rgba(255, 205, 130, 0.66);
+  transform: translateY(-1px);
+}
+
+.btn-presentation.active {
+  background: linear-gradient(135deg, rgba(230, 150, 80, 0.58), rgba(245, 175, 105, 0.58));
+  border-color: rgba(255, 230, 185, 0.82);
+  color: rgba(255, 255, 255, 0.99);
+  box-shadow: 0 0 16px rgba(240, 170, 95, 0.3);
+}
+
+.presentation-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 260;
+}
+
+.presentation-copy {
+  position: absolute;
+  left: clamp(20px, 4vw, 60px);
+  bottom: clamp(24px, 5vh, 70px);
+  max-width: min(600px, 72vw);
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(6, 10, 24, 0.56), rgba(12, 18, 40, 0.36));
+  border: 1px solid rgba(170, 210, 255, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.presentation-kicker {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(176, 205, 242, 0.7);
+  margin-bottom: 6px;
+}
+
+.presentation-title {
+  font-size: clamp(18px, 2.4vw, 30px);
+  font-weight: 500;
+  line-height: 1.25;
+  color: rgba(240, 247, 255, 0.97);
+  margin-bottom: 8px;
+}
+
+.presentation-description {
+  font-size: clamp(12px, 1.1vw, 15px);
+  line-height: 1.5;
+  color: rgba(210, 226, 246, 0.88);
+}
+
+.presentation-minihud {
+  position: absolute;
+  top: clamp(16px, 3vh, 30px);
+  right: clamp(14px, 3vw, 36px);
+  width: clamp(210px, 21vw, 280px);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(160, 210, 255, 0.25);
+  background: linear-gradient(145deg, rgba(8, 16, 34, 0.5), rgba(14, 22, 44, 0.34));
+  backdrop-filter: blur(8px);
+}
+
+.presentation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: rgba(198, 218, 245, 0.82);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(170, 220, 255, 0.14);
+}
+
+.presentation-row:last-child {
+  border-bottom: none;
+}
+
+.presentation-row strong {
+  font-family: 'Courier New', monospace;
+  color: rgba(236, 246, 255, 0.98);
+  font-size: 13px;
+}
+
+.presentation-exit {
+  position: absolute;
+  right: clamp(14px, 3vw, 36px);
+  bottom: clamp(18px, 3vh, 30px);
+  pointer-events: auto;
+}
+
+.presentation-active .dock-panel,
+.presentation-active .timeline-panel,
+.presentation-active .scientific-panel,
+.presentation-active .experiments-panel,
+.presentation-active .missions-panel,
+.presentation-active .journey-overlay,
+.presentation-active .intro-overlay {
+  display: none !important;
+}
+
+.presentation-active .header > div:last-child button:not(#btn-presentation) {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .presentation-copy {
+    max-width: 88vw;
+  }
+
+  .presentation-minihud {
+    width: 230px;
+  }
+}
+
+@media (max-width: 600px) {
+  .presentation-copy {
+    left: 12px;
+    right: 12px;
+    bottom: 64px;
+    max-width: none;
+    padding: 12px;
+  }
+
+  .presentation-minihud {
+    top: 12px;
+    right: 12px;
+    left: auto;
+    width: min(230px, calc(100vw - 24px));
+  }
+
+  .presentation-exit {
+    right: 12px;
+    bottom: 12px;
+  }
+}

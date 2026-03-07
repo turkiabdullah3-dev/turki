@@ -22,6 +22,7 @@ import { TimelineRenderer } from '../ui/timelineRenderer.js';
 import { ObserverFrame } from '../core/observerFrames.js';
 import ExperimentsLab from '../ui/experimentsLab.js';
 import MissionScenarios from '../ui/missionScenarios.js';
+import PresentationMode from '../ui/presentationMode.js';
 
 auth.requireLogin();
 
@@ -499,6 +500,29 @@ btnMissions?.addEventListener('click', () => {
   missionScenarios.toggle();
 });
 
+const btnPresentation = document.getElementById('btn-presentation');
+const presentationMode = new PresentationMode('wormhole', {
+  getCameraController: () => wormholeScene.getCameraController(),
+  onEnter: () => {
+    if (timelinePanel) {
+      timelinePanel.style.display = 'none';
+    }
+    experimentsLab.hide();
+    missionScenarios.hide();
+  },
+  onExit: () => {
+    refreshWormholeStateForHUD();
+  },
+  onVisibilityChange: (isVisible) => {
+    btnPresentation?.classList.toggle('active', isVisible);
+  }
+});
+presentationMode.init();
+
+btnPresentation?.addEventListener('click', () => {
+  presentationMode.toggle();
+});
+
 function updateWormholeHUD(state) {
   const distanceEl = document.getElementById('value-distance');
   const warpEl = document.getElementById('value-warp');
@@ -586,6 +610,7 @@ function animate(time) {
   wormholeScene.setPerformanceContext({ fps: currentFPS, isMobile: isMobileOrTablet });
   updateWormholeHUD(wormholeScene.state);
   scientificMode.updateState(wormholeScene.state);
+  presentationMode.update(time, wormholeScene.state);
 
   if (qualityMode === 'high' && !isMobileOrTablet) {
     if (currentFPS < 40) {

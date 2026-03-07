@@ -22,6 +22,7 @@ import { TimelineRenderer } from '../ui/timelineRenderer.js';
 import { ObserverFrame } from '../core/observerFrames.js';
 import ExperimentsLab from '../ui/experimentsLab.js';
 import MissionScenarios from '../ui/missionScenarios.js';
+import PresentationMode from '../ui/presentationMode.js';
 
 auth.requireLogin();
 
@@ -528,6 +529,29 @@ btnMissions?.addEventListener('click', () => {
   missionScenarios.toggle();
 });
 
+const btnPresentation = document.getElementById('btn-presentation');
+const presentationMode = new PresentationMode('blackhole', {
+  getCameraController: () => blackHoleScene.getCameraController(),
+  onEnter: () => {
+    if (timelinePanel) {
+      timelinePanel.style.display = 'none';
+    }
+    experimentsLab.hide();
+    missionScenarios.hide();
+  },
+  onExit: () => {
+    refreshBlackHoleStateForHUD();
+  },
+  onVisibilityChange: (isVisible) => {
+    btnPresentation?.classList.toggle('active', isVisible);
+  }
+});
+presentationMode.init();
+
+btnPresentation?.addEventListener('click', () => {
+  presentationMode.toggle();
+});
+
 const controls = new Controls(
   (distance) => {
     blackHoleScene.setDistance(distance);
@@ -638,6 +662,7 @@ function animate(time) {
   blackHoleScene.state = { ...rawState, ...state, tidalForce: state.tidal };
   hud.setData(blackHoleScene.state);
   scientificMode.updateState(blackHoleScene.state);
+  presentationMode.update(time, blackHoleScene.state);
 
   spaceBackground.render(time);
   blackHoleScene.render(time);
