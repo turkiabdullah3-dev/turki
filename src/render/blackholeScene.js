@@ -4,6 +4,7 @@
 import BlackHolePhysics from '../physics/blackhole.js';
 import { safeNumber } from '../physics/safety.js';
 import { sanitizeBlackHoleState, getVisualRadius } from '../physics/renderSafety.js';
+import CameraController from './cameraController.js';
 
 class BlackHoleScene {
   constructor(canvasRoot) {
@@ -17,6 +18,9 @@ class BlackHoleScene {
     this.spinParameter = Math.max(0, Math.min(0.99, parseFloat(localStorage.getItem('blackHoleSpin') || '0') || 0));
     this.observationMode = localStorage.getItem('observationMode') || 'simulation';
     this.lensingSamples = this.createLensingSamples(96);
+    
+    // Initialize camera controller for free navigation
+    this.cameraController = new CameraController(canvasRoot, 1.5, 50);
   }
 
   createLensingSamples(count) {
@@ -89,6 +93,20 @@ class BlackHoleScene {
   getObservationMode() {
     return this.observationMode;
   }
+
+  /**
+   * Get camera controller for external control
+   */
+  getCameraController() {
+    return this.cameraController;
+  }
+
+  /**
+   * Reset camera to default position
+   */
+  resetCamera() {
+    this.cameraController.reset();
+  }
   
   /**
    * Update physics state
@@ -113,6 +131,9 @@ class BlackHoleScene {
    * Update scene
    */
   update(time) {
+    // Update camera controller (smooth interpolation)
+    this.cameraController.update();
+    
     // Slow rotation for observer position
     this.angle += 0.0005;
     // Store time for accretion disk rotation
@@ -135,11 +156,15 @@ class BlackHoleScene {
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
 
+    // Apply camera zoom (1.0 = normal, < 1.0 = zoomed in, > 1.0 = zoomed out)
+    const cameraZoom = 1.0 + (this.cameraController.distance - this.cameraController.defaultDistance) * 0.08;
+
     // Calculate visual sizes using safe getVisualRadius
     // VISUAL SCALE: Increased from 0.2 to 0.26 for better hero prominence
-    const horizonRadius = getVisualRadius(this.physics.r_s, this.physics.r_s, Math.min(width, height) * 0.26);
-    const photonRadius = getVisualRadius(this.physics.r_photon, this.physics.r_s, Math.min(width, height) * 0.2);
-    const observerRadius = getVisualRadius(this.distance, this.physics.r_s, Math.min(width, height) * 0.2);
+    // Apply camera zoom to scale everything
+    const horizonRadius = getVisualRadius(this.physics.r_s, this.physics.r_s, Math.min(width, height) * 0.26 / cameraZoom);
+    const photonRadius = getVisualRadius(this.physics.r_photon, this.physics.r_s, Math.min(width, height) * 0.2 / cameraZoom);
+    const observerRadius = getVisualRadius(this.distance, this.physics.r_s, Math.min(width, height) * 0.2 / cameraZoom);
     
     const centerX = width / 2;
     const centerY = height / 2;

@@ -269,6 +269,14 @@ if (btnJourneyStart) {
   });
 }
 
+// Camera reset button
+const btnResetCamera = document.getElementById('btn-reset-camera');
+if (btnResetCamera) {
+  btnResetCamera.addEventListener('click', () => {
+    wormholeScene.resetCamera();
+  });
+}
+
 // Connect journey distance updates to controls
 guidedJourney.onDistanceUpdate((newDistance) => {
   controls.setDistance(newDistance);

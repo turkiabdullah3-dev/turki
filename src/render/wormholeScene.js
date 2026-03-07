@@ -3,6 +3,7 @@
 
 import WormholePhysics from '../physics/wormhole.js';
 import { clamp, safeNumber } from '../physics/safety.js';
+import CameraController from './cameraController.js';
 
 class WormholeScene {
   constructor(canvasRoot) {
@@ -20,6 +21,9 @@ class WormholeScene {
     this.performanceMonitor = null; // Set externally
     this.viewMode = localStorage.getItem('wormholeViewMode') === 'interior' ? 'interior' : 'exterior';
     this.interiorParticles = this.createInteriorParticles(42);
+    
+    // Initialize camera controller for free navigation
+    this.cameraController = new CameraController(canvasRoot, 1.0, 40);
   }
 
   createInteriorParticles(count) {
@@ -68,6 +72,20 @@ class WormholeScene {
   getViewMode() {
     return this.viewMode;
   }
+
+  /**
+   * Get camera controller for external control
+   */
+  getCameraController() {
+    return this.cameraController;
+  }
+
+  /**
+   * Reset camera to default position
+   */
+  resetCamera() {
+    this.cameraController.reset();
+  }
   
   /**
    * Set traverse progress (0 = one side, 1 = other side)
@@ -97,6 +115,9 @@ class WormholeScene {
    * Update scene
    */
   update(time) {
+    // Update camera controller (smooth interpolation)
+    this.cameraController.update();
+    
     // Animate warp effect
   }
 
@@ -141,6 +162,9 @@ class WormholeScene {
     const ctx = this.canvasRoot.getContext();
     const { width, height } = this.canvasRoot.getDimensions();
     
+    // Apply camera zoom (1.0 = normal, < 1.0 = zoomed in, > 1.0 = zoomed out)
+    const cameraZoom = 1.0 + (this.cameraController.distance - this.cameraController.defaultDistance) * 0.08;
+    
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -148,7 +172,8 @@ class WormholeScene {
     const distanceRatio = Math.max(safeNumber(safeState.r_normalized, 1), epsilon);
     const intensity = clamp(safeNumber(safeState.warpStrength, 0), 0, 2);
     // VISUAL SCALE: Increased from 0.15 to 0.19 for better hero prominence
-    const baseRadius = Math.min(width, height) * 0.19;
+    // Apply camera zoom to scale
+    const baseRadius = Math.min(width, height) * 0.19 / cameraZoom;
     const throatRadius = baseRadius * clamp(1 / (distanceRatio + epsilon), 0.6, 1.6);
 
     if (this.viewMode === 'interior') {
