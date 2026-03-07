@@ -20,7 +20,7 @@
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   box-shadow: 0 8px 32px var(--glass-shadow);
-  padding: 20px;
+  padding: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -111,8 +111,8 @@
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   color: var(--text-primary);
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 8px 16px;
+  font-size: clamp(12px, 1vw, 15px);
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -165,7 +165,7 @@
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 6px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   outline: none;
@@ -175,8 +175,8 @@
 .glass-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   background: linear-gradient(135deg, var(--glow-primary), var(--glow-secondary));
   border-radius: 50%;
   cursor: pointer;
@@ -190,8 +190,8 @@
 }
 
 .glass-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   background: linear-gradient(135deg, var(--glow-primary), var(--glow-secondary));
   border-radius: 50%;
   cursor: pointer;
@@ -223,7 +223,7 @@
 }
 
 .glass-label {
-  font-size: 14px;
+  font-size: clamp(11px, 1vw, 14px);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 1px;

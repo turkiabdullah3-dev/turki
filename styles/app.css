@@ -39,14 +39,14 @@ html, body {
 
 /* Header */
 .header {
-  padding: 20px;
+  padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: clamp(18px, 2vw, 24px);
   font-weight: 300;
   letter-spacing: 2px;
 }
@@ -62,7 +62,7 @@ html, body {
   position: absolute;
   top: 96px;
   left: clamp(16px, 2vw, 28px);
-  width: min(380px, calc(100vw - 32px));
+  width: clamp(260px, 22vw, 340px);
   max-height: calc(100vh - 132px);
   overflow: auto;
   pointer-events: auto;
@@ -81,8 +81,8 @@ html, body {
   background: rgba(255, 255, 255, 0.04);
   color: rgba(255, 255, 255, 0.85);
   border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 13px;
+  padding: 6px 8px;
+  font-size: clamp(11px, 0.9vw, 13px);
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease;
 }
@@ -122,7 +122,7 @@ html, body {
 }
 
 .control-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .control-group:last-child {
@@ -146,9 +146,9 @@ html, body {
 }
 
 .observed-object-title {
-  font-size: 14px;
+  font-size: clamp(12px, 1vw, 14px);
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: rgba(220, 235, 255, 0.95);
 }
 
@@ -156,9 +156,9 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 6px;
-  font-size: 11px;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 10px;
   color: rgba(200, 220, 255, 0.8);
 }
 
@@ -184,15 +184,15 @@ html, body {
 
 .slider-container {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
 }
 
 .slider-value {
-  min-width: 80px;
+  min-width: 70px;
   text-align: right;
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 /* Info panel */
@@ -208,16 +208,16 @@ html, body {
 /* Data Dock - Premium 3-column grid layout */
 .data-rows {
   display: grid;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .data-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -229,24 +229,24 @@ html, body {
 }
 
 .data-label {
-  font-size: 12px;
+  font-size: clamp(10px, 0.9vw, 12px);
   color: rgba(255, 255, 255, 0.7);
 }
 
 .data-value {
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: clamp(12px, 1vw, 14px);
   font-weight: 600;
   font-feature-settings: "tnum", "tabular-nums" 1;
   color: rgba(255, 255, 255, 0.95);
   text-align: right;
-  min-width: 60px;
+  min-width: 55px;
 }
 
 .data-unit {
-  font-size: 12px;
+  font-size: clamp(9px, 0.8vw, 11px);
   color: rgba(255, 255, 255, 0.60);
-  min-width: 40px;
+  min-width: 35px;
   text-align: left;
 }
 
@@ -528,14 +528,34 @@ html, body {
   .mode-selection {
     grid-template-columns: 1fr;
   }
+  
+  .header {
+    padding: 12px;
+  }
+  
+  .logo {
+    font-size: 16px;
+  }
+  
+  .dock-panel {
+    max-height: 45vh;
+  }
+  
+  .glass-panel {
+    padding: 12px;
+  }
+  
+  .data-row {
+    padding: 6px 8px;
+  }
 }
 
 /* Scientific Mode Panel */
 .scientific-panel {
   position: fixed;
   top: 100px;
-  right: 24px;
-  width: 360px;
+  right: 20px;
+  width: clamp(280px, 25vw, 340px);
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   z-index: 100;
@@ -548,7 +568,7 @@ html, body {
     0 8px 32px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   
-  padding: 20px;
+  padding: 14px;
   color: rgba(255, 255, 255, 0.95);
   
   animation: slideInRight 0.3s ease-out;
@@ -566,20 +586,20 @@ html, body {
 }
 
 .scientific-header {
-  margin-bottom: 20px;
-  padding-bottom: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(180, 140, 255, 0.2);
 }
 
 .scientific-header h3 {
-  font-size: 20px;
+  font-size: clamp(16px, 1.5vw, 18px);
   font-weight: 500;
   color: rgba(230, 210, 255, 0.95);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .scientific-subtitle {
-  font-size: 13px;
+  font-size: clamp(11px, 0.9vw, 13px);
   color: rgba(180, 160, 220, 0.75);
   font-weight: 400;
 }
@@ -587,11 +607,11 @@ html, body {
 .scientific-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 
 .scientific-equation {
-  padding: 16px;
+  padding: 12px;
   background: rgba(20, 15, 35, 0.4);
   border: 1px solid rgba(140, 100, 200, 0.2);
   border-radius: 12px;
@@ -604,52 +624,52 @@ html, body {
 }
 
 .equation-title {
-  font-size: 15px;
+  font-size: clamp(13px, 1.1vw, 15px);
   font-weight: 600;
   color: rgba(210, 180, 255, 0.95);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .equation-formula {
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: clamp(11px, 0.95vw, 13px);
   color: rgba(180, 220, 255, 0.9);
   background: rgba(10, 10, 20, 0.5);
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   border-left: 3px solid rgba(140, 180, 255, 0.4);
   letter-spacing: 0.3px;
 }
 
 .equation-explanation {
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: clamp(11px, 0.9vw, 13px);
+  line-height: 1.5;
   color: rgba(200, 200, 220, 0.85);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .equation-value {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 1px solid rgba(140, 100, 200, 0.15);
 }
 
 .value-label {
-  font-size: 12px;
+  font-size: clamp(10px, 0.85vw, 12px);
   color: rgba(160, 150, 180, 0.75);
   font-weight: 500;
 }
 
 .value-data {
   font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-  font-size: 13px;
+  font-size: clamp(11px, 0.9vw, 13px);
   font-weight: 600;
   color: rgba(140, 220, 255, 0.95);
   background: rgba(140, 180, 255, 0.1);
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 6px;
   font-feature-settings: "tnum";
 }
