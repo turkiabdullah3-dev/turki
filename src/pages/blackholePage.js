@@ -19,6 +19,7 @@ import { sanitizeState } from '../physics/safety.js';
 import navigationHelper from '../ui/navigationHelper.js';
 import SimulationRecorder from '../core/simulationRecorder.js';
 import { TimelineRenderer } from '../ui/timelineRenderer.js';
+import { ObserverFrame } from '../core/observerFrames.js';
 
 auth.requireLogin();
 
@@ -140,6 +141,44 @@ document.getElementById('btn-timeline-toggle')?.addEventListener('click', (e) =>
     e.target.textContent = 'Show';
   }
 });
+
+// Initialize observer frame system
+let currentObserverFrame = new ObserverFrame('distant');
+const savedFrame = localStorage.getItem('blackhole-observer-frame') || 'distant';
+currentObserverFrame = new ObserverFrame(savedFrame);
+
+// Observer frame button setup
+const observerFrameButtons = document.querySelectorAll('.observer-frame-btn');
+const observerFrameNameEl = document.getElementById('observer-frame-name');
+const observerFrameDescEl = document.getElementById('observer-frame-description');
+
+observerFrameButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const frameType = btn.getAttribute('data-frame');
+    currentObserverFrame = new ObserverFrame(frameType);
+    localStorage.setItem('blackhole-observer-frame', frameType);
+
+    // Update button states
+    observerFrameButtons.forEach((b) => b.classList.remove('primary'));
+    btn.classList.add('primary');
+
+    // Update info display
+    if (observerFrameNameEl && observerFrameDescEl) {
+      observerFrameNameEl.textContent = currentObserverFrame.getName();
+      observerFrameDescEl.textContent = currentObserverFrame.getDescription();
+    }
+  });
+});
+
+// Set initial observer frame info display
+if (observerFrameNameEl && observerFrameDescEl) {
+  observerFrameNameEl.textContent = currentObserverFrame.getName();
+  observerFrameDescEl.textContent = currentObserverFrame.getDescription();
+  // Set primary button
+  observerFrameButtons.forEach((btn) => {
+    btn.classList.toggle('primary', btn.getAttribute('data-frame') === savedFrame);
+  });
+}
 
 const hud = new HUD();
 hud.init();
@@ -461,6 +500,9 @@ function animate(time) {
   // Update performance monitor
   const currentFPS = performanceMonitor.update();
   
+  // Update observer frame
+  currentObserverFrame.update(0.016, blackHoleScene.state);
+  
   // Update guided journey (if active)
   if (guidedJourney.isJourneyActive()) {
     const currentDistance = controls.getDistance();
@@ -476,7 +518,9 @@ function animate(time) {
       ...rawState,
       rs: blackHoleScene.physics.r_s,
       tidal: rawState.tidalForce,
-      fps: currentFPS
+      fps: currentFPS,
+      observerFrame: currentObserverFrame.getName(),
+      observerFrameVelocity: currentObserverFrame.getVelocity()
     },
     'blackhole'
   );
@@ -489,13 +533,16 @@ function animate(time) {
   spaceBackground.renderNebula();
   postFX.apply(0.4, 0.2);
 
-  // Update simulation recorder
+  // Update simulation recorder with observer frame redshift modification
   const deltaTime = 0.016; // ~60 FPS
+  const baseRedshift = blackHoleScene.state?.redshift !== undefined ? blackHoleScene.state.redshift : 0;
+  const observerRedshift = currentObserverFrame.getRedshiftModification(baseRedshift);
+  
   const stateForRecorder = {
     ...blackHoleScene.state,
     distance: blackHoleScene.state?.distance || 5,
     alpha: blackHoleScene.state?.alpha !== undefined ? blackHoleScene.state.alpha : 1.0,
-    redshift: blackHoleScene.state?.redshift !== undefined ? blackHoleScene.state.redshift : 0,
+    redshift: observerRedshift,
     tidalForce: blackHoleScene.state?.tidalForce || 0,
     schwarzschildRadius: blackHoleScene.physics.r_s,
     isBlackHole: true

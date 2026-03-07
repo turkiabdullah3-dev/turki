@@ -84,6 +84,37 @@ export class ScientificMode {
           symbol: 'I(θ)'
         },
         {
+          title: 'Observer Velocity (Reference Frame)',
+          formula: 'v_obs = (dx / dt_proper)',
+          explanation: 'Different observers have different velocities in spacetime. A distant observer is stationary; an orbiting observer has orbital velocity; an infalling observer accelerates toward the horizon. Each experiences relativity differently.',
+          getValue: (state) => {
+            const frameVelocity = state.observerFrameVelocity != null ? state.observerFrameVelocity : 0;
+            return `${(frameVelocity * 299792.458).toFixed(0)} km/s (${(frameVelocity * 100).toFixed(1)}% c)`;
+          },
+          symbol: 'v_obs'
+        },
+        {
+          title: 'Proper Time Scaling',
+          formula: 'dτ = α(r) dt',
+          explanation: 'An observer\'s proper time (experienced time) differs from coordinate time. Time dilation factor α determines how fast their clock ticks relative to distant observers. As observers fall in or orbit, their proper time scaling changes.',
+          getValue: (state) => state.alpha != null ? state.alpha.toFixed(4) : '—',
+          symbol: 'dτ/dt'
+        },
+        {
+          title: 'Doppler Shift (Moving Observer)',
+          formula: 'ν_obs = ν_source √((1−β)/(1+β))',
+          explanation: 'Moving observers experience relativistic Doppler shift. Orbiting observers see blue-shift approaching the black hole and red-shift receding. This adds to gravitational redshift, creating combined effects.',
+          getValue: (state) => state.redshift != null ? state.redshift.toFixed(4) : '—',
+          symbol: 'z_total'
+        },
+        {
+          title: 'Reference Frame Transformation',
+          formula: 'x^μ_obs = Λ^μ_ν x^ν',
+          explanation: 'A Lorentz transformation relates coordinates between different reference frames. Each observer (distant, orbiting, infalling) applies different transformations to map the same events to different spacetime coordinates.',
+          getValue: (state) => state.observerFrame || 'Distant Observer',
+          symbol: 'Λ'
+        },
+        {
           title: 'Accretion Disk',
           formula: 'F(r) = (GM/r²)√(1 − r_s/r)',
           explanation: 'Matter spiraling into the black hole forms a hot, glowing accretion disk. The approaching side appears brighter due to relativistic Doppler boosting (blueshift), while the receding side is dimmer (redshift). Regions closer to the event horizon are strongly redshifted by gravitational effects.',
