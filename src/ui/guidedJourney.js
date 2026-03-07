@@ -10,28 +10,28 @@ const BLACK_HOLE_STAGES = [
   {
     stage: 1,
     title: 'Distant View',
-    description: 'We begin our journey at a safe distance, 50 Schwarzschild radii from the black hole. From here, we can observe the entire system without experiencing extreme gravitational effects.',
+    description: 'Start from a safe distance at 50 Schwarzschild radii to observe the full system clearly.',
     targetDistance: 50,
     duration: 3000
   },
   {
     stage: 2,
     title: 'Approaching Photon Sphere',
-    description: 'At 3 Schwarzschild radii, we enter the photon sphere—the region where light can orbit the black hole. Gravitational lensing becomes visually apparent as space curves dramatically.',
+    description: 'At 3 Schwarzschild radii, lensing becomes strong as light paths bend around the black hole.',
     targetDistance: 3,
     duration: 4000
   },
   {
     stage: 3,
     title: 'Near Event Horizon',
-    description: 'We are now at 1.5 Schwarzschild radii, just outside the event horizon. Time dilation is extreme—clocks here tick much slower than those far from the black hole. Tidal forces begin to rise sharply.',
+    description: 'At 1.5 Schwarzschild radii, time dilation and redshift rise rapidly near the horizon.',
     targetDistance: 1.5,
     duration: 4000
   },
   {
     stage: 4,
     title: 'Critical Region',
-    description: 'This is the boundary—1.02 Schwarzschild radii. Any closer and escape becomes impossible. Redshift approaches infinity, and tidal forces would tear apart any physical object. This is as close as we can safely observe.',
+    description: 'At 1.02 Schwarzschild radii, this is the closest safe observation point before no-return.',
     targetDistance: 1.02,
     duration: 4000
   }
@@ -44,28 +44,28 @@ const WORMHOLE_STAGES = [
   {
     stage: 1,
     title: 'External Observation',
-    description: 'We begin at 5 throat radii from the wormhole entrance. From this vantage point, we can see the warping of spacetime that connects two distant regions of the universe.',
+    description: 'Begin at 5 throat radii to view the full external wormhole geometry.',
     targetDistance: 5,
     duration: 3000
   },
   {
     stage: 2,
     title: 'Approach',
-    description: 'Moving to 2.5 throat radii, the curvature of space becomes more pronounced. The wormhole\'s shape function dictates how dramatically space is bent to create this shortcut through spacetime.',
+    description: 'At 2.5 throat radii, curvature intensifies and the throat profile becomes clearer.',
     targetDistance: 2.5,
     duration: 4000
   },
   {
     stage: 3,
     title: 'Throat Region',
-    description: 'We are now at the throat—the narrowest point of the wormhole. Exotic matter with negative energy density is required to keep this passage open. Without it, the wormhole would collapse.',
+    description: 'At the throat, exotic matter requirements become central to maintaining traversability.',
     targetDistance: 1.0,
     duration: 4000
   },
   {
     stage: 4,
     title: 'Tunnel Transition',
-    description: 'At 0.5 throat radii, we are inside the tunnel itself. The warp strength is at maximum, and we can observe the connection between two regions of spacetime. This is theoretical physics made visual.',
+    description: 'At 0.5 throat radii, the tunnel transition highlights peak warp effects.',
     targetDistance: 0.5,
     duration: 4000
   }
@@ -92,6 +92,8 @@ export class GuidedJourney {
     
     // Callbacks
     this.onDistanceChange = null;
+    this.onStageChangeCallback = null;
+    this.onActiveChangeCallback = null;
   }
   
   /**
@@ -138,6 +140,10 @@ export class GuidedJourney {
     
     // Save preference
     localStorage.setItem('journeyMode', 'active');
+    document.body.classList.add('journey-active');
+    if (this.onActiveChangeCallback) {
+      this.onActiveChangeCallback(true);
+    }
   }
   
   /**
@@ -158,6 +164,11 @@ export class GuidedJourney {
     
     // Save preference
     localStorage.setItem('journeyMode', 'inactive');
+    document.body.classList.remove('journey-active');
+    document.body.removeAttribute('data-journey-stage');
+    if (this.onActiveChangeCallback) {
+      this.onActiveChangeCallback(false);
+    }
   }
   
   /**
@@ -205,6 +216,11 @@ export class GuidedJourney {
     
     const stage = this.stages[this.currentStage - 1];
     if (!stage) return;
+
+    document.body.setAttribute('data-journey-stage', String(stage.stage));
+    if (this.onStageChangeCallback) {
+      this.onStageChangeCallback({ ...stage, totalStages: this.stages.length });
+    }
     
     const html = `
       <div class="journey-content">
@@ -313,6 +329,18 @@ export class GuidedJourney {
    */
   onDistanceUpdate(callback) {
     this.onDistanceChange = callback;
+  }
+
+  onStageChange(callback) {
+    this.onStageChangeCallback = callback;
+  }
+
+  onActiveChange(callback) {
+    this.onActiveChangeCallback = callback;
+  }
+
+  getCurrentStage() {
+    return this.stages[this.currentStage - 1] || null;
   }
   
   /**

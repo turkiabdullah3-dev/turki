@@ -107,13 +107,25 @@ const timelineRenderer = new TimelineRenderer();
 const timelinePanel = document.getElementById('timeline-panel');
 const timelineCanvas = document.getElementById('timeline-canvas');
 const timelineCtx = timelineCanvas ? timelineCanvas.getContext('2d') : null;
+const timelineBody = document.getElementById('timeline-body');
+const btnTimelineToggle = document.getElementById('btn-timeline-toggle');
 let currentGraphType = 'redshift';
+
+function setTimelineCollapsed(collapsed) {
+  if (!timelinePanel) {
+    return;
+  }
+
+  timelinePanel.classList.toggle('timeline-collapsed', collapsed);
+  timelineBody && (timelineBody.style.display = collapsed ? 'none' : 'block');
+  if (btnTimelineToggle) {
+    btnTimelineToggle.textContent = collapsed ? 'Expand' : 'Collapse';
+  }
+}
 
 // Timeline button
 document.getElementById('btn-timeline')?.addEventListener('click', () => {
-  if (timelinePanel) {
-    timelinePanel.style.display = timelinePanel.style.display === 'none' ? 'block' : 'none';
-  }
+  setTimelineCollapsed(!timelinePanel?.classList.contains('timeline-collapsed'));
 });
 
 // Graph tab switching
@@ -131,19 +143,11 @@ document.getElementById('btn-timeline-reset')?.addEventListener('click', () => {
 });
 
 // Toggle timeline button text
-document.getElementById('btn-timeline-toggle')?.addEventListener('click', (e) => {
-  const canvas = document.getElementById('timeline-canvas');
-  const info = document.getElementById('timeline-info');
-  if (canvas.style.display === 'none') {
-    canvas.style.display = 'block';
-    if (info) info.style.display = 'block';
-    e.target.textContent = 'Hide';
-  } else {
-    canvas.style.display = 'none';
-    if (info) info.style.display = 'none';
-    e.target.textContent = 'Show';
-  }
+btnTimelineToggle?.addEventListener('click', () => {
+  setTimelineCollapsed(!timelinePanel?.classList.contains('timeline-collapsed'));
 });
+
+setTimelineCollapsed(true);
 
 // Initialize observer frame system
 let currentObserverFrame = new ObserverFrame('distant');
@@ -533,9 +537,6 @@ const btnPresentation = document.getElementById('btn-presentation');
 const presentationMode = new PresentationMode('blackhole', {
   getCameraController: () => blackHoleScene.getCameraController(),
   onEnter: () => {
-    if (timelinePanel) {
-      timelinePanel.style.display = 'none';
-    }
     experimentsLab.hide();
     missionScenarios.hide();
   },
@@ -584,19 +585,45 @@ controls.init('blackhole');
 
 // Journey button
 const btnJourneyStart = document.getElementById('btn-journey-start');
+
+function syncJourneyButton(isActive, stageInfo = null) {
+  if (!btnJourneyStart) {
+    return;
+  }
+
+  btnJourneyStart.classList.toggle('active', isActive);
+  btnJourneyStart.textContent = isActive ? 'Exit Journey' : 'Start Journey';
+  const stageLabel = isActive && stageInfo
+    ? `Journey active • Stage ${stageInfo.stage}/${stageInfo.totalStages}: ${stageInfo.title}`
+    : 'Launch guided multi-stage exploration';
+  btnJourneyStart.title = stageLabel;
+  btnJourneyStart.setAttribute('aria-label', stageLabel);
+}
+
+guidedJourney.onActiveChange((isActive) => {
+  if (!isActive) {
+    syncJourneyButton(false);
+  }
+});
+
+guidedJourney.onStageChange((stageInfo) => {
+  syncJourneyButton(true, stageInfo);
+});
+
 if (btnJourneyStart) {
   btnJourneyStart.addEventListener('click', () => {
     if (guidedJourney.isJourneyActive()) {
       guidedJourney.exit();
-      btnJourneyStart.textContent = '🎬 Start Journey';
-      btnJourneyStart.classList.remove('active');
+      syncJourneyButton(false);
     } else {
       guidedJourney.start(controls.getDistance());
-      btnJourneyStart.textContent = '✕ Exit Journey';
-      btnJourneyStart.classList.add('active');
+      const stage = guidedJourney.getCurrentStage();
+      syncJourneyButton(true, stage ? { ...stage, totalStages: guidedJourney.stages.length } : null);
     }
   });
 }
+
+syncJourneyButton(false);
 
 // Camera reset button
 const btnResetCamera = document.getElementById('btn-reset-camera');
@@ -686,7 +713,7 @@ function animate(time) {
   simulationRecorder.update(deltaTime, stateForRecorder);
 
   // Render timeline if visible
-  if (timelinePanel && timelinePanel.style.display !== 'none' && timelineCtx) {
+  if (timelinePanel && !timelinePanel.classList.contains('timeline-collapsed') && timelineCtx) {
     const mapProperty = {
       redshift: 'redshift',
       distance: 'distance',
