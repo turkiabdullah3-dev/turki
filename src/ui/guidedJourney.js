@@ -11,6 +11,7 @@ const BLACK_HOLE_STAGES = [
     stage: 1,
     title: 'Distant View',
     description: 'Start from a safe distance at 50 Schwarzschild radii to observe the full system clearly.',
+    focusLabel: 'Safe Limit',
     targetDistance: 50,
     duration: 3000
   },
@@ -18,6 +19,7 @@ const BLACK_HOLE_STAGES = [
     stage: 2,
     title: 'Approaching Photon Sphere',
     description: 'At 3 Schwarzschild radii, lensing becomes strong as light paths bend around the black hole.',
+    focusLabel: 'Photon Sphere',
     targetDistance: 3,
     duration: 4000
   },
@@ -25,6 +27,7 @@ const BLACK_HOLE_STAGES = [
     stage: 3,
     title: 'Near Event Horizon',
     description: 'At 1.5 Schwarzschild radii, time dilation and redshift rise rapidly near the horizon.',
+    focusLabel: 'Event Horizon',
     targetDistance: 1.5,
     duration: 4000
   },
@@ -32,6 +35,7 @@ const BLACK_HOLE_STAGES = [
     stage: 4,
     title: 'Critical Region',
     description: 'At 1.02 Schwarzschild radii, this is the closest safe observation point before no-return.',
+    focusLabel: 'Safe Limit',
     targetDistance: 1.02,
     duration: 4000
   }
@@ -45,6 +49,7 @@ const WORMHOLE_STAGES = [
     stage: 1,
     title: 'External Observation',
     description: 'Begin at 5 throat radii to view the full external wormhole geometry.',
+    focusLabel: '',
     targetDistance: 5,
     duration: 3000
   },
@@ -52,6 +57,7 @@ const WORMHOLE_STAGES = [
     stage: 2,
     title: 'Approach',
     description: 'At 2.5 throat radii, curvature intensifies and the throat profile becomes clearer.',
+    focusLabel: '',
     targetDistance: 2.5,
     duration: 4000
   },
@@ -59,6 +65,7 @@ const WORMHOLE_STAGES = [
     stage: 3,
     title: 'Throat Region',
     description: 'At the throat, exotic matter requirements become central to maintaining traversability.',
+    focusLabel: 'Wormhole Throat',
     targetDistance: 1.0,
     duration: 4000
   },
@@ -66,6 +73,7 @@ const WORMHOLE_STAGES = [
     stage: 4,
     title: 'Tunnel Transition',
     description: 'At 0.5 throat radii, the tunnel transition highlights peak warp effects.',
+    focusLabel: 'Wormhole Throat',
     targetDistance: 0.5,
     duration: 4000
   }
@@ -94,6 +102,7 @@ export class GuidedJourney {
     this.onDistanceChange = null;
     this.onStageChangeCallback = null;
     this.onActiveChangeCallback = null;
+    this.isCompleted = false;
   }
   
   /**
@@ -121,6 +130,7 @@ export class GuidedJourney {
    */
   start(currentDistance) {
     this.isActive = true;
+    this.isCompleted = false;
     this.currentStage = 1;
     this.startDistance = currentDistance;
     
@@ -152,6 +162,7 @@ export class GuidedJourney {
   exit() {
     this.isActive = false;
     this.isTransitioning = false;
+    this.isCompleted = false;
     
     if (this.overlay) {
       this.overlay.style.transition = 'opacity 0.3s ease';
@@ -179,7 +190,10 @@ export class GuidedJourney {
       this.currentStage++;
       this.renderStage();
       this.transitionToStage(this.currentStage);
+      return;
     }
+
+    this.finishJourney();
   }
   
   /**
@@ -207,6 +221,12 @@ export class GuidedJourney {
     
     // Will be updated in update() method
   }
+
+  finishJourney() {
+    this.isCompleted = true;
+    this.isTransitioning = false;
+    this.renderCompletion();
+  }
   
   /**
    * Render current stage UI
@@ -221,18 +241,36 @@ export class GuidedJourney {
     if (this.onStageChangeCallback) {
       this.onStageChangeCallback({ ...stage, totalStages: this.stages.length });
     }
+
+    const progressPercent = ((stage.stage / this.stages.length) * 100).toFixed(0);
+    const nextLabel = this.currentStage === this.stages.length ? 'Finish Journey' : 'Next Stage →';
+    const focusLabel = stage.focusLabel ? `<div class="journey-scene-label">${this.escapeHtml(stage.focusLabel)}</div>` : '';
     
     const html = `
       <div class="journey-content">
         <div class="journey-header">
-          <div class="journey-stage-number">Stage ${stage.stage} of ${this.stages.length}</div>
-          <button class="journey-exit-btn" id="journey-exit-inline" type="button">✕ Exit Journey</button>
+          <div>
+            <div class="journey-stage-number">Stage ${stage.stage} / ${this.stages.length}</div>
+            <div class="journey-stage-subtle">Guided Relativity Journey</div>
+          </div>
+          <button class="journey-exit-btn" id="journey-exit-inline" type="button">Exit</button>
+        </div>
+
+        <div class="journey-progress-wrap">
+          <div class="journey-progress-bar"><div class="journey-progress-fill" style="width: ${progressPercent}%;"></div></div>
+          <div class="journey-progress">
+            ${this.stages.map((s, i) => `
+              <div class="journey-dot ${i + 1 === this.currentStage ? 'active' : ''} ${i + 1 < this.currentStage ? 'completed' : ''}"></div>
+            `).join('')}
+          </div>
         </div>
         
-        <div class="journey-stage-info">
+        <div class="journey-stage-info journey-text-fade">
           <h2 class="journey-title">${this.escapeHtml(stage.title)}</h2>
           <p class="journey-description">${this.escapeHtml(stage.description)}</p>
         </div>
+
+        ${focusLabel}
         
         <div class="journey-controls">
           <button 
@@ -243,18 +281,12 @@ export class GuidedJourney {
           >
             ← Previous
           </button>
-          <div class="journey-progress">
-            ${this.stages.map((s, i) => `
-              <div class="journey-dot ${i + 1 === this.currentStage ? 'active' : ''} ${i + 1 < this.currentStage ? 'completed' : ''}"></div>
-            `).join('')}
-          </div>
           <button 
             class="journey-btn journey-btn-next" 
             id="journey-next" 
             type="button"
-            ${this.currentStage === this.stages.length ? 'disabled' : ''}
           >
-            ${this.currentStage === this.stages.length ? 'Journey Complete' : 'Next →'}
+            ${nextLabel}
           </button>
         </div>
       </div>
@@ -263,6 +295,37 @@ export class GuidedJourney {
     this.overlay.innerHTML = html;
     
     // Attach event listeners
+    this.attachEventListeners();
+
+    const stageInfo = this.overlay.querySelector('.journey-stage-info');
+    if (stageInfo) {
+      requestAnimationFrame(() => {
+        stageInfo.classList.add('journey-text-visible');
+      });
+    }
+  }
+
+  renderCompletion() {
+    if (!this.overlay) {
+      return;
+    }
+
+    this.overlay.innerHTML = `
+      <div class="journey-content journey-complete-state">
+        <div class="journey-header">
+          <div>
+            <div class="journey-stage-number">Journey Complete</div>
+            <div class="journey-stage-subtle">All stages explored</div>
+          </div>
+          <button class="journey-exit-btn" id="journey-exit-inline" type="button">Exit</button>
+        </div>
+        <div class="journey-stage-info journey-text-fade journey-text-visible">
+          <h2 class="journey-title">You reached the final stage</h2>
+          <p class="journey-description">The guided journey is complete. You can exit and continue exploring manually.</p>
+        </div>
+      </div>
+    `;
+
     this.attachEventListeners();
   }
   
@@ -280,9 +343,7 @@ export class GuidedJourney {
     
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        if (this.currentStage < this.stages.length) {
-          this.nextStage();
-        }
+        this.nextStage();
       });
     }
     

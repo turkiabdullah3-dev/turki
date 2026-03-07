@@ -788,6 +788,34 @@ html, body {
   text-transform: uppercase;
 }
 
+.journey-stage-subtle {
+  margin-top: 2px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.4px;
+}
+
+.journey-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.journey-progress-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.journey-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 185, 120, 0.95), rgba(255, 125, 95, 0.95));
+  transition: width 0.45s ease;
+}
+
 .journey-exit-btn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -811,6 +839,17 @@ html, body {
   gap: 12px;
 }
 
+.journey-text-fade {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
+
+.journey-text-fade.journey-text-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .journey-title {
   font-size: clamp(16px, 1.7vw, 20px);
   font-weight: 600;
@@ -826,11 +865,30 @@ html, body {
   margin: 0;
 }
 
+.journey-scene-label {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -120%);
+  font-size: 11px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: rgba(225, 240, 255, 0.95);
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(150, 205, 255, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  box-shadow: 0 0 14px rgba(110, 170, 250, 0.22);
+  pointer-events: none;
+  z-index: 2050;
+}
+
 .journey-controls {
   display: flex;
   align-items: center;
   gap: 16px;
   padding-top: 8px;
+  justify-content: space-between;
 }
 
 .journey-btn {
@@ -844,6 +902,11 @@ html, body {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+}
+
+.journey-btn-next {
+  background: rgba(120, 185, 255, 0.2);
+  border-color: rgba(150, 210, 255, 0.55);
 }
 
 .journey-btn:hover:not(:disabled) {
@@ -912,6 +975,25 @@ html, body {
 .journey-active .dock-panel {
   border-color: rgba(255, 170, 120, 0.38);
   box-shadow: 0 8px 30px rgba(255, 120, 70, 0.12);
+}
+
+body[data-journey-stage='2'] .journey-scene-label {
+  border-color: rgba(150, 210, 255, 0.55);
+  box-shadow: 0 0 20px rgba(110, 180, 255, 0.35);
+}
+
+body[data-journey-stage='3'] .journey-scene-label {
+  border-color: rgba(255, 180, 150, 0.55);
+  box-shadow: 0 0 20px rgba(255, 130, 95, 0.35);
+}
+
+body[data-journey-stage='4'] .journey-scene-label {
+  border-color: rgba(255, 140, 120, 0.65);
+  box-shadow: 0 0 20px rgba(255, 110, 90, 0.42);
+}
+
+.journey-complete-state .journey-title {
+  color: rgba(255, 222, 185, 0.98);
 }
 
 /* Responsive adjustments */

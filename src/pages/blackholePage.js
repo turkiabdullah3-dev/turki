@@ -585,6 +585,55 @@ controls.init('blackhole');
 
 // Journey button
 const btnJourneyStart = document.getElementById('btn-journey-start');
+let journeyPreviousObservationMode = null;
+let activeJourneyVisualProfile = {
+  lensingIntensity: 1,
+  glowEmphasis: 1,
+  focus: 'balanced',
+  observationMode: null,
+  postFxBloom: 0.4,
+  postFxVignette: 0.2
+};
+
+function getBlackHoleJourneyVisualProfile(stageInfo) {
+  const stage = stageInfo?.stage || 1;
+  const profiles = {
+    1: {
+      lensingIntensity: 0.85,
+      glowEmphasis: 0.9,
+      focus: 'balanced',
+      observationMode: 'simulation',
+      postFxBloom: 0.34,
+      postFxVignette: 0.17
+    },
+    2: {
+      lensingIntensity: 1.3,
+      glowEmphasis: 1.1,
+      focus: 'photon-sphere',
+      observationMode: 'telescope',
+      postFxBloom: 0.44,
+      postFxVignette: 0.22
+    },
+    3: {
+      lensingIntensity: 1.55,
+      glowEmphasis: 1.35,
+      focus: 'horizon',
+      observationMode: 'telescope',
+      postFxBloom: 0.5,
+      postFxVignette: 0.24
+    },
+    4: {
+      lensingIntensity: 1.2,
+      glowEmphasis: 1.55,
+      focus: 'critical',
+      observationMode: 'simulation',
+      postFxBloom: 0.52,
+      postFxVignette: 0.26
+    }
+  };
+
+  return profiles[stage] || profiles[1];
+}
 
 function syncJourneyButton(isActive, stageInfo = null) {
   if (!btnJourneyStart) {
@@ -601,12 +650,38 @@ function syncJourneyButton(isActive, stageInfo = null) {
 }
 
 guidedJourney.onActiveChange((isActive) => {
+  if (isActive) {
+    journeyPreviousObservationMode = blackHoleScene.getObservationMode();
+    return;
+  }
+
+  if (journeyPreviousObservationMode) {
+    blackHoleScene.setObservationMode(journeyPreviousObservationMode);
+    applyObservationModeUI(journeyPreviousObservationMode);
+  }
+
+  activeJourneyVisualProfile = {
+    lensingIntensity: 1,
+    glowEmphasis: 1,
+    focus: 'balanced',
+    observationMode: null,
+    postFxBloom: 0.4,
+    postFxVignette: 0.2
+  };
+  blackHoleScene.resetJourneyVisualProfile();
+
   if (!isActive) {
     syncJourneyButton(false);
   }
 });
 
 guidedJourney.onStageChange((stageInfo) => {
+  activeJourneyVisualProfile = getBlackHoleJourneyVisualProfile(stageInfo);
+  blackHoleScene.setJourneyVisualProfile(activeJourneyVisualProfile);
+  if (activeJourneyVisualProfile.observationMode) {
+    blackHoleScene.setObservationMode(activeJourneyVisualProfile.observationMode);
+    applyObservationModeUI(activeJourneyVisualProfile.observationMode);
+  }
   syncJourneyButton(true, stageInfo);
 });
 
@@ -694,7 +769,7 @@ function animate(time) {
   spaceBackground.render(time);
   blackHoleScene.render(time);
   spaceBackground.renderNebula();
-  postFX.apply(0.4, 0.2);
+  postFX.apply(activeJourneyVisualProfile.postFxBloom, activeJourneyVisualProfile.postFxVignette);
 
   // Update simulation recorder with observer frame redshift modification
   const deltaTime = 0.016; // ~60 FPS

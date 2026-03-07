@@ -18,6 +18,11 @@ class BlackHoleScene {
     this.spinParameter = Math.max(0, Math.min(0.99, parseFloat(localStorage.getItem('blackHoleSpin') || '0') || 0));
     this.observationMode = localStorage.getItem('observationMode') || 'simulation';
     this.lensingSamples = this.createLensingSamples(96);
+    this.journeyVisualProfile = {
+      lensingIntensity: 1,
+      glowEmphasis: 1,
+      focus: 'balanced'
+    };
     
     // Initialize camera controller for free navigation
     this.cameraController = new CameraController(canvasRoot, 1.5, 50);
@@ -92,6 +97,22 @@ class BlackHoleScene {
 
   getObservationMode() {
     return this.observationMode;
+  }
+
+  setJourneyVisualProfile(profile = {}) {
+    this.journeyVisualProfile = {
+      lensingIntensity: Math.max(0.7, Math.min(1.9, safeNumber(profile.lensingIntensity, 1))),
+      glowEmphasis: Math.max(0.7, Math.min(2.0, safeNumber(profile.glowEmphasis, 1))),
+      focus: profile.focus || 'balanced'
+    };
+  }
+
+  resetJourneyVisualProfile() {
+    this.journeyVisualProfile = {
+      lensingIntensity: 1,
+      glowEmphasis: 1,
+      focus: 'balanced'
+    };
   }
 
   /**
@@ -245,7 +266,8 @@ class BlackHoleScene {
       ? this.performanceMonitor.getQualitySettings() 
       : { enableGlow: true, glowIntensity: 1.0 };
     
-    const glowMultiplier = qualitySettings.glowIntensity;
+    const journeyGlow = this.journeyVisualProfile?.glowEmphasis ?? 1;
+    const glowMultiplier = qualitySettings.glowIntensity * journeyGlow;
     const ringScaleX = 1 + (kerrVisual.isKerr ? 0.08 * kerrVisual.spin : 0);
     const ringScaleY = 1 - (kerrVisual.isKerr ? 0.08 * kerrVisual.spin : 0);
     const shiftedX = x + kerrVisual.centerShiftX;
@@ -489,6 +511,8 @@ class BlackHoleScene {
    */
   drawPhotonSphere(x, y, radius, kerrVisual = { isKerr: false, spin: 0, kerrTwist: 0 }) {
     const ctx = this.canvasRoot.getContext();
+    const journeyLensing = this.journeyVisualProfile?.lensingIntensity ?? 1;
+    const focusMode = this.journeyVisualProfile?.focus || 'balanced';
     const ringScaleX = 1 + (kerrVisual.isKerr ? 0.06 * kerrVisual.spin : 0);
     const ringScaleY = 1 - (kerrVisual.isKerr ? 0.06 * kerrVisual.spin : 0);
     const ringX = x + (kerrVisual.isKerr ? kerrVisual.centerShiftX * 0.6 : 0);
@@ -496,8 +520,8 @@ class BlackHoleScene {
     
     // LAYER 1: Glow halo
     const haloGradient = ctx.createRadialGradient(ringX, ringY, radius * 0.7, ringX, ringY, radius * 1.3);
-    haloGradient.addColorStop(0, 'rgba(100, 180, 255, 0.2)');
-    haloGradient.addColorStop(0.5, 'rgba(100, 150, 255, 0.08)');
+    haloGradient.addColorStop(0, `rgba(100, 180, 255, ${0.2 * journeyLensing})`);
+    haloGradient.addColorStop(0.5, `rgba(100, 150, 255, ${0.08 * journeyLensing})`);
     haloGradient.addColorStop(1, 'rgba(80, 120, 255, 0)');
     
     ctx.fillStyle = haloGradient;
@@ -514,8 +538,8 @@ class BlackHoleScene {
     ctx.restore();
     
     // LAYER 2: Main photon sphere ring (bright, always visible)
-    ctx.strokeStyle = `rgba(120, 180, 255, ${0.5 + 0.15 * Math.sin(performance.now() * 0.003)})`;
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = `rgba(120, 180, 255, ${(0.5 + 0.15 * Math.sin(performance.now() * 0.003)) * journeyLensing})`;
+    ctx.lineWidth = focusMode === 'photon-sphere' ? 4 : 3;
     ctx.save();
     if (kerrVisual.isKerr) {
       ctx.translate(x, y);
@@ -590,7 +614,8 @@ class BlackHoleScene {
 
     const effectsLevel = qualitySettings.effectsMultiplier ?? 1;
     const nearStrength = Math.max(0.2, Math.min(1.1, 1.2 - this.state.r_normalized / 12));
-    const photonBlend = Math.max(0.1, Math.min(1, effectsLevel * nearStrength));
+    const journeyLensing = this.journeyVisualProfile?.lensingIntensity ?? 1;
+    const photonBlend = Math.max(0.1, Math.min(1.25, effectsLevel * nearStrength * journeyLensing));
     const spin = kerrVisual.isKerr ? kerrVisual.spin : 0;
     const fieldOuter = photonRadius * (2.1 + 0.6 * effectsLevel);
 
