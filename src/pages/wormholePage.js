@@ -21,6 +21,7 @@ import SimulationRecorder from '../core/simulationRecorder.js';
 import { TimelineRenderer } from '../ui/timelineRenderer.js';
 import { ObserverFrame } from '../core/observerFrames.js';
 import ExperimentsLab from '../ui/experimentsLab.js';
+import MissionScenarios from '../ui/missionScenarios.js';
 
 auth.requireLogin();
 
@@ -412,6 +413,91 @@ function applyViewMode(mode) {
 btnViewExterior?.addEventListener('click', () => applyViewMode('exterior'));
 btnViewInterior?.addEventListener('click', () => applyViewMode('interior'));
 applyViewMode(wormholeScene.getViewMode());
+
+function refreshWormholeStateForHUD() {
+  const rawState = wormholeScene.getState();
+  const safeState = sanitizeState(
+    {
+      ...rawState,
+      r0: wormholeScene.physics.r0,
+      distanceRatio: rawState.r_normalized
+    },
+    'wormhole'
+  );
+  const state = { ...rawState, ...safeState, r_normalized: safeState.distanceRatio ?? rawState.r_normalized };
+  wormholeScene.state = state;
+  updateWormholeHUD(state);
+  scientificMode.updateState(state);
+}
+
+function applyWormholeScenarioDistance(distance) {
+  const slider = document.getElementById('slider-distance');
+  const nextDistance = Number(distance);
+  if (!Number.isFinite(nextDistance)) {
+    return;
+  }
+
+  if (slider) {
+    const min = parseFloat(slider.min || '0.5');
+    const max = parseFloat(slider.max || '5');
+    const clamped = Math.min(max, Math.max(min, nextDistance));
+    slider.value = clamped.toFixed(2);
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+    return;
+  }
+
+  wormholeScene.setDistance(nextDistance);
+  refreshWormholeStateForHUD();
+}
+
+function setWormholeScientificMode(isEnabled) {
+  const active = Boolean(isEnabled);
+  scientificMode.setActive(active);
+  btnScientific?.classList.toggle('active', active);
+  localStorage.setItem('scientificMode', active ? 'on' : 'off');
+}
+
+function applyWormholeScenarioPreset(preset = {}) {
+  if (preset.viewMode) {
+    applyViewMode(preset.viewMode);
+  }
+
+  if (preset.qualityMode) {
+    applyQualityMode(preset.qualityMode, false);
+  }
+
+  if (Number.isFinite(preset.distance)) {
+    applyWormholeScenarioDistance(preset.distance);
+  }
+
+  if (preset.resetCamera) {
+    wormholeScene.resetCamera();
+  }
+
+  if (typeof preset.scientificMode === 'boolean') {
+    setWormholeScientificMode(preset.scientificMode);
+  }
+
+  refreshWormholeStateForHUD();
+}
+
+const btnMissions = document.getElementById('btn-missions');
+const missionScenarios = new MissionScenarios('wormhole', {
+  onApplyScenario: (scenario) => {
+    applyWormholeScenarioPreset(scenario.preset || {});
+  },
+  onManualReset: () => {
+    refreshWormholeStateForHUD();
+  },
+  onVisibilityChange: (isVisible) => {
+    btnMissions?.classList.toggle('active', isVisible);
+  }
+});
+missionScenarios.init();
+
+btnMissions?.addEventListener('click', () => {
+  missionScenarios.toggle();
+});
 
 function updateWormholeHUD(state) {
   const distanceEl = document.getElementById('value-distance');

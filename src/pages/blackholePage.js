@@ -21,6 +21,7 @@ import SimulationRecorder from '../core/simulationRecorder.js';
 import { TimelineRenderer } from '../ui/timelineRenderer.js';
 import { ObserverFrame } from '../core/observerFrames.js';
 import ExperimentsLab from '../ui/experimentsLab.js';
+import MissionScenarios from '../ui/missionScenarios.js';
 
 auth.requireLogin();
 
@@ -432,6 +433,100 @@ if (btnExperiments) {
     experimentsLab.show();
   });
 }
+
+function refreshBlackHoleStateForHUD() {
+  const rawState = blackHoleScene.getState();
+  const state = sanitizeState(
+    {
+      ...rawState,
+      rs: blackHoleScene.physics.r_s,
+      tidal: rawState.tidalForce
+    },
+    'blackhole'
+  );
+  blackHoleScene.state = { ...rawState, ...state, tidalForce: state.tidal };
+  hud.setData(blackHoleScene.state);
+  scientificMode.updateState(blackHoleScene.state);
+}
+
+function applyBlackHoleScenarioDistance(distance) {
+  const slider = document.getElementById('slider-distance');
+  const nextDistance = Number(distance);
+  if (!Number.isFinite(nextDistance)) {
+    return;
+  }
+
+  if (slider) {
+    const min = parseFloat(slider.min || '1.02');
+    const max = parseFloat(slider.max || '50');
+    const clamped = Math.min(max, Math.max(min, nextDistance));
+    slider.value = clamped.toFixed(2);
+    slider.dispatchEvent(new Event('input', { bubbles: true }));
+    return;
+  }
+
+  blackHoleScene.setDistance(nextDistance);
+  refreshBlackHoleStateForHUD();
+}
+
+function setBlackHoleScientificMode(isEnabled) {
+  const active = Boolean(isEnabled);
+  scientificMode.setActive(active);
+  btnScientific?.classList.toggle('active', active);
+  localStorage.setItem('scientificMode', active ? 'on' : 'off');
+}
+
+function applyBlackHoleScenarioPreset(preset = {}) {
+  if (preset.blackHoleModel) {
+    blackHoleScene.setBlackHoleModel(preset.blackHoleModel);
+    applyBlackHoleModelUI(preset.blackHoleModel);
+  }
+
+  if (Number.isFinite(preset.spinParameter)) {
+    blackHoleScene.setSpinParameter(preset.spinParameter);
+    if (sliderSpin && sliderValueSpin) {
+      sliderSpin.value = Number(preset.spinParameter).toFixed(2);
+      sliderValueSpin.textContent = Number(preset.spinParameter).toFixed(2);
+    }
+  }
+
+  if (preset.observationMode) {
+    blackHoleScene.setObservationMode(preset.observationMode);
+    applyObservationModeUI(preset.observationMode);
+  }
+
+  if (Number.isFinite(preset.distance)) {
+    applyBlackHoleScenarioDistance(preset.distance);
+  }
+
+  if (preset.resetCamera) {
+    blackHoleScene.resetCamera();
+  }
+
+  if (typeof preset.scientificMode === 'boolean') {
+    setBlackHoleScientificMode(preset.scientificMode);
+  }
+
+  refreshBlackHoleStateForHUD();
+}
+
+const btnMissions = document.getElementById('btn-missions');
+const missionScenarios = new MissionScenarios('blackhole', {
+  onApplyScenario: (scenario) => {
+    applyBlackHoleScenarioPreset(scenario.preset || {});
+  },
+  onManualReset: () => {
+    refreshBlackHoleStateForHUD();
+  },
+  onVisibilityChange: (isVisible) => {
+    btnMissions?.classList.toggle('active', isVisible);
+  }
+});
+missionScenarios.init();
+
+btnMissions?.addEventListener('click', () => {
+  missionScenarios.toggle();
+});
 
 const controls = new Controls(
   (distance) => {
