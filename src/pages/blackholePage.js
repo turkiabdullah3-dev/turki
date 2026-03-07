@@ -450,3 +450,48 @@ animate(0);
 
 // Setup page load fade-in transition
 navigationHelper.setupPageLoadFadeIn();
+
+// Setup intro fly-in effect on first load
+const INTRO_FLY_IN_KEY = 'blackhole-intro-flyIn-done';
+if (!localStorage.getItem(INTRO_FLY_IN_KEY)) {
+  localStorage.setItem(INTRO_FLY_IN_KEY, 'true');
+  
+  // Start with camera far away
+  const cameraController = blackHoleScene.getCameraController();
+  if (cameraController) {
+    const defaultDistance = cameraController.defaultDistance;
+    const startDistance = defaultDistance * 3;
+    
+    // Set initial camera position
+    cameraController.distance = startDistance;
+    cameraController.targetDistance = startDistance;
+    
+    // Animate camera flying in
+    navigationHelper.getTransitionManager().introFlyIn(
+      startDistance,
+      defaultDistance,
+      2000,
+      (distance) => {
+        if (cameraController) {
+          cameraController.distance = distance;
+          cameraController.targetDistance = distance;
+        }
+      },
+      () => {
+        // After fly-in, stagger fade-in HUD elements
+        const hudElements = [
+          document.querySelector('.header'),
+          document.querySelector('.dock-panel'),
+          document.querySelector('.hud-data')
+        ];
+        
+        navigationHelper.getTransitionManager().staggerElements(
+          hudElements.filter(el => el),
+          'fade',
+          100,
+          400
+        );
+      }
+    );
+  }
+}
