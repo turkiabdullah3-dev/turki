@@ -20,6 +20,7 @@ import navigationHelper from '../ui/navigationHelper.js';
 import SimulationRecorder from '../core/simulationRecorder.js';
 import { TimelineRenderer } from '../ui/timelineRenderer.js';
 import { ObserverFrame } from '../core/observerFrames.js';
+import ExperimentsLab from '../ui/experimentsLab.js';
 
 auth.requireLogin();
 
@@ -420,6 +421,18 @@ if (btnScientific) {
 const guidedJourney = new GuidedJourney('blackhole');
 guidedJourney.init();
 
+// Initialize experiments lab
+const experimentsLab = new ExperimentsLab('blackhole', blackHoleScene.physics, blackHoleScene);
+experimentsLab.init();
+
+// Experiments button
+const btnExperiments = document.getElementById('btn-experiments');
+if (btnExperiments) {
+  btnExperiments.addEventListener('click', () => {
+    experimentsLab.show();
+  });
+}
+
 const controls = new Controls(
   (distance) => {
     blackHoleScene.setDistance(distance);
@@ -502,6 +515,9 @@ function animate(time) {
   
   // Update observer frame
   currentObserverFrame.update(0.016, blackHoleScene.state);
+  
+  // Update experiments lab
+  experimentsLab.update(0.016);
   
   // Update guided journey (if active)
   if (guidedJourney.isJourneyActive()) {

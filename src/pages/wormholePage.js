@@ -20,6 +20,7 @@ import navigationHelper from '../ui/navigationHelper.js';
 import SimulationRecorder from '../core/simulationRecorder.js';
 import { TimelineRenderer } from '../ui/timelineRenderer.js';
 import { ObserverFrame } from '../core/observerFrames.js';
+import ExperimentsLab from '../ui/experimentsLab.js';
 
 auth.requireLogin();
 
@@ -246,6 +247,18 @@ if (btnScientific) {
 const guidedJourney = new GuidedJourney('wormhole');
 guidedJourney.init();
 
+// Initialize experiments lab
+const experimentsLab = new ExperimentsLab('wormhole', wormholeScene.physics, wormholeScene);
+experimentsLab.init();
+
+// Experiments button
+const btnExperiments = document.getElementById('btn-experiments');
+if (btnExperiments) {
+  btnExperiments.addEventListener('click', () => {
+    experimentsLab.show();
+  });
+}
+
 const QUALITY_KEY = 'qualityMode';
 const isTouchIPad = /Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document;
 const isMobileOrTablet = perf.isMobileOrTablet() || isTouchIPad;
@@ -457,6 +470,9 @@ function animate(time) {
   
   // Update observer frame
   currentObserverFrame.update(0.016, wormholeScene.state);
+  
+  // Update experiments lab
+  experimentsLab.update(0.016);
   
   // Update guided journey (if active)
   if (guidedJourney.isJourneyActive()) {
