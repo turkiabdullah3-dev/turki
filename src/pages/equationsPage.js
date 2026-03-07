@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('btn-home')?.addEventListener('click', () => {
-  navigationHelper.navigateWithTransition('./home.html');
+  navigationHelper.navigateWithTransition('./observatory.html');
 });
 
 // Setup page load fade-in transition

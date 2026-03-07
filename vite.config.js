@@ -9,6 +9,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         login: 'login.html',
+        observatory: 'observatory.html',
         home: 'home.html',
         blackhole: 'blackhole.html',
         wormhole: 'wormhole.html',

@@ -291,6 +291,202 @@ html, body {
   pointer-events: none;
 }
 
+/* Observatory Navigation Hub */
+.observatory-page {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(90, 130, 255, 0.14), transparent 48%),
+    radial-gradient(circle at 72% 80%, rgba(210, 110, 255, 0.1), transparent 48%),
+    #04050c;
+  overflow: hidden;
+}
+
+.observatory-shell {
+  position: relative;
+  z-index: 2;
+  width: min(1100px, 94vw);
+  height: min(760px, 90vh);
+  margin: 5vh auto 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 20px;
+}
+
+.observatory-header {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.observatory-title {
+  font-size: clamp(34px, 4.2vw, 54px);
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.observatory-subtitle {
+  margin-top: 10px;
+  color: rgba(220, 230, 255, 0.72);
+  font-size: clamp(13px, 1.2vw, 16px);
+}
+
+.observatory-map {
+  position: relative;
+  border: 1px solid rgba(120, 160, 255, 0.16);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(12, 20, 44, 0.4), rgba(10, 8, 22, 0.56));
+  backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 0 46px rgba(94, 140, 255, 0.11),
+    0 20px 40px rgba(0, 0, 0, 0.38);
+}
+
+.observatory-node {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%) scale(0.94);
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    transform 0.25s ease,
+    opacity 0.55s ease,
+    filter 0.25s ease;
+  transition-delay: var(--delay);
+}
+
+.node-marker {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), hsla(var(--hue), 100%, 70%, 0.82) 45%, hsla(var(--hue), 100%, 55%, 0.46) 70%, transparent 100%);
+  box-shadow:
+    0 0 12px hsla(var(--hue), 100%, 70%, 0.8),
+    0 0 28px hsla(var(--hue), 100%, 65%, 0.54),
+    inset 0 0 9px rgba(255, 255, 255, 0.85);
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.node-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: rgba(235, 242, 255, 0.95);
+  border: 1px solid rgba(150, 185, 255, 0.34);
+  background: rgba(8, 14, 38, 0.88);
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+
+.observatory-node:hover,
+.observatory-node:focus-visible {
+  transform: translate(-50%, -50%) scale(1.06);
+  filter: brightness(1.08);
+}
+
+.observatory-node:hover .node-marker,
+.observatory-node:focus-visible .node-marker {
+  transform: scale(1.15);
+  box-shadow:
+    0 0 16px hsla(var(--hue), 100%, 72%, 0.98),
+    0 0 38px hsla(var(--hue), 100%, 65%, 0.72),
+    inset 0 0 12px rgba(255, 255, 255, 0.95);
+}
+
+.observatory-node:hover .node-label,
+.observatory-node:focus-visible .node-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.observatory-node:focus-visible {
+  outline: none;
+}
+
+.observatory-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.observatory-stars {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.observatory-star {
+  position: absolute;
+  width: var(--size, 2px);
+  height: var(--size, 2px);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: var(--delay, 0s);
+  animation: observatoryTwinkle var(--twinkle, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.entry-ready .observatory-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.entry-ready .observatory-node {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.entry-ready .observatory-star {
+  opacity: 0.85;
+  transform: scale(1);
+}
+
+@keyframes observatoryTwinkle {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 720px) {
+  .observatory-shell {
+    margin-top: 3vh;
+    height: min(700px, 92vh);
+    gap: 14px;
+  }
+
+  .observatory-map {
+    border-radius: 16px;
+  }
+
+  .node-marker {
+    width: 20px;
+    height: 20px;
+  }
+
+  .node-label {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
 /* Intro presentation layer */
 .intro-overlay {
   position: fixed;

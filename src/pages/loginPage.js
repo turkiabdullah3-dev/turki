@@ -54,7 +54,7 @@ function updateLockoutUI() {
 }
 
 if (auth.isLoggedIn()) {
-  window.location.href = './home.html';
+  window.location.href = './observatory.html';
 }
 
 updateLockoutUI();
@@ -80,7 +80,7 @@ form.addEventListener('submit', async (event) => {
   const success = await auth.login(username, password);
   if (success) {
     auth.resetLoginLockState();
-    window.location.href = './home.html';
+    window.location.href = './observatory.html';
     return;
   }
 

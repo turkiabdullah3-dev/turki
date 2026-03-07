@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <title>Spacetime Observatory</title>
+</head>
+<body class="observatory-page">
+  <div class="observatory-stars" id="observatory-stars" aria-hidden="true"></div>
+
+  <main class="observatory-shell" aria-label="Observatory Navigation Hub">
+    <header class="observatory-header">
+      <h1 class="observatory-title">Spacetime Observatory</h1>
+      <p class="observatory-subtitle">Choose a destination to continue your journey through spacetime.</p>
+    </header>
+
+    <section class="observatory-map" aria-label="Simulation Destinations">
+      <button class="observatory-node" type="button" data-target="./blackhole.html" style="--x: 18%; --y: 38%; --hue: 222; --delay: 0ms;">
+        <span class="node-marker" aria-hidden="true"></span>
+        <span class="node-label">Black Hole Simulation</span>
+      </button>
+
+      <button class="observatory-node" type="button" data-target="./wormhole.html" style="--x: 78%; --y: 35%; --hue: 270; --delay: 100ms;">
+        <span class="node-marker" aria-hidden="true"></span>
+        <span class="node-label">Wormhole Geometry</span>
+      </button>
+
+      <button class="observatory-node" type="button" data-target="./blackhole.html?panel=experiments" style="--x: 34%; --y: 72%; --hue: 186; --delay: 200ms;">
+        <span class="node-marker" aria-hidden="true"></span>
+        <span class="node-label">Physics Experiments</span>
+      </button>
+
+      <button class="observatory-node" type="button" data-target="./wormhole.html?panel=missions" style="--x: 66%; --y: 72%; --hue: 318; --delay: 300ms;">
+        <span class="node-marker" aria-hidden="true"></span>
+        <span class="node-label">Mission Scenarios</span>
+      </button>
+    </section>
+
+    <div class="observatory-actions">
+      <button class="glass-btn" id="btn-equations" type="button">📊 Equations Reference</button>
+      <button class="glass-btn" id="btn-about" type="button">ℹ️ About & Rights</button>
+      <button class="glass-btn" id="btn-logout" type="button">Logout</button>
+    </div>
+  </main>
+
+  <div class="footer">
+    <p>© 2026 Turki Abdullah & Mashael Abdullah</p>
+    <p>All Rights Reserved</p>
+  </div>
+
+  <script type="module" src="./src/pages/observatoryPage.js"></script>
+</body>
+</html>

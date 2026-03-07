@@ -52,7 +52,7 @@ function setupDockTabs() {
 setupDockTabs();
 
 document.getElementById('btn-home')?.addEventListener('click', () => {
-  navigationHelper.navigateWithTransition('./home.html');
+  navigationHelper.navigateWithTransition('./observatory.html');
 });
 
 document.getElementById('btn-equations-header')?.addEventListener('click', () => {
@@ -599,6 +599,17 @@ missionScenarios.init();
 btnMissions?.addEventListener('click', () => {
   missionScenarios.toggle();
 });
+
+function applyInitialPanelFromQuery() {
+  const panel = new URLSearchParams(window.location.search).get('panel');
+  if (panel === 'experiments') {
+    experimentsLab.show();
+  } else if (panel === 'missions') {
+    missionScenarios.show();
+  }
+}
+
+applyInitialPanelFromQuery();
 
 const btnPresentation = document.getElementById('btn-presentation');
 const presentationMode = new PresentationMode('wormhole', {
