@@ -358,19 +358,112 @@ controls.init('wormhole');
 
 // Journey button
 const btnJourneyStart = document.getElementById('btn-journey-start');
+let journeyPreviousViewMode = null;
+let activeWormholeJourneyProfile = {
+  viewMode: null,
+  qualityMode: null,
+  postFxBloom: 0.3,
+  postFxVignette: 0.2
+};
+let currentJourneyPostFx = {
+  bloom: 0.3,
+  vignette: 0.2
+};
+
+function getWormholeJourneyVisualProfile(stageInfo) {
+  const stage = stageInfo?.stage || 1;
+  const profiles = {
+    1: {
+      viewMode: 'exterior',
+      qualityMode: 'glow',
+      postFxBloom: 0.28,
+      postFxVignette: 0.18
+    },
+    2: {
+      viewMode: 'exterior',
+      qualityMode: 'glow',
+      postFxBloom: 0.34,
+      postFxVignette: 0.2
+    },
+    3: {
+      viewMode: 'interior',
+      qualityMode: 'glow',
+      postFxBloom: 0.4,
+      postFxVignette: 0.24
+    },
+    4: {
+      viewMode: 'interior',
+      qualityMode: 'glow',
+      postFxBloom: 0.46,
+      postFxVignette: 0.27
+    }
+  };
+
+  return profiles[stage] || profiles[1];
+}
+
+function syncJourneyButton(isActive, stageInfo = null) {
+  if (!btnJourneyStart) {
+    return;
+  }
+
+  btnJourneyStart.classList.toggle('active', isActive);
+  btnJourneyStart.textContent = isActive ? 'Exit Journey' : 'Start Journey';
+  const stageLabel = isActive && stageInfo
+    ? `Journey active • Stage ${stageInfo.stage}/${stageInfo.totalStages}: ${stageInfo.title}`
+    : 'Launch guided multi-stage exploration';
+  btnJourneyStart.title = stageLabel;
+  btnJourneyStart.setAttribute('aria-label', stageLabel);
+}
+
+guidedJourney.onActiveChange((isActive) => {
+  if (isActive) {
+    journeyPreviousViewMode = wormholeScene.getViewMode();
+    return;
+  }
+
+  if (journeyPreviousViewMode) {
+    applyViewMode(journeyPreviousViewMode);
+  }
+
+  activeWormholeJourneyProfile = {
+    viewMode: null,
+    qualityMode: null,
+    postFxBloom: 0.3,
+    postFxVignette: 0.2
+  };
+
+  syncJourneyButton(false);
+});
+
+guidedJourney.onStageChange((stageInfo) => {
+  activeWormholeJourneyProfile = getWormholeJourneyVisualProfile(stageInfo);
+
+  if (activeWormholeJourneyProfile.viewMode) {
+    applyViewMode(activeWormholeJourneyProfile.viewMode);
+  }
+
+  if (activeWormholeJourneyProfile.qualityMode) {
+    applyQualityMode(activeWormholeJourneyProfile.qualityMode, false);
+  }
+
+  syncJourneyButton(true, stageInfo);
+});
+
 if (btnJourneyStart) {
   btnJourneyStart.addEventListener('click', () => {
     if (guidedJourney.isJourneyActive()) {
       guidedJourney.exit();
-      btnJourneyStart.textContent = '🎬 Start Journey';
-      btnJourneyStart.classList.remove('active');
+      syncJourneyButton(false);
     } else {
       guidedJourney.start(controls.getDistance());
-      btnJourneyStart.textContent = '✕ Exit Journey';
-      btnJourneyStart.classList.add('active');
+      const stage = guidedJourney.getCurrentStage();
+      syncJourneyButton(true, stage ? { ...stage, totalStages: guidedJourney.stages.length } : null);
     }
   });
 }
+
+syncJourneyButton(false);
 
 // Camera reset button
 const btnResetCamera = document.getElementById('btn-reset-camera');
@@ -630,7 +723,10 @@ function animate(time) {
   spaceBackground.render(time);
   wormholeScene.render(time);
   spaceBackground.renderNebula();
-  postFX.apply(0.3, 0.2);
+  const lerp = 0.075;
+  currentJourneyPostFx.bloom += (activeWormholeJourneyProfile.postFxBloom - currentJourneyPostFx.bloom) * lerp;
+  currentJourneyPostFx.vignette += (activeWormholeJourneyProfile.postFxVignette - currentJourneyPostFx.vignette) * lerp;
+  postFX.apply(currentJourneyPostFx.bloom, currentJourneyPostFx.vignette);
 
   // Update simulation recorder with observer frame redshift modification
   const deltaTime = 0.016; // ~60 FPS
