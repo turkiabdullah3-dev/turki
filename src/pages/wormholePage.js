@@ -17,6 +17,8 @@ import UnitsConverter, { UnitMode } from '../core/unitsConverter.js';
 import { sanitize } from '../core/sanitize.js';
 import { sanitizeState } from '../physics/safety.js';
 import navigationHelper from '../ui/navigationHelper.js';
+import SimulationRecorder from '../core/simulationRecorder.js';
+import { TimelineRenderer } from '../ui/timelineRenderer.js';
 
 auth.requireLogin();
 
@@ -92,6 +94,52 @@ wormholeScene.setPerformanceMonitor(performanceMonitor);
 
 spaceBackground.init();
 wormholeScene.init();
+
+// Initialize simulation recorder and timeline renderer
+const simulationRecorder = new SimulationRecorder(500); // Record every 500ms
+const timelineRenderer = new TimelineRenderer();
+
+// Timeline panel setup
+const timelinePanel = document.getElementById('timeline-panel');
+const timelineCanvas = document.getElementById('timeline-canvas');
+const timelineCtx = timelineCanvas ? timelineCanvas.getContext('2d') : null;
+let currentGraphType = 'distance';
+
+// Timeline button
+document.getElementById('btn-timeline')?.addEventListener('click', () => {
+  if (timelinePanel) {
+    timelinePanel.style.display = timelinePanel.style.display === 'none' ? 'block' : 'none';
+  }
+});
+
+// Graph tab switching
+document.querySelectorAll('.graph-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.graph-tab').forEach((t) => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentGraphType = tab.getAttribute('data-graph');
+  });
+});
+
+// Reset timeline button
+document.getElementById('btn-timeline-reset')?.addEventListener('click', () => {
+  simulationRecorder.resetTimeline();
+});
+
+// Toggle timeline button text
+document.getElementById('btn-timeline-toggle')?.addEventListener('click', (e) => {
+  const canvas = document.getElementById('timeline-canvas');
+  const info = document.getElementById('timeline-info');
+  if (canvas.style.display === 'none') {
+    canvas.style.display = 'block';
+    if (info) info.style.display = 'block';
+    e.target.textContent = 'Hide';
+  } else {
+    canvas.style.display = 'none';
+    if (info) info.style.display = 'none';
+    e.target.textContent = 'Show';
+  }
+});
 
 const hud = new HUD();
 hud.init();
@@ -412,6 +460,48 @@ function animate(time) {
   wormholeScene.render(time);
   spaceBackground.renderNebula();
   postFX.apply(0.3, 0.2);
+
+  // Update simulation recorder
+  const deltaTime = 0.016; // ~60 FPS
+  const stateForRecorder = {
+    ...wormholeScene.state,
+    distance: wormholeScene.state?.distance || 10,
+    alpha: wormholeScene.state?.alpha !== undefined ? wormholeScene.state.alpha : 1.0,
+    redshift: wormholeScene.state?.redshift !== undefined ? wormholeScene.state.redshift : 0,
+    tidalForce: wormholeScene.state?.tidalForce || 0,
+    warpStrength: wormholeScene.state?.warpStrength || 0,
+    throatRadius: wormholeScene.physics.r0 || 5,
+    isWormhole: true
+  };
+  simulationRecorder.update(deltaTime, stateForRecorder);
+
+  // Render timeline if visible
+  if (timelinePanel && timelinePanel.style.display !== 'none' && timelineCtx) {
+    const mapProperty = {
+      distance: 'distance',
+      warpStrength: 'warpStrength',
+      alpha: 'alpha'
+    }[currentGraphType] || 'distance';
+
+    const range = simulationRecorder.getPropertyRange(mapProperty);
+    timelineRenderer.renderLineGraph(
+      timelineCtx,
+      timelineCanvas.width,
+      timelineCanvas.height,
+      simulationRecorder.getDataPoints(),
+      'timestamp',
+      mapProperty,
+      currentGraphType.charAt(0).toUpperCase() + currentGraphType.slice(1),
+      simulationRecorder.getEventMarkers(),
+      range
+    );
+
+    // Update data point count
+    const pointCountEl = document.getElementById('timeline-point-count');
+    if (pointCountEl) {
+      pointCountEl.textContent = simulationRecorder.getDataPointCount();
+    }
+  }
 
   hud.updateFPS();
 

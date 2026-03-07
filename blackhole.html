@@ -32,6 +32,7 @@
       <div style="display: flex; gap: 10px;">
         <button class="btn-journey" id="btn-journey-start" type="button">🎬 Start Journey</button>
         <button class="btn-scientific" id="btn-scientific" type="button">Scientific Mode</button>
+        <button class="btn-timeline" id="btn-timeline" type="button">📈 Timeline</button>
       </div>
     </div>
     
@@ -211,6 +212,30 @@
           </div>
         </div>
       </section>
+    </div>
+
+    <!-- Timeline Panel -->
+    <div class="timeline-panel glass-panel" id="timeline-panel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 16px;">📈 Simulation Timeline</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="glass-btn" id="btn-timeline-toggle" type="button" style="font-size: 11px; padding: 4px 8px;">Hide</button>
+          <button class="glass-btn" id="btn-timeline-reset" type="button" style="font-size: 11px; padding: 4px 8px;">Reset</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 12px; overflow-x: auto;">
+        <button class="glass-btn graph-tab active" type="button" data-graph="redshift" style="flex-shrink: 0;">Redshift</button>
+        <button class="glass-btn graph-tab" type="button" data-graph="distance" style="flex-shrink: 0;">Distance</button>
+        <button class="glass-btn graph-tab" type="button" data-graph="alpha" style="flex-shrink: 0;">Time Dilation</button>
+        <button class="glass-btn graph-tab" type="button" data-graph="tidal" style="flex-shrink: 0;">Tidal Force</button>
+      </div>
+
+      <canvas id="timeline-canvas" width="400" height="200" style="width: 100%; height: auto; border: 1px solid rgba(100, 150, 255, 0.3); border-radius: 4px; background: rgba(20, 40, 80, 0.4);"></canvas>
+
+      <div id="timeline-info" style="font-size: 11px; color: rgba(150, 200, 255, 0.7); margin-top: 8px;">
+        <p>Data points: <span id="timeline-point-count">0</span> / 300</p>
+      </div>
     </div>
   </div>
   
