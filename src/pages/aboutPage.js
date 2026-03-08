@@ -1,7 +1,4 @@
 // © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved
-import '../../styles/app.css';
-import '../../styles/glass.css';
-
 import auth from '../core/auth.js';
 import navigationHelper from '../ui/navigationHelper.js';
 

@@ -1,7 +1,4 @@
 // © 2026 Turki Abdullah & Mashael Abdullah. All Rights Reserved
-import '../../styles/app.css';
-import '../../styles/glass.css';
-
 import auth from '../core/auth.js';
 import CanvasRoot from '../render/canvasRoot.js';
 import SpaceBackground from '../render/spaceBackground.js';
