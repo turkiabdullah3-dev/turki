@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: spacetime-observatory
+    env: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false

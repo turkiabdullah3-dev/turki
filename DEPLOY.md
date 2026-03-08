@@ -172,6 +172,31 @@ Vercel will:
 
 ---
 
+## Render Static Site (Important)
+
+If Render serves raw HTML without styles/scripts, it usually means it is publishing the repository root instead of the built `dist/` output.
+
+Use these settings in Render:
+
+- **Environment**: `Static Site`
+- **Build Command**: `npm ci && npm run build`
+- **Publish Directory**: `dist`
+
+This repository also includes `render.yaml` with the same configuration:
+
+```yaml
+services:
+   - type: web
+      name: spacetime-observatory
+      env: static
+      buildCommand: npm ci && npm run build
+      staticPublishPath: dist
+```
+
+After updating settings, trigger **Manual Deploy → Clear build cache & deploy**.
+
+---
+
 ## Troubleshooting
 
 ### Build fails
