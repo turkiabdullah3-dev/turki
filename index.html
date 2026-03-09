@@ -11,25 +11,56 @@
   <link rel="stylesheet" href="./styles/app.css">
   <link rel="stylesheet" href="./styles/glass.css">
 </head>
-<body style="min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#000;">
-  <main style="width:100%; max-width:480px; margin:auto;">
-    <section class="glass-panel" style="margin-top:48px; text-align:center;">
-      <h1 style="font-size:2.4rem; font-weight:700; color:var(--text-primary); letter-spacing:0.04em;">Turki Abdullah</h1>
-      <h2 style="font-size:1.2rem; font-weight:400; color:var(--text-secondary); margin-bottom:32px;">Technology & Research Projects</h2>
-      <div class="glass-panel" style="margin:0 auto 32px auto; padding:18px 16px; text-align:left;">
-        <h3 style="font-size:1.1rem; font-weight:600; color:var(--text-primary); margin-bottom:8px;">Spacetime Observatory</h3>
-        <p style="color:var(--text-secondary); font-size:1rem; margin-bottom:12px;">Interactive black hole and wormhole spacetime visualization</p>
-        <ul style="list-style:none; padding:0; margin-bottom:16px;">
-          <li><strong>Project Lead:</strong> <span style="color:var(--text-primary);">Turki Abdullah</span></li>
-          <li><strong>Collaboration:</strong> <span style="color:var(--text-secondary);">Mashael Abdullah</span></li>
-          <li><strong>Field:</strong> <span style="color:var(--text-secondary);">Physics Visualization / Simulation</span></li>
-        </ul>
-        <a href="./login.html" style="display:inline-block; padding:10px 28px; border-radius:8px; background:linear-gradient(90deg, var(--glow-primary), var(--glow-secondary)); color:#fff; font-weight:600; font-size:1rem; text-decoration:none; box-shadow:0 2px 8px var(--glass-shadow); transition:background 0.2s;">Enter Project</a>
+<body style="min-height:100vh; background:#000; display:flex; flex-direction:column;">
+  <!-- HERO SECTION -->
+  <section class="glass-panel" style="max-width:700px; margin:48px auto 0 auto; text-align:center; padding:32px 24px 24px 24px;">
+    <h1 style="font-size:2.6rem; font-weight:700; color:var(--text-primary); letter-spacing:0.04em;">Turki Abdullah</h1>
+    <h2 style="font-size:1.3rem; font-weight:400; color:var(--text-secondary); margin-bottom:18px;">Technology, Cybersecurity & Research Projects</h2>
+    <p style="color:var(--text-secondary); font-size:1.05rem; margin-bottom:28px;">Building technical projects in cybersecurity, physics simulations, and experimental technology. Passionate about research, innovation, and advancing science through interactive tools.</p>
+    <div style="display:flex; justify-content:center; gap:18px; margin-bottom:8px;">
+      <a href="#projects" class="glass-btn" style="font-weight:600;">View Projects</a>
+      <a href="#about" class="glass-btn" style="font-weight:600;">About</a>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="glass-panel" style="max-width:700px; margin:32px auto 0 auto; text-align:center; padding:24px 18px;">
+    <h3 style="font-size:1.2rem; font-weight:600; color:var(--text-primary); margin-bottom:10px;">About</h3>
+    <p style="color:var(--text-secondary); font-size:1rem;">Turki Abdullah is a builder of technical projects in cybersecurity, simulations, and experimental technology. Dedicated to creating innovative tools and research platforms that push the boundaries of science and technology.</p>
+  </section>
+
+  <!-- PROJECTS SECTION -->
+  <section id="projects" class="glass-panel" style="max-width:900px; margin:40px auto 0 auto; padding:32px 18px;">
+    <h3 style="font-size:1.2rem; font-weight:600; color:var(--text-primary); margin-bottom:24px; text-align:center;">Projects</h3>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:24px;">
+      <!-- Physics Project Card -->
+      <div class="glass-card glow-border" style="padding:18px 14px; text-align:left;">
+        <h4 style="font-size:1.1rem; font-weight:600; color:var(--text-primary); margin-bottom:8px;">Physics Project</h4>
+        <p style="color:var(--text-secondary); font-size:1rem; margin-bottom:12px;">Interactive black hole and wormhole spacetime visualization.</p>
+        <p style="color:var(--text-dim); font-size:0.98rem; margin-bottom:16px;">Field: Physics Simulation</p>
+        <a href="./login.html" class="glass-btn" style="font-weight:600;">Open Project</a>
       </div>
-    </section>
-  </main>
-  <footer style="position:fixed; bottom:12px; left:50%; transform:translateX(-50%); text-align:center; font-size:11px; color:var(--text-dim);">
-    <p>© 2026 Turki Abdullah & Mashael Abdullah</p>
+      <!-- Cybersecurity Lab Placeholder -->
+      <div class="glass-card" style="padding:18px 14px; text-align:left; opacity:0.7;">
+        <h4 style="font-size:1.1rem; font-weight:600; color:var(--text-primary); margin-bottom:8px;">Cybersecurity Lab</h4>
+        <p style="color:var(--text-secondary); font-size:1rem; margin-bottom:12px;">Coming soon: cybersecurity experiments and tools.</p>
+      </div>
+      <!-- Network Experiments Placeholder -->
+      <div class="glass-card" style="padding:18px 14px; text-align:left; opacity:0.7;">
+        <h4 style="font-size:1.1rem; font-weight:600; color:var(--text-primary); margin-bottom:8px;">Network Experiments</h4>
+        <p style="color:var(--text-secondary); font-size:1rem; margin-bottom:12px;">Coming soon: network research and simulations.</p>
+      </div>
+      <!-- Future Research Placeholder -->
+      <div class="glass-card" style="padding:18px 14px; text-align:left; opacity:0.7;">
+        <h4 style="font-size:1.1rem; font-weight:600; color:var(--text-primary); margin-bottom:8px;">Future Research</h4>
+        <p style="color:var(--text-secondary); font-size:1rem; margin-bottom:12px;">Coming soon: new experimental projects.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="width:100%; text-align:center; font-size:12px; color:var(--text-dim); margin-top:48px; margin-bottom:12px;">
+    <p>© 2026 Turki Abdullah</p>
     <p>All Rights Reserved</p>
   </footer>
 </body>
